@@ -67,8 +67,10 @@ function Productos() {
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       <br />
 
+
                       {userState.rol === Roles.ADMIN ?
                         <>
+                          {/* <Link to={`/private/${PrivateRoutes.EDIT_PRODUCT}${product._id}`} className="btn btn-warning mt-2"> */}
                           <Link to={`/Productos/edit/${product._id}`} className="btn btn-warning mt-2">
                           Editar
                           </Link>
@@ -78,7 +80,10 @@ function Productos() {
                         <>
                           <CartProduct product={product}/>
                         </>
-                      }
+                    }
+
+
+
                     </div>
                   </div>
                 </div>

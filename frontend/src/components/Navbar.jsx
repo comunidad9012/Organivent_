@@ -7,6 +7,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
+import Logout from "./Logout";
+import { PrivateRoutes } from "../models/routes";
 
 function Navbar() {
     const location = useLocation(); // Obtener la ubicación actual
@@ -52,9 +54,9 @@ function Navbar() {
                             </Link>
                         )}
 
-                        {userState.rol === Roles.ADMIN && location.pathname !== '/Productos/editor' && (
+                        {userState.rol === Roles.ADMIN && location.pathname !== `/private/${PrivateRoutes.CREATE_PRODUCT}` && (
                             <li className="nav-item">
-                                <Link className="nav-link active fancy" aria-current="page" to="/Productos/editor">
+                                <Link className="nav-link active fancy" aria-current="page" to={`/private/${PrivateRoutes.CREATE_PRODUCT}`}>
                                     {/* Añadir producto */}
                                     <span className="top-key"></span>
                                     <span className="text">Añadir producto</span>
@@ -73,11 +75,11 @@ function Navbar() {
                             "¡Hola " + userState.nombre_usuario + "!"
                         )}
 
+                    
                     {/* carrito */}
-                   
 
                     { userState.rol === Roles.USER && (
-                            <Link className="navbar-brand" to="/cart">
+                            <Link className="navbar-brand" to={`/private/${PrivateRoutes.CART}`}>
                             <button className="flex p-2 hover:bg-blue-300 rounded">
                                 <svg
                                 className="icon"
@@ -100,6 +102,8 @@ function Navbar() {
                             </button>
                             </Link>
                         )}
+
+                        <Logout />
 
                     {/* Encontrar la forma de pasar el json a otro componente */}
                 </div>
