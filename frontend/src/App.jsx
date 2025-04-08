@@ -3,7 +3,6 @@
 import { BrowserRouter, Route, Navigate} from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-
 import Navbar from "./components/Navbar";
 import ProductosDetail from './components/ProductosDetail';
 import FormProducto from './components/FormProducto';
