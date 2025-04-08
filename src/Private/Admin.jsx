@@ -2,8 +2,8 @@ import Productos from "../components/Productos"
 
 function Admin() {
   return (
-    <div>Admin
-      <h1>SUPER SECREETOOOO!!</h1>
+    <div>
+      <h1>Usuario ADMIN</h1>
       <Productos/>
     </div>
   )
