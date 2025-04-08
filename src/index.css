@@ -28,6 +28,13 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  
+  justify-content: center; /* Centra en eje X */
+  align-items: center;     /* Centra en eje Y */
+  flex-direction: column;  /* Si querés que los elementos se apilen */
+  text-align: center;
+
+
 }
 
 h1 {

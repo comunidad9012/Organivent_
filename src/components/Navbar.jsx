@@ -64,21 +64,43 @@ function Navbar() {
                             </li>
                         )} 
 
-
-                        { userState.rol === Roles.USER && (
-                            <Link className="navbar-brand fancy" to="/cart">
-                                <span className="top-key"></span>
-                                <span className="text">Carrito</span>
-                                <span className="bottom-key-1"></span>
-                                <span className="bottom-key-2"></span>
-                            </Link>
-                        )}
-
                     </ul>
             
                     <Categorias />
-            
                     <SearchForm />
+
+                    { userState.rol !== null && (
+                            "¡Hola " + userState.nombre_usuario + "!"
+                        )}
+
+                    {/* carrito */}
+                   
+
+                    { userState.rol === Roles.USER && (
+                            <Link className="navbar-brand" to="/cart">
+                            <button className="flex p-2 hover:bg-blue-300 rounded">
+                                <svg
+                                className="icon"
+                                stroke="currentColor"
+                                fill="none"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                height="1em"
+                                width="3em"
+                                xmlns="http://www.w3.org/2000/svg"
+                                >
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path
+                                    d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                                ></path>
+                                </svg>
+                            </button>
+                            </Link>
+                        )}
+
                     {/* Encontrar la forma de pasar el json a otro componente */}
                 </div>
             </div>
