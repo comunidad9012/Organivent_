@@ -22,6 +22,7 @@ function FormProducto() {
   // Cargar datos si es edición
   useEffect(() => {
     if (id) {
+      console.log('Cargando producto con ID:', id);
       fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
         .then(response => response.json())
         .then(data => setProducto(data))

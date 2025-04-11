@@ -23,7 +23,8 @@ function Private() {
         <Route element={<RoleGuard />}>
           <Route path={`${PrivateRoutes.ADMIN}/*`} element={<Admin />} />
           <Route path={PrivateRoutes.CREATE_PRODUCT} element={<FormProducto />} /> 
-          <Route path={PrivateRoutes.EDIT_PRODUCT} element={<FormProducto />} /> 
+          <Route path={`${PrivateRoutes.EDIT_PRODUCT}/:id`} element={<FormProducto />} />
+
         </Route>
 
             {/* ver si es asi la ruta */}
