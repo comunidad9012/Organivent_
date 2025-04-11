@@ -8,7 +8,7 @@ export const PrivateRoutes = {
     PRIVATE: 'private',
     ADMIN : 'admin',
     CREATE_PRODUCT : 'Productos/editor',
-    EDIT_PRODUCT : 'Productos/edit/:id',
+    EDIT_PRODUCT : 'Productos/edit',
     USER : 'homeUser',
     CART : 'cart',
     
@@ -17,4 +17,4 @@ export const PrivateRoutes = {
     // SETTINGS : 'settings'
 }
 
-// localhost:3000/private/user
+// localhost:5173/private/user

@@ -8,6 +8,7 @@ import DeleteProduct from './DeleteProduct.jsx';
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
+import { PrivateRoutes } from '../models/routes.js';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -70,8 +71,8 @@ function Productos() {
 
                       {userState.rol === Roles.ADMIN ?
                         <>
-                          {/* <Link to={`/private/${PrivateRoutes.EDIT_PRODUCT}${product._id}`} className="btn btn-warning mt-2"> */}
-                          <Link to={`/Productos/edit/${product._id}`} className="btn btn-warning mt-2">
+                          {/* <Link to={`/Productos/edit/${product._id}`} className="btn btn-warning mt-2"> */}
+                          <Link to={`/private/${PrivateRoutes.EDIT_PRODUCT}/${product._id}`} className="btn btn-warning mt-2">
                           Editar
                           </Link>
                           <DeleteProduct product={product} setColorMessage={setColorMessage} setProductos={setProductos} setMessage={setMessage}/>
