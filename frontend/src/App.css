@@ -1,3 +1,5 @@
+/* por si me hace falta cuando saque boostrap*/
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -16,6 +18,10 @@
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.App {
+  margin: 100px;
 }
 
 @keyframes logo-spin {

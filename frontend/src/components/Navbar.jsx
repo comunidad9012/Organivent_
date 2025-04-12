@@ -15,8 +15,11 @@ function Navbar() {
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
     
     return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-            <div className="container-fluid">
+        // <nav className="bg-gray-800 text-white px-6 py-3 fixed top-0 left-0 w-full shadow-lg z-50">
+        //     <div className="flex justify-between items-center">
+        
+        <nav className="navbar navbar-expand-lg bg-body-tertiary px-6 py-2 fixed top-0 left-0 w-full shadow-lg z-50 fixed-top">
+            <div className="container-fluid flex justify-between items-center">
             {location.pathname !== '/' && (
                 <Link className="navbar-brand fancy" to="/">
                     {/* Inicio */}
@@ -67,18 +70,26 @@ function Navbar() {
                         )} 
 
                     </ul>
-            
-                    <Categorias />
-                    <SearchForm />
+        
 
                     { userState.rol !== null && (
-                            "¡Hola " + userState.nombre_usuario + "!"
+                        <>
+                        <div className="navbar-nav mb-2 mb-lg-0">
+                            <Categorias />
+                        </div>
+                        <div className="navbar-nav mb-2 mb-lg-0">
+                            <SearchForm />
+                        </div>
+                        <div className="navbar-nav mb-2 mb-lg-0" style={{ margin: "20px" }}>
+                            <p>¡Hola {userState.nombre_usuario}!</p>
+                        </div>
+                        </>
                         )}
 
                     
                     {/* carrito */}
 
-                    { userState.rol === Roles.USER && (
+                    { userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` &&(
                             <Link className="navbar-brand" to={`/private/${PrivateRoutes.CART}`}>
                             <button className="flex p-2 hover:bg-blue-300 rounded">
                                 <svg
@@ -103,7 +114,11 @@ function Navbar() {
                             </Link>
                         )}
 
-                        <Logout />
+                        { userState.rol !== null && (
+                        <div className="navbar-nav mb-2 mb-lg-0">
+                            <Logout />
+                        </div>
+                        )}  
 
                     {/* Encontrar la forma de pasar el json a otro componente */}
                 </div>
