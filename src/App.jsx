@@ -5,7 +5,6 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import Navbar from "./components/Navbar";
 import ProductosDetail from './components/ProductosDetail';
-import FormProducto from './components/FormProducto';
 import CreateClient from './components/CreateClient';
 import { PrivateRoutes, PublicRoutes } from "./models/routes";
 import AuthGuard from "./guards/auth.guard";
@@ -21,7 +20,7 @@ const Private = lazy(() => import('./Private/Private')); //ver si esto de privat
 function App() {  
 
   return (
-    <div className="App">
+    <div className="App" style={{ margin: "100px"}}>
       <Suspense fallback={<>Cargando...Hay que poner spinner</>}> 
         <Provider store={store}>
           <BrowserRouter>
