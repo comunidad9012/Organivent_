@@ -18,16 +18,16 @@ function Navbar() {
         // <nav className="bg-gray-800 text-white px-6 py-3 fixed top-0 left-0 w-full shadow-lg z-50">
         //     <div className="flex justify-between items-center">
         
-        <nav className="navbar navbar-expand-lg bg-body-tertiary px-6 py-2 fixed top-0 left-0 w-full shadow-lg z-50 fixed-top">
+        <nav className="navbar navbar-expand-lg bg-body-tertiary px-4 py-3 fixed top-0 left-0 w-full shadow-lg z-50 fixed-top">
             <div className="container-fluid flex justify-between items-center">
-            {location.pathname !== '/' && (
-                <Link className="navbar-brand fancy" to="/">
-                    {/* Inicio */}
-                    <span className="top-key"></span>
-                    <span className="text">Inicio</span>
-                    <span className="bottom-key-1"></span>
-                    <span className="bottom-key-2"></span>
-                </Link>
+                {location.pathname !== '/' && (
+                    <Link className="navbar-brand fancy" to="/">
+                        {/* Inicio */}
+                        <span className="top-key"></span>
+                        <span className="text">Inicio</span>
+                        <span className="bottom-key-1"></span>
+                        <span className="bottom-key-2"></span>
+                    </Link>
             )}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon" />
