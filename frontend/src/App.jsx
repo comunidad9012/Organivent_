@@ -21,6 +21,7 @@ function App() {
 
   return (
     <div className="App" style={{ margin: "100px"}}>
+      {/* -------SE ME OCURRE HACER UN COMPONENTE SE TENGA EL SPINER PARA PONER ACA EN EL SUSPENSE Y EN DONDE CARGA */}
       <Suspense fallback={<>Cargando...Hay que poner spinner</>}> 
         <Provider store={store}>
           <BrowserRouter>

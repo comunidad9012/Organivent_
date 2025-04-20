@@ -44,10 +44,10 @@ function Categorias() {
           </div> */}
     
           <div className="nav-item dropdown">
-            <a className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href=''> 
+            <a className="nav-link dropdown-toggle text-black" role="button" data-bs-toggle="dropdown" href=''> 
                 {/* le saque el href arriba*/}
                 Categorías
-                {filters.category && <p className="badge bg-secondary">{filters.category}</p>}
+                {filters.category && <p className="badge bg-secondary mx-2">{filters.category}</p>}
 
             </a>
             <ul className="dropdown-menu">
