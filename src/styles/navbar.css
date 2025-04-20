@@ -1,16 +1,21 @@
 /* botones  */
 .fancy {
+    display: inline-flex; /* Esto ayuda a que solo ocupe lo que necesita */
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: flex-start; /* No empuja el contenido tanto */
+
+    /* display: flex;
+    justify-content: space-between; Alinea elementos a los extremos  */
+
     background-color: transparent;
     border: 2px solid #000;
     border-radius: 0;
     box-sizing: border-box;
     color: #fff;
     cursor: pointer;
-    display: flex;
-    justify-content: space-between; /* Alinea elementos a los extremos */
     font-weight: 700;
     letter-spacing: 0.05em;
-    margin: 3; /* Espacio entre botones */
+    margin: 3px; /* Espacio entre botones */
     outline: none;
     padding: 1em 2em;
     position: relative;
