@@ -54,49 +54,12 @@ function Login() {
     };
 
     return (
-        <>
-        {/* -------- Esta parte es la que es de mi sistema y funciona - */}
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                {/* aca falta el label*/}
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={user.username}
-                    onChange={(e) => setUser({...user, username: e.target.value})}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={user.password}
-                    onChange={(e) => setUser({...user, password: e.target.value})}
-                />
-                <button type="submit">Login</button>
-            </form>
-            {error && <p>{error}</p>}
-
-            {/* ver si esto aca queda bien */}
-            <h5>¿No tenes cuenta?</h5>
-            <button onClick={() => navigate('/createClient')}>Registrate</button> 
-        </div>
-        {/* ---------------- */}
-
-
-
-        {/* --------esta es la parte del video que quiero hacer funcionar con la logica del anterior */}
         <div className={`container ${isSignUpMode ? "right-panel-active" : ""}`} id="container">
 
             {/* <div class="container" id="container"> */}
-                <div class="form-container sign-up-container">
+                <div class="form-container sign-up-container align-content-center">
                     <form action="#">
                         <h1>Create Account</h1>
-                        <div class="social-container">
-                            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                        <span>or use your email for registration</span>
                         <div class="infield">
                             <input type="text" placeholder="Name" />
                             <label></label>
@@ -112,15 +75,11 @@ function Login() {
                         <button onClick={() => setIsSignUpMode(true)}>Sign Up</button>
                     </form>
                 </div>
-                <div class="form-container sign-in-container">
+                
+                
+                <div class="form-container sign-in-container align-content-center">
                     <form action="#">
                         <h1>Sign in</h1>
-                        <div class="social-container">
-                            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                        <span>or use your account</span>
                         <div class="infield">
                             <input type="email" placeholder="Email" name="email"/>
                             <label></label>
@@ -151,8 +110,6 @@ function Login() {
                     <button id="overlayBtn"></button>
                 </div>
             </div>
-
-        </>
     );
 }
 

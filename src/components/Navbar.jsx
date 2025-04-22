@@ -15,8 +15,8 @@ function Navbar() {
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
     
     return (
-        <nav className="bg-gray-100 text-white px-6 py-3 fixed top-0 left-0 w-full shadow-lg h-20">
-            <div className="flex justify-between items-center mx-auto">
+        <nav className="bg-gray-100 px-4 py-3 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
+            <div className="flex justify-around items-center mx-auto">
                 
                 {/* Logo */}
                 {/* DEJAR EL INICIO EN CUALQUIER PARTE PORQUE SE SUPONE QUE EL USUARIO PUEDE VER LOS PRODUCTOS SIN NECESIDAD DE LOGUEARSE */}

@@ -48,7 +48,7 @@ function Productos() {
         <title>Productos</title>
       </Helmet>
 
-      <div className="container text-center">
+      <div className="text-center">
       <h1>Productos</h1>
 
         {/* Muestra un mensaje de éxito o error */}
@@ -56,11 +56,12 @@ function Productos() {
 
 
         {Productos.length > 0 ? (
-          <div className="row mx-auto d-flex justify-content-center align-products-center mt-4">
+          // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
+          <div className="row justify-content-center mt-4">
             {Productos.map((product, index) => (
               <Fragment key={product._id}>
-                <div className="col-md-4 mi-clase-css mt-4">
-                  <div className="card h-100" style={{ width: "18rem" }}>
+                <div className="col-md-3 mt-4">
+                  <div className="card h-100">
                     <img src={product.miniatura || "../../imagenes/foto.png"} className="card-img-top" alt="..." />
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{product.nombre_producto}</h5>
