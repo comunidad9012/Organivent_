@@ -88,7 +88,6 @@ function Login() {
                             <input type="password" placeholder="Password" />
                             <label></label>
                         </div>
-                        <a href="#" class="forgot">Forgot your password?</a>
                         <button onClick={() => setIsSignUpMode(false)}>Sign In</button>
 
                     </form>
