@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import Loading from './Loading';
 
 function CreateClient() {
   const [nombre, setNombre] = useState('');
@@ -107,17 +108,7 @@ function CreateClient() {
           )}
         </div>
         {loading && 
-          <div className="banter-loader">
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-            <div className="banter-loader__box"></div>
-          </div>
+          <Loading/>
         }
       </form>
     </div>

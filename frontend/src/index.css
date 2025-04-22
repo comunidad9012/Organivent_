@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 :root {
+
+  --linear-grad: linear-gradient(to right, #141E30, #243B55);
+    --grad-clr1: #141E30;
+    --grad-clr2: #243B55;
+
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -62,6 +68,33 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+
+/* GUARDA CON ESTO (lo veo mas adelante cuando me de la cabeza) -----------------------*/
+/* input {
+  width: 100%;
+  padding: 12px 15px;
+  background-color: #f3f3f3;
+  border: none;
+  outline: none;
+}
+
+label {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translate(-50%);
+  width: 0%;
+  height: 2px;
+  background: var(--linear-grad);
+  transition: 0.3s;
+}
+
+input:focus ~ label {
+  width: 100%;
+} */
+
+/* -------------------------------------- */
 
 @media (prefers-color-scheme: light) {
   :root {

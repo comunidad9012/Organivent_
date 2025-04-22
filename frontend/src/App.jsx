@@ -12,6 +12,7 @@ import RoutesWhitNotFound from "./utilities/routesWhitNotFound.utility";
 import { Suspense, lazy } from "react";
 import { FiltersProvider } from "./components/context/filters";
 import { CartProvider } from "./components/context/CartContext";
+import Loading from "./components/Loading";
 
 const Login = lazy(() => import('./components/Login')); //ver si esto de Login/Login esta bien
 const Private = lazy(() => import('./Private/Private')); //ver si esto de private/Private esta bien minuscula mayuscula
@@ -20,9 +21,9 @@ const Private = lazy(() => import('./Private/Private')); //ver si esto de privat
 function App() {  
 
   return (
-    <div className="App" style={{ margin: "100px"}}>
+    <div className="App" style={{ margin: "120px"}}>
       {/* -------SE ME OCURRE HACER UN COMPONENTE SE TENGA EL SPINER PARA PONER ACA EN EL SUSPENSE Y EN DONDE CARGA */}
-      <Suspense fallback={<>Cargando...Hay que poner spinner</>}> 
+      <Suspense fallback={<Loading/>}> 
         <Provider store={store}>
           <BrowserRouter>
             {/*aca es donde consumimos el contexto de useContext*/}
