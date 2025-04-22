@@ -1,26 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
 * {
     padding: 0px;
     margin: 0px;
     box-sizing: border-box;
 }
 
-:root {
-    --linear-grad: linear-gradient(to right, #141E30, #243B55);
-    --grad-clr1: #141E30;
-    --grad-clr2: #243B55;
-}
-
-body {
-    height: 100vh;
-    background: #f6f5f7;
-    display: grid;
-    place-content: center;
-    font-family: 'Poppins', sans-serif;
-}
-
-.container {
+.containerLogin {
     background-color: #fff;
     border-radius: 13px;
     box-shadow: 25px 30px 55px #5557;
@@ -32,8 +16,8 @@ body {
     /* max-width: 100%;
     min-height: 700px; */
   }
-  
-  .form-container {
+
+  .form-containerLogin {
     position: absolute;
     /* top: 0; */
     width: 60%;
@@ -41,20 +25,20 @@ body {
     padding: 0px 40px;
     transition: all 0.6s ease-in-out;
   }
-  
-  .sign-in-container {
+
+  .sign-in-containerLogin {
     /* left: 0;
     width: 50%; */
     z-index: 2;
   }
-  
-  .sign-up-container {
+
+  .sign-up-containerLogin {
     /* left: 0; */
     /* width: 50%; */
     opacity: 0;
     z-index: 1;
   }
-  
+
 form {
   height: 100%;
   display: flex;
@@ -69,18 +53,18 @@ h1 {
 }
 
 
-  .container.right-panel-active .sign-in-container {
+  .containerLogin.right-panel-active .sign-in-containerLogin {
     transform: translateX(100%);
     opacity: 0;
   }
-  
-  .container.right-panel-active .sign-up-container {
+
+  .containerLogin.right-panel-active .sign-up-containerLogin {
     transform: translateX(100%);
     opacity: 1;
     z-index: 5;
   }
-  
-  .overlay-container {
+
+  .overlay-containerLogin {
     position: absolute;
     top: 0;
     left: 60%;
@@ -90,7 +74,7 @@ h1 {
     transition: transform 0.6s ease-in-out;
     z-index: 9;
   }
-  
+
   .overlay {
     background: var(--linear-grad);
     /* background-repeat: no-repeat; */
@@ -104,7 +88,7 @@ h1 {
     /* transform: translateX(0); */
     transition: transform 0.6s ease-in-out;
   }
-  
+
   .overlay-panel {
     position: absolute;
     display: flex;
@@ -119,17 +103,17 @@ h1 {
     /* transform: translateX(0); */
     transition: transform 0.6s ease-in-out;
   }
-  
+
   .overlay-left {
     right: 60%;
     transform: translateX(-12%);
   }
-  
+
   .overlay-right {
     right: 0;
     transform: translateX(0%);
   }
-  
+
   .overlay-panel h1 {
     color: #fff;
   }
@@ -141,7 +125,7 @@ h1 {
     letter-spacing: 0.5px;
     margin: 25px 0 35px;
   }
- 
+
   .overlay-panel button {
     border: none;
     background-color: transparent;
@@ -161,7 +145,7 @@ h1 {
     border: none;
     outline: none;
   }
-  
+
   label {
     position: absolute;
     left: 50%;
@@ -169,9 +153,9 @@ h1 {
     transform: translate(-50%);
     width: 0%;
     height: 2px;
-    background: var(--linear-grad); 
+    background: var(--linear-grad);
     transition: 0.3s;
-  } 
+  }
 
   input:focus ~ label {
     width: 100%;
@@ -189,38 +173,38 @@ h1 {
     text-transform: uppercase;
   }
 
-  .form-container button{
+  .form-containerLogin button{
     margin-top: 17px;
     transition: 80ms ease-in;
   }
 
-  .form-container button:hover{
+  .form-containerLogin button:hover{
     background: #fff;
     cursor: var(--grad-clr1);
   }
 
-  .container.right-panel-active .overlay-container {
+  .containerLogin.right-panel-active .overlay-containerLogin {
     transform: translateX(-150%);
   }
 
-  .container.right-panel-active .overlay {
+  .containerLogin.right-panel-active .overlay {
     transform: translateX(50%);
   }
 
-  .container.right-panel-active .overlay-left {
+  .containerLogin.right-panel-active .overlay-left {
     transform: translateX(25%);
   }
 
-  .container.right-panel-active .overlay-right {
+  .containerLogin.right-panel-active .overlay-right {
     transform: translateX(35%);
   }
 
-  .container.right-panel-active .sign-in-container {
+  .containerLogin.right-panel-active .sign-in-containerLogin {
     transform: translateX(20%);
     opacity: 0;
   }
 
-  .container.right-panel-active .sign-up-container {
+  .containerLogin.right-panel-active .sign-up-containerLogin {
     transform: translateX(66.7%);
     opacity: 1;
     z-index: 5;

@@ -54,61 +54,72 @@ function Login() {
     };
 
     return (
-        <div className={`container ${isSignUpMode ? "right-panel-active" : ""}`} id="container">
 
-            {/* <div class="container" id="container"> */}
-                <div class="form-container sign-up-container align-content-center">
-                    <form action="#">
-                        <h1>Create Account</h1>
-                        <div class="infield">
-                            <input type="text" placeholder="Name" />
-                            <label></label>
-                        </div>
-                        <div class="infield">
-                            <input type="email" placeholder="Email" name="email"/>
-                            <label></label>
-                        </div>
-                        <div class="infield">
-                            <input type="password" placeholder="Password" />
-                            <label></label>
-                        </div>
-                        <button onClick={() => setIsSignUpMode(true)}>Sign Up</button>
-                    </form>
-                </div>
-                
-                
-                <div class="form-container sign-in-container align-content-center">
-                    <form action="#">
-                        <h1>Sign in</h1>
-                        <div class="infield">
-                            <input type="email" placeholder="Email" name="email"/>
-                            <label></label>
-                        </div>
-                        <div class="infield">
-                            <input type="password" placeholder="Password" />
-                            <label></label>
-                        </div>
-                        <button onClick={() => setIsSignUpMode(false)}>Sign In</button>
-
-                    </form>
-                </div>
-                <div class="overlay-container" id="overlayCon">
-                    <div class="overlay">
-                        <div class="overlay-panel overlay-left">
-                            <h1>Welcome Back!</h1>
-                            <p>To keep connected with us please login with your personal info</p>
-                            <button onClick={() => setIsSignUpMode(false)}>Sign In</button>
-
-                        </div>
-                        <div class="overlay-panel overlay-right">
-                            <h1>Hello, Friend!</h1>
-                            <p>Enter your personal details and start journey with us</p>
-                            <button onClick={() => setIsSignUpMode(true)}>Sign Up</button>
-                        </div>
+        // crear de cuenta ---------------------------------------
+        <div className={`containerLogin ${isSignUpMode ? "right-panel-active" : ""}`} id="containerLogin">
+            <div class="form-containerLogin sign-up-containerLogin align-content-center">
+                <form action="#">
+                    <h1>Crear cuenta</h1>
+                    <div class="infield">
+                        <input type="text" placeholder="Name" />
+                        <label></label>
                     </div>
-                    <button id="overlayBtn"></button>
+                    <div class="infield">
+                        <input type="email" placeholder="Email" name="email"/>
+                        <label></label>
+                    </div>
+                    <div class="infield">
+                        <input type="password" placeholder="Password" />
+                        <label></label>
+                    </div>
+                    <button onClick={() => setIsSignUpMode(true)}>Registrarme</button>
+                </form>
+            </div>
+            
+            
+            {/* Iniciar sesión --------------------------------------- */}
+            <div class="form-containerLogin sign-in-containerLogin align-content-center">
+                <form onSubmit={handleLogin}>
+                    <h1>Iniciar sesión</h1>
+                    <div class="infield">
+                        <input 
+                            type="text" 
+                            placeholder="Nombre de usuario" 
+                            value={user.username}
+                            onChange={(e) => setUser({...user, username: e.target.value})}
+                        />
+                        <label></label>
+                    </div>
+                    <div class="infield">
+                        <input 
+                            type="password" 
+                            placeholder="Contraseña" 
+                            value={user.password}
+                            onChange={(e) => setUser({...user, password: e.target.value})}
+                        />
+                        <label></label>
+                    </div>
+                    <button type="submit">Ingresar</button>
+                </form>
+                {error && <p>{error}</p>}
+                
+            </div>
+            <div class="overlay-containerLogin" id="overlayCon">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-left">
+                        <h1>¿Ya tenés cuenta?</h1>
+                        <p>Ingresá a tu cuenta aquí</p>
+                        <button onClick={() => setIsSignUpMode(false)}>Ingresar</button>
+
+                    </div>
+                    <div class="overlay-panel overlay-right">
+                        <h1>¿No tenés cuenta?</h1>
+                        <p>¡Registrate para ser parte!</p>
+                        <button onClick={() => setIsSignUpMode(true)}>Registrarme</button>
+                    </div>
                 </div>
             </div>
+        </div>
     );
 }
 

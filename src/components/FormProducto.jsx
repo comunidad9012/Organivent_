@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
 import { Helmet } from 'react-helmet';
-import '../styles/FormProducto.css';
+import '../styles/loading.css';
 
 function FormProducto() { 
   const { id } = useParams(); // Para editar un producto existente
