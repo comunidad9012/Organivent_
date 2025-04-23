@@ -1,87 +1,91 @@
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { createUser, resetUser, UserKey } from "../redux/userSlice";
-import { useNavigate } from "react-router-dom";
-import { PrivateRoutes, PublicRoutes } from "../models/routes";
-import { clearLocalStorage } from "../utilities/localStorage.utility";
+import { useState } from "react";
+import { Helmet } from 'react-helmet';
+import useAutenticacion from "./hooks/useAutenticacion";
+import useCreateClient from "./hooks/useCreateClient";
+import Loading from "./Loading";
+
 import "../styles/Login.css";
 
 function Login() {
-    
     const [isSignUpMode, setIsSignUpMode] = useState(false);
 
-    const [user , setUser] = useState({
-        username: '',
-        password: ''
-    });
-
-    const [error, setError] = useState(null);
-  
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
-    //este effect es para que cuando viaje a ruta /login se borre el usuario del localstorage y no pueda volver a la ruta en la que estaba (evita inconsistencias)
-    useEffect(() => {
-        clearLocalStorage(UserKey);
-        dispatch(resetUser());
-        navigate(`/${PublicRoutes.LOGIN}`, { replace: true });
-      }, []);
-
-  const handleLogin = async (e) => {
-    e.preventDefault(); //esto esta igual que otros submit de fomularios
-    console.log("User:", user); //SACAAARRRR------------------
-
-    //aca se pone el cargando: setLoading(true);
-    try {
-        const response = await fetch("http://localhost:5000/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user }),
-        });
-        console.log("los datos volvieron del back") //SACAAARRRR--------------------------------------------
-        console.log(response) //SACAAARRRR--------------------------------------------
-        const data = await response.json();
-        if (response.ok) {
-            console.log("tengo la data que llegó del back", data); //SACAAARRRR------------------
-            dispatch(createUser(data));  // Guarda en Redux
-            navigate(`/${PrivateRoutes.PRIVATE}`, {replace: true}); //el replace es para remplazar /login por /private en la ruta
-        } else {
-            console.log("Error: la respuesta no fue ok", data.message);
-        }
-        } catch (err) {
-            setError('Invalid username or password');
-        }
-    };
+    const { handleInicioSesion , user, setUser, error } = useAutenticacion();
+    const { handleRegister, registUser, setRegistUser, handleDNIChange, loading, message } = useCreateClient();
 
     return (
-
+        
         // crear de cuenta ---------------------------------------
         <div className={`containerLogin ${isSignUpMode ? "right-panel-active" : ""}`} id="containerLogin">
-            <div class="form-containerLogin sign-up-containerLogin align-content-center">
-                <form action="#">
+            <Helmet>
+                <title>Login</title>
+            </Helmet>
+            {message && <div className="alert alert-info">{message}</div>}
+            <div className="form-containerLogin sign-up-containerLogin align-content-center">
+                <form onSubmit={handleRegister}>
                     <h1>Crear cuenta</h1>
-                    <div class="infield">
-                        <input type="text" placeholder="Name" />
+                    <div className="infield">
+                        <input 
+                            required
+                            // VER SI FUNCIONA BIEN EL required
+                            type="text" 
+                            placeholder="Nombre" 
+                            value={registUser.nombre}
+                            onChange={(e) => setRegistUser({...registUser, nombre: e.target.value})}
+                        />
                         <label></label>
                     </div>
-                    <div class="infield">
-                        <input type="email" placeholder="Email" name="email"/>
+                    <div className="infield">
+                        <input 
+                            required
+                            type="text" 
+                            placeholder="DNI" 
+                            value={registUser.DNI_cliente}
+                            onChange={handleDNIChange}
+                            // onChange={(e) => setRegistUser({...registUser, DNI_cliente: e.target.value})}
+                        />
                         <label></label>
                     </div>
-                    <div class="infield">
-                        <input type="password" placeholder="Password" />
+                    <div className="infield">
+                        <input 
+                            required
+                            type="email" 
+                            placeholder="email" 
+                            value={registUser.email}
+                            onChange={(e) => setRegistUser({...registUser, email: e.target.value})}
+                        />
                         <label></label>
                     </div>
-                    <button onClick={() => setIsSignUpMode(true)}>Registrarme</button>
+                    <div className="infield">
+                        <input 
+                            required
+                            type="text" 
+                            placeholder="Nombre de usuario" 
+                            value={registUser.nombre_usuario}
+                            onChange={(e) => setRegistUser({...registUser, nombre_usuario: e.target.value})}
+                        />
+                        <label></label>
+                    </div><div className="infield">
+                        <input
+                            required
+                            type="password" 
+                            placeholder="Contraseña" 
+                            value={registUser.Contraseña}
+                            onChange={(e) => setRegistUser({...registUser, Contraseña: e.target.value})}
+                        />
+                        <label></label>
+                    </div>
+                    {/* <button onClick={() => setIsSignUpMode(true)}>Registrarme</button> */}
+                    {!loading && (<button type="submit">Registrarme</button>)}
+                    {loading && <Loading/>}
                 </form>
             </div>
             
             
             {/* Iniciar sesión --------------------------------------- */}
-            <div class="form-containerLogin sign-in-containerLogin align-content-center">
-                <form onSubmit={handleLogin}>
+            <div className="form-containerLogin sign-in-containerLogin align-content-center">
+                <form onSubmit={handleInicioSesion}>
                     <h1>Iniciar sesión</h1>
-                    <div class="infield">
+                    <div className="infield">
                         <input 
                             type="text" 
                             placeholder="Nombre de usuario" 
@@ -90,7 +94,7 @@ function Login() {
                         />
                         <label></label>
                     </div>
-                    <div class="infield">
+                    <div className="infield">
                         <input 
                             type="password" 
                             placeholder="Contraseña" 
@@ -104,15 +108,15 @@ function Login() {
                 {error && <p>{error}</p>}
                 
             </div>
-            <div class="overlay-containerLogin" id="overlayCon">
-                <div class="overlay">
-                    <div class="overlay-panel overlay-left">
+            <div className="overlay-containerLogin" id="overlayCon">
+                <div className="overlay">
+                    <div className="overlay-panel overlay-left">
                         <h1>¿Ya tenés cuenta?</h1>
                         <p>Ingresá a tu cuenta aquí</p>
                         <button onClick={() => setIsSignUpMode(false)}>Ingresar</button>
 
                     </div>
-                    <div class="overlay-panel overlay-right">
+                    <div className="overlay-panel overlay-right">
                         <h1>¿No tenés cuenta?</h1>
                         <p>¡Registrate para ser parte!</p>
                         <button onClick={() => setIsSignUpMode(true)}>Registrarme</button>
