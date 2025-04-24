@@ -49,7 +49,7 @@ function Login() {
                         <input 
                             required
                             type="email" 
-                            placeholder="email" 
+                            placeholder="Email" 
                             value={registUser.email}
                             onChange={(e) => setRegistUser({...registUser, email: e.target.value})}
                         />
