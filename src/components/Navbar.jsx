@@ -15,7 +15,7 @@ function Navbar() {
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
     
     return (
-        <nav className="bg-gray-100 px-4 py-3 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
+        <nav className="bg-gray-100 px-4 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
             <div className="flex justify-around items-center mx-auto">
                 
                 {/* Logo */}
@@ -31,15 +31,6 @@ function Navbar() {
 
                 {/* Menú */}
                 <div className="flex items-center gap-4">
-                    {userState.rol === null && (
-                        <Link to="/createClient" className="fancy">
-                        <span className="top-key"></span>
-                        <span className="text">Crear cuenta</span>
-                        <span className="bottom-key-1"></span>
-                        <span className="bottom-key-2"></span>
-                        </Link>
-                    )}
-
                     {userState.rol === Roles.ADMIN && (
                         <Link to="/holiiiiss" className="fancy">
                         <span className="top-key"></span>
@@ -65,7 +56,7 @@ function Navbar() {
                     <Categorias />
                     <SearchForm />
                     {/* <p className="text-lg text-black mx-4">¡Hola {userState.nombre_usuario}!</p> */}
-                    <p className="text-lg text-black mx-4 whitespace-nowrap">¡Hola {userState.nombre_usuario}!</p>
+                    <p className="text-lg  text-black mx-4 whitespace-nowrap">¡Hola {userState.nombre_usuario}!</p>
 
 
                     {userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` && (
