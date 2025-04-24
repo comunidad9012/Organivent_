@@ -18,16 +18,35 @@ const getInitialCart = () => {
 const cartReducer = (state, action) => {
   switch (action.type) {
     case "ADD_TO_CART": {
-        const existing = state.find((item) => item._id === action.payload._id);
-        if (existing) {
-          return state.map(item =>
-            item._id === action.payload._id
-              ? { ...item, quantity: (item.quantity || 1) + 1 }
-              : item
-          );
-        }
-        return [...state, { ...action.payload, quantity: 1 }];
+      const existing = state.find((item) => item._id === action.payload._id);
+      if (existing) {
+        return state.map(item =>
+          item._id === action.payload._id
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
+            : item
+        );
       }
+      return [...state, { ...action.payload, quantity: 1 }];
+    }
+
+    case "INCREMENT_QUANTITY": {
+      return state.map((item) =>
+        item._id === action.payload
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+    }
+    
+    case "DECREMENT_QUANTITY": {
+      return state.map((item) =>
+        item._id === action.payload
+          ? {
+              ...item,
+              quantity: item.quantity > 1 ? item.quantity - 1 : 1,
+            }
+          : item
+      );
+    }
       
 
     case "REMOVE_FROM_CART": {
