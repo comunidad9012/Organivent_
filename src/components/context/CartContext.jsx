@@ -50,8 +50,10 @@ const cartReducer = (state, action) => {
       
 
     case "REMOVE_FROM_CART": {
-    return state.filter((product) => product._id !== action.payload);
+      const idToRemove = typeof action.payload === 'object' ? action.payload._id : action.payload;
+      return state.filter(product => product._id !== idToRemove);
     }
+    
       
 
     case "CLEAR_CART":
