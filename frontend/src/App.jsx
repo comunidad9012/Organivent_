@@ -11,7 +11,7 @@ import RoutesWhitNotFound from "./utilities/routesWhitNotFound.utility";
 import { Suspense, lazy } from "react";
 import { FiltersProvider } from "./components/context/filters";
 import { CartProvider } from "./components/context/CartContext";
-import Loading from "./components/Loading";
+import Loading from "./utilities/Loading";
 
 const Login = lazy(() => import('./components/Login')); 
 const Private = lazy(() => import('./Private/Private'));

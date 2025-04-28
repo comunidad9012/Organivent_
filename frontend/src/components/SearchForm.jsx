@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ProductosDisplay from './ProductosDisplay'; 
+import '../styles/searchForm.css';
 
 function SearchForm() {
     const [palabra, setQuery] = useState('');

@@ -53,7 +53,7 @@ export default function Cart() {
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-xl font-bold mx-4">${product.precio_venta}</span>
                   <button
-                    onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product._id })}
+                    onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product })}
                     className="text-red-500"> Eliminar
                   </button>
                 </div>

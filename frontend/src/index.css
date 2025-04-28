@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
 
   --linear-grad: linear-gradient(to right, #141E30, #243B55);
@@ -45,12 +46,20 @@ body {
 
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 50px;
 }
 
-button {
+h1 {
+  color: var(--grad-clr1);
+}
+
+/* button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -60,18 +69,28 @@ button {
   background-color: #dadfd9;
   cursor: pointer;
   transition: border-color 0.25s;
+} */
+
+button {
+  border-radius: 20px;
+  border: 1px solid var(--grad-clr1);
+  background: var(--grad-clr2);
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 button:hover {
-  border-color: #5e5e5e;
+  border-color: #ffffff;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-
-/* GUARDA CON ESTO (lo veo mas adelante cuando me de la cabeza) -----------------------*/
-/* input {
+input {
   width: 100%;
   padding: 12px 15px;
   background-color: #f3f3f3;
@@ -92,9 +111,15 @@ label {
 
 input:focus ~ label {
   width: 100%;
-} */
+}
 
-/* -------------------------------------- */
+p {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  margin: 25px 0 35px;
+}
 
 @media (prefers-color-scheme: light) {
   :root {
