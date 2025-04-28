@@ -43,6 +43,7 @@ class ProductosModel:
 
     def specific_product(self,id):
         Productos=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
+        Productos['_id'] = str(Productos['_id'])
         response=json_util.dumps(Productos)
         return Response(response, mimetype="application/json")
     
