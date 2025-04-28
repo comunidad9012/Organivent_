@@ -4,6 +4,7 @@ import Categorias from './Categorias';
 import SearchForm from './SearchForm';
 import '../styles/navbar.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
+// SACAR ESTO CUANDO MIGRE LAS COSAS A TAILWIND
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
