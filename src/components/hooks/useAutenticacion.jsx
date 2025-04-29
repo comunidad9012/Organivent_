@@ -45,7 +45,7 @@ function useAutenticacion() {
             navigate(`/${PrivateRoutes.PRIVATE}`, {replace: true}); //el replace es para remplazar /login por /private en la ruta
             setMessageAuth('¡Autenticación exitosa!');
         } else {
-            console.log("Error: ", data.message);
+            // console.log("Error: ", data.message);
             setMessageAuth('Nombre de usuario o contraseña inválidos');
         }
     } catch (err) {

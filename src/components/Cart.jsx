@@ -36,14 +36,14 @@ export default function Cart() {
                 <div className="flex items-center mx-4">
                 <button
                   onClick={() => dispatch({ type: "DECREMENT_QUANTITY", payload: product._id })}
-                  className="bg-zinc-300 p-1 rounded-l"
+                  className="bg-zinc-300 p-1 rounded w-4 hover:bg-gray-200"
                 >
                   -
                 </button>
                 <span className="mx-2">{product.quantity || 1}</span>
                 <button
                   onClick={() => dispatch({ type: "INCREMENT_QUANTITY", payload: product._id })}
-                  className="bg-zinc-300 p-1 rounded-r"
+                  className="bg-zinc-300 p-1 rounded w-4 hover:bg-gray-200"
                 >
                   +
                 </button>
@@ -54,7 +54,7 @@ export default function Cart() {
                   <span className="text-xl font-bold mx-4">${product.precio_venta}</span>
                   <button
                     onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product })}
-                    className="text-red-500"> Eliminar
+                    className="text-red-500 hover:text-red-700"> Eliminar
                   </button>
                 </div>
               </div>
@@ -65,7 +65,7 @@ export default function Cart() {
        {cart.length > 0 && (
         <button
           onClick={() => dispatch({ type: "CLEAR_CART" })}
-          className="bg-red-500 p-2 mt-2 rounded"
+          className="button-pretty"
         >
           Vaciar Carrito
         </button> 
@@ -94,7 +94,7 @@ export default function Cart() {
 
 
 
-              <button className="text-primary-foreground w-full p-2 rounded">Continuar compra</button>
+              <button className="button-pretty">Continuar compra</button>
           </div>
     </div>
   )
