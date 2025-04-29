@@ -17,7 +17,7 @@ function Navbar() {
     
     return (
         <nav className="bg-gray-100 px-4 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
-            <div className="flex justify-around items-center mx-auto">
+            <div className="flex justify-around items-center mx-auto h-full">
                 
                 {/* Logo */}
                 {/* DEJAR EL INICIO EN CUALQUIER PARTE PORQUE SE SUPONE QUE EL USUARIO PUEDE VER LOS PRODUCTOS SIN NECESIDAD DE LOGUEARSE */}
@@ -62,10 +62,10 @@ function Navbar() {
 
                     {userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` && (
                     <Link to={`/private/${PrivateRoutes.CART}`}>
-                        <button className="flex p-2 hover:bg-blue-300 rounded">
+                        <button className="flex p-2 hover:bg-gray-200 rounded">
                         {/* Icono carrito */}
                         <svg
-                            color="white"
+                            color="black"
                             className="icon"
                             stroke="currentColor"
                             fill="none"

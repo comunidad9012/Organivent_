@@ -9,6 +9,7 @@ import { clearLocalStorage } from "../../utilities/localStorage.utility";
 function useAutenticacion() {
 
     // const [loading, setLoading] = useState(false);
+    const [messageAuth, setMessageAuth] = useState('');
 
     const [user , setUser] = useState({
         username: '',
@@ -42,16 +43,19 @@ function useAutenticacion() {
         if (response.ok) {
             dispatch(createUser(data));  // Guarda en Redux
             navigate(`/${PrivateRoutes.PRIVATE}`, {replace: true}); //el replace es para remplazar /login por /private en la ruta
+            setMessageAuth('¡Autenticación exitosa!');
         } else {
             console.log("Error: ", data.message);
+            setMessageAuth('Nombre de usuario o contraseña inválidos');
         }
-        } catch (err) {
-            setError('Nombre de usuario o contraseña inválidos');
-        }
-    };
+    } catch (err) {
+        setError('Nombre de usuario o contraseña inválidos');
+    }
+    setTimeout(() => setMessageAuth(""), 3000);
+};
 
 
-  return { handleInicioSesion , user, setUser, error }
+  return { handleInicioSesion , user, setUser, error, messageAuth }
 }
 export default useAutenticacion
 

@@ -14,7 +14,7 @@ function Logout() {
     };
 
   return (
-    <button onClick={logOut}>Log Out</button>
+    <button className="button-pretty" onClick={logOut}>Log Out</button>
   )
 }
 export default Logout

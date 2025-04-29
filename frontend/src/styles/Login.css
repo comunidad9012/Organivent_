@@ -126,6 +126,18 @@ h1 {
     margin: 25px 0 35px;
   } */
 
+  /* VER SI DESPUES LO SACO PARA AFUERA esto es del mensaje para superponerse a los componentes*/
+  .floating-alert {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    width: fit-content;
+    max-width: 90%;
+  }
+  
+
   .overlay-panel button {
     border: none;
     background-color: transparent;
@@ -178,10 +190,10 @@ h1 {
     transition: 80ms ease-in;
   }
 
-  .form-containerLogin button:hover{
+  /* .form-containerLogin button:hover{
     background: #fff;
     cursor: var(--grad-clr1);
-  }
+  } */
 
   .containerLogin.right-panel-active .overlay-containerLogin {
     transform: translateX(-150%);
