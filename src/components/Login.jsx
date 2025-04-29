@@ -9,8 +9,8 @@ import "../styles/Login.css";
 function Login() {
     const [isSignUpMode, setIsSignUpMode] = useState(false);
 
-    const { handleInicioSesion , user, setUser, error } = useAutenticacion();
-    const { handleRegister, registUser, setRegistUser, handleDNIChange, loading, message } = useCreateClient();
+    const { handleInicioSesion , user, setUser, error, messageAuth } = useAutenticacion();
+    const { handleRegister, registUser, setRegistUser, handleDNIChange, loading, messageCreate } = useCreateClient();
 
     return (
         <div className="flex justify-center w-full">
@@ -19,7 +19,7 @@ function Login() {
                 <Helmet>
                     <title>Login</title>
                 </Helmet>
-                {message && <div className="alert alert-info">{message}</div>}
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="form-containerLogin sign-up-containerLogin align-content-center">
                     <form onSubmit={handleRegister}>
                         <h1>Crear cuenta</h1>
@@ -74,8 +74,13 @@ function Login() {
                             <label></label>
                         </div>
                         {/* <button onClick={() => setIsSignUpMode(true)}>Registrarme</button> */}
-                        {!loading && (<button type="submit">Registrarme</button>)}
+                        {!loading && (<button className="button-pretty" type="submit">Registrarme</button>)}
                         {loading && <Loading/>}
+                        {messageCreate && (
+                            <div className="floating-alert">
+                                <div className="alert alert-info">{messageCreate}</div>
+                            </div>
+                            )}
                     </form>
                 </div>
                 
@@ -86,6 +91,7 @@ function Login() {
                         <h1>Iniciar sesión</h1>
                         <div className="infield">
                             <input 
+                                required
                                 type="text" 
                                 placeholder="Nombre de usuario" 
                                 value={user.username}
@@ -95,6 +101,7 @@ function Login() {
                         </div>
                         <div className="infield">
                             <input 
+                                required
                                 type="password" 
                                 placeholder="Contraseña" 
                                 value={user.password}
@@ -102,7 +109,15 @@ function Login() {
                             />
                             <label></label>
                         </div>
-                        <button type="submit">Ingresar</button>
+                        <button className="button-pretty" type="submit">Ingresar</button>
+                    
+
+                        {messageAuth && (
+                            <div className="floating-alert">
+                                <div className="alert alert-info">{messageAuth}</div>
+                            </div>
+                            )}
+
                     </form>
                     {error && <p>{error}</p>}
                     
@@ -112,13 +127,13 @@ function Login() {
                         <div className="overlay-panel overlay-left">
                             <h1>¿Ya tenés cuenta?</h1>
                             <p>Ingresá a tu cuenta aquí</p>
-                            <button onClick={() => setIsSignUpMode(false)}>Ingresar</button>
+                            <button className="button-pretty" onClick={() => setIsSignUpMode(false)}>Ingresar</button>
 
                         </div>
                         <div className="overlay-panel overlay-right">
                             <h1>¿No tenés cuenta?</h1>
                             <p>¡Registrate para ser parte!</p>
-                            <button onClick={() => setIsSignUpMode(true)}>Registrarme</button>
+                            <button className="button-pretty" onClick={() => setIsSignUpMode(true)}>Registrarme</button>
                         </div>
                     </div>
                 </div>

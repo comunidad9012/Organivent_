@@ -11,7 +11,7 @@ function useCreateClient() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [messageCreate, setMessageCreate] = useState('');
   const navigate = useNavigate();
 
   const formatDNI = (value) => {
@@ -72,20 +72,20 @@ function useCreateClient() {
       .then(data => {
         setLoading(false);
         if (data.contenido === "Usuario registrado con éxito") {
-          setMessage('Usuario registrado con éxito!');
+          setMessageCreate('Usuario registrado con éxito!');
           setTimeout(() => navigate("/"), 2000);
         } else {
-          setMessage('Error al registrar el usuario: ' + data.contenido);
+          setMessageCreate('Error al registrar el usuario: ' + data.contenido);
         }
       })
       .catch(error => {
         console.error('Error:', error);
         setLoading(false);
-        setMessage('Error al registrar el usuario. ' + error.message);
+        setMessageCreate('Error al registrar el usuario. ' + error.message);
       });
   };
 
-  return { handleRegister, registUser, setRegistUser, handleDNIChange, loading, message };
+  return { handleRegister, registUser, setRegistUser, handleDNIChange, loading, messageCreate };
 }
 
 export default useCreateClient;

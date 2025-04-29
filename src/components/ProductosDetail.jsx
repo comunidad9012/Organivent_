@@ -50,10 +50,11 @@ function ProductoDetail() {
           </div>
           <div className="md:w-1/2 md:pl-6">
               <h2 className="text-2xl font-bold text-foreground mt-4">{Producto.nombre_producto}</h2>
-              <p className="text-xl text-primary">$140</p>
+              <p className="text-xl text-primary">${Producto.precio_venta}</p>
               <div className="flex items-center mt-2">
                   <span className="text-yellow-500">★★★★☆</span>
-              </div>
+                  {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}
+              </div>  
 
               <div dangerouslySetInnerHTML={{ __html: Producto.descripcion }} className="mt-2 mr-4 text-muted-foreground"/>
               {/* <p className="mt-2 text-muted-foreground">

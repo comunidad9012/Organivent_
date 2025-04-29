@@ -71,7 +71,7 @@ h1 {
   transition: border-color 0.25s;
 } */
 
-button {
+.button-pretty {
   border-radius: 20px;
   border: 1px solid var(--grad-clr1);
   background: var(--grad-clr2);
@@ -82,11 +82,13 @@ button {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-button:hover {
+.button-pretty:hover {
   border-color: #ffffff;
+  background: var(--grad-clr1);
+  /* color: #bbbbbb; */
 }
-button:focus,
-button:focus-visible {
+.button-pretty:focus,
+.button-pretty:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 

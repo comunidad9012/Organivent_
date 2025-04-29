@@ -9,6 +9,7 @@ import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
+import limitText from '../utilities/limitText.jsx';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -62,10 +63,11 @@ function Productos() {
               <Fragment key={product._id}>
                 <div className="col-md-3 mt-4">
                   <div className="card h-100">
-                    <img src={product.miniatura || "../../imagenes/foto.png"} className="card-img-top" alt="..." />
+                    {/* <img src={product.miniatura || "../../imagenes/foto.png"} className="card-img-top" alt="..." /> */}
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{product.nombre_producto}</h5>
-                      <p className="card-text">${product.precio_venta}</p>
+                      <p>{limitText(product.descripcion, 100)}</p>
+                      <p className="card-text mt-auto">${product.precio_venta}</p>
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       <br />
 
