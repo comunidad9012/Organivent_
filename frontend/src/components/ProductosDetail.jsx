@@ -49,26 +49,26 @@ function ProductoDetail() {
               </div>
           </div>
           <div className="md:w-1/2 md:pl-6">
-              <h2 className="text-2xl font-bold text-foreground mt-4">{Producto.nombre_producto}</h2>
+              <h2 className="text-2xl font-bold text-foreground mt-5 mr-5">{Producto.nombre_producto}</h2>
               <p className="text-xl text-primary">${Producto.precio_venta}</p>
               <div className="flex items-center mt-2">
                   <span className="text-yellow-500">★★★★☆</span>
                   {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}
               </div>  
 
-              <div dangerouslySetInnerHTML={{ __html: Producto.descripcion }} className="mt-2 mr-4 text-muted-foreground"/>
+              <div dangerouslySetInnerHTML={{ __html: Producto.descripcion }} className="mt-2 mr-5 text-muted-foreground"/>
               {/* <p className="mt-2 text-muted-foreground">
                   The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
               </p> */}
               <div className="mt-4">
-                  <label className="block text-muted-foreground">Color:</label>
+                  <span className="block text-muted-foreground">Color:</span>
                   <div className="flex space-x-2">
-                      <button className="w-8 h-8 rounded-full bg-zinc-300"></button>
+                      <button className="w-8 h-8 rounded bg-zinc-300"></button>
                       <button className="w-8 h-8 rounded-full bg-zinc-800"></button>
                   </div>
               </div>
     
-              <div className="flex flex-col justify-end min-h-screen">
+              <div className="flex flex-col justify-end mt-4">
               <CartProduct product={Producto}/>
               </div>
                 {/* ESTE BOTON NO SE MANTIENE COMO QUE YA ESTA EN EL CARRITO SINO QUE deja añadir mas del mismo y salen los dos en el carrito, tenia pensado dejar esto para cuando cuztomizan dos productos que son el mismo pero con diferentes caracteristicas (ejemplo color) como en mercado libre */}
