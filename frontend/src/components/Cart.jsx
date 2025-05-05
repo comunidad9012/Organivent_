@@ -36,8 +36,10 @@ export default function Cart() {
                 {product.selectedColor && (
   <div className="flex items-center mx-4 my-1">
     <span className="text-sm text-muted-foreground mr-2">Color: {product.selectedColor.name}</span>
-    <div className={`w-5 h-5 rounded-full border border-gray-400 ${product.selectedColor.class}`}></div>
-
+    <div
+      className="w-5 h-5 rounded-full border border-gray-400"
+      style={{ backgroundColor: product.selectedColor.hex }}
+    ></div>
   </div>
 )}
 

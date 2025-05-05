@@ -71,37 +71,26 @@ function ProductoDetail() {
               </p> */}
               
 
-              <div className="mt-4">
-              <span className="block text-muted-foreground">Color:</span>
-                <fieldset aria-label="Elegí un color" className="mt-2">
-                <RadioGroup
-                  value={selectedColor}
-                  onChange={setSelectedColor}
-                  className="flex items-center gap-x-3"
-                >
-                  {Producto.colores?.map((color) => (
-                    <RadioGroup.Option
-                      key={color.name}
-                      value={color}
-                      className="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
-                    >
-                      {({ checked }) => (
-                        <span
-                          aria-hidden="true"
-                          className={`
-                            ${color.class} 
-                            w-8 h-8 rounded-full border border-black/10 
-                            ${checked ? 'ring-2 ring-offset-2 ring-zinc-500' : ''}
-                          `}
-                          // arriba se puede poner ${checked ? color.selectedClass : ''} y hacer que el anillo del sea del color pero esto no funciona porque la comparacion de objetos del color y del cheked no es la misma (genera otra instancia parece)
-                        />
-                      )}
-                    </RadioGroup.Option>
-                  ))}
-                </RadioGroup>
-
-                </fieldset>
-              </div>
+               {/* Colores disponibles */}
+               {Producto.colores && Producto.colores.length > 0 && (
+                  <div className="mt-4">
+                    <span className="block text-muted-foreground">Colores disponibles:</span>
+                    <div className="flex gap-x-3 mt-2">
+                      {Producto.colores.map((color, index) => (
+                        <div
+                          key={index}
+                          title={color.name}
+                          onClick={() => setSelectedColor(color)}
+                          className={`w-8 h-8 rounded-full border border-black/10  cursor-pointer ${selectedColor?.hex === color.hex ?  'ring-2 ring-offset-2 ring-zinc-500' : ''}`}
+                          style={{ backgroundColor: color.hex }}
+                        ></div>
+                      ))}
+                    </div>
+                    {selectedColor && (
+                      <p className="mt-2 text-sm text-gray-500">Color seleccionado: {selectedColor.name}</p>
+                    )}
+                  </div>
+                )}
 
 
     
