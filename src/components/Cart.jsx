@@ -33,6 +33,14 @@ export default function Cart() {
               <img src="https://placehold.co/200x200" alt="Product Image" className="w-48 h-48 object-cover mr-4" />
               <div className="flex flex-col justify-between">
                 <h2 className="text-lg text-left font-semibold mt-2 mx-4">{product.nombre_producto}</h2>
+                {product.selectedColor && (
+  <div className="flex items-center mx-4 my-1">
+    <span className="text-sm text-muted-foreground mr-2">Color: {product.selectedColor.name}</span>
+    <div className={`w-5 h-5 rounded-full border border-gray-400 ${product.selectedColor.class}`}></div>
+
+  </div>
+)}
+
                 <div className="flex items-center mx-4">
                 <button
                   onClick={() => dispatch({ type: "DECREMENT_QUANTITY", payload: product._id })}

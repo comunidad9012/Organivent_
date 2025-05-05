@@ -5,11 +5,14 @@ import CartProduct from './CartProduct';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
-// import { Radio, RadioGroup } from '@headlessui/react'
+import { Radio, RadioGroup } from '@headlessui/react'
 
 function ProductoDetail() {
   const [Producto, setProducto] = useState({});
   const { id } = useParams();
+
+  const [selectedColor, setSelectedColor] = useState(null);
+
 
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
 
@@ -66,45 +69,46 @@ function ProductoDetail() {
               {/* <p className="mt-2 text-muted-foreground">
                   The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
               </p> */}
+              
+
               <div className="mt-4">
-                  <span className="block text-muted-foreground">Color:</span>
-                  <div className="flex space-x-2">
-                      <button className="w-8 h-8 rounded bg-zinc-300"></button>
-                      <button className="w-8 h-8 rounded-full bg-zinc-800"></button>
-                  </div>
-              </div>
-
-
-              {/* <div>
-                <h3 className="text-sm font-medium text-gray-900">Color</h3>
-
-                <fieldset aria-label="Choose a color" className="mt-4">
-                  <RadioGroup value={selectedColor} onChange={setSelectedColor} className="flex items-center gap-x-3">
-                    {Producto.colors.map((color) => (
-                      <Radio
-                        key={color.name}
-                        value={color}
-                        aria-label={color.name}
-                        className={classNames(
-                          color.selectedClass,
-                          'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-hidden data-checked:ring-2 data-focus:data-checked:ring-3 data-focus:data-checked:ring-offset-1',
-                        )}
-                      >
+              <span className="block text-muted-foreground">Color:</span>
+                <fieldset aria-label="Elegí un color" className="mt-2">
+                <RadioGroup
+                  value={selectedColor}
+                  onChange={setSelectedColor}
+                  className="flex items-center gap-x-3"
+                >
+                  {Producto.colores?.map((color) => (
+                    <RadioGroup.Option
+                      key={color.name}
+                      value={color}
+                      className="relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-none"
+                    >
+                      {({ checked }) => (
                         <span
                           aria-hidden="true"
-                          className={classNames(color.class, 'size-8 rounded-full border border-black/10')}
+                          className={`
+                            ${color.class} 
+                            w-8 h-8 rounded-full border border-black/10 
+                            ${checked ? 'ring-2 ring-offset-2 ring-zinc-500' : ''}
+                          `}
+                          // arriba se puede poner ${checked ? color.selectedClass : ''} y hacer que el anillo del sea del color pero esto no funciona porque la comparacion de objetos del color y del cheked no es la misma (genera otra instancia parece)
                         />
-                      </Radio>
-                    ))}
-                  </RadioGroup>
+                      )}
+                    </RadioGroup.Option>
+                  ))}
+                </RadioGroup>
+
                 </fieldset>
-              </div> */}
+              </div>
+
 
     
               <div className="flex flex-col justify-end mt-4">
               
               {userState.rol === Roles.USER && (
-                <CartProduct product={Producto}/>
+                <CartProduct product={Producto} selectedColor={selectedColor} />
               )}
                 {/* ESTE BOTON NO SE MANTIENE COMO QUE YA ESTA EN EL CARRITO SINO QUE deja añadir mas del mismo y salen los dos en el carrito, tenia pensado dejar esto para cuando cuztomizan dos productos que son el mismo pero con diferentes caracteristicas (ejemplo color) como en mercado libre */}
                   {/* bueno al final lo arreglé sacandole el $oid del _id (vonviendo string lo que volvia del back en view_product) y con esto el boton funciona normalmente peeeeeero quizas no estaria mal permitirle a usuario poner mas de un mismo producto con diferentes caracteristicas*/}
