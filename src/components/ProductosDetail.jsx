@@ -2,10 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import CartProduct from './CartProduct';
+import store from "../redux/store";
+import { useSelector } from "react-redux";
+import { Roles } from "../models/roles";
+// import { Radio, RadioGroup } from '@headlessui/react'
 
 function ProductoDetail() {
   const [Producto, setProducto] = useState({});
   const { id } = useParams();
+
+  const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
 
   useEffect(() => {
     fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
@@ -67,12 +73,42 @@ function ProductoDetail() {
                       <button className="w-8 h-8 rounded-full bg-zinc-800"></button>
                   </div>
               </div>
+
+
+              {/* <div>
+                <h3 className="text-sm font-medium text-gray-900">Color</h3>
+
+                <fieldset aria-label="Choose a color" className="mt-4">
+                  <RadioGroup value={selectedColor} onChange={setSelectedColor} className="flex items-center gap-x-3">
+                    {Producto.colors.map((color) => (
+                      <Radio
+                        key={color.name}
+                        value={color}
+                        aria-label={color.name}
+                        className={classNames(
+                          color.selectedClass,
+                          'relative -m-0.5 flex cursor-pointer items-center justify-center rounded-full p-0.5 focus:outline-hidden data-checked:ring-2 data-focus:data-checked:ring-3 data-focus:data-checked:ring-offset-1',
+                        )}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={classNames(color.class, 'size-8 rounded-full border border-black/10')}
+                        />
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                </fieldset>
+              </div> */}
+
     
               <div className="flex flex-col justify-end mt-4">
-              <CartProduct product={Producto}/>
-              </div>
+              
+              {userState.rol === Roles.USER && (
+                <CartProduct product={Producto}/>
+              )}
                 {/* ESTE BOTON NO SE MANTIENE COMO QUE YA ESTA EN EL CARRITO SINO QUE deja añadir mas del mismo y salen los dos en el carrito, tenia pensado dejar esto para cuando cuztomizan dos productos que son el mismo pero con diferentes caracteristicas (ejemplo color) como en mercado libre */}
                   {/* bueno al final lo arreglé sacandole el $oid del _id (vonviendo string lo que volvia del back en view_product) y con esto el boton funciona normalmente peeeeeero quizas no estaria mal permitirle a usuario poner mas de un mismo producto con diferentes caracteristicas*/}
+              </div>
           </div>
       </div>
 

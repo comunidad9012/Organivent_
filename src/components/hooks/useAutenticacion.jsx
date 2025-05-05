@@ -58,6 +58,3 @@ function useAutenticacion() {
   return { handleInicioSesion , user, setUser, error, messageAuth }
 }
 export default useAutenticacion
-
-
-// VER SI QUEDO BIEN
