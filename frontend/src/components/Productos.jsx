@@ -19,6 +19,16 @@ function Productos() {
   const { filters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
 
+  //paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  const startIndex = (currentPage - 1) * itemsPerPage; //para definir el comienzo dice donde esta el anterior, lo multiplica por la cantidad de items por pagina para determinar desde que producto empezar a mostrar
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = Productos.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(Productos.length / itemsPerPage);
+
+
 
   //const [loading, setLoading] = useState(false); // Para mostrar un spinner mientras se cargan los productos
 
@@ -59,7 +69,7 @@ function Productos() {
         {Productos.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
           <div className="row justify-content-center mt-4">
-            {Productos.map((product, index) => (
+            {currentProducts.map((product, index) => (
               <Fragment key={product._id}>
                 <div className="col-md-3 mt-4">
                   <div className="card h-100">
@@ -99,6 +109,20 @@ function Productos() {
             <p>No hay productos disponibles.</p>
         )}
       </div>
+
+      {/* Paginación */}
+      <div className="mt-4">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            className={`btn mx-1 ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+
     </div>
   );
 }
