@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "./context/CartContext";
 import '../styles/CartProduct.css';
 
-function CartProduct({ product }) {
+function CartProduct({ product , selectedColor}) {
   const { dispatch } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -12,9 +12,18 @@ function CartProduct({ product }) {
     const isAlreadyInCart = cart.some(item => item._id === product._id);
     setAdded(isAlreadyInCart);
   }, [product._id]);
+  
+  // const addToCart = () => {
+  //   dispatch({ type: "ADD_TO_CART", payload: product });
+  //   setAdded(true);
+  // };
 
   const addToCart = () => {
-    dispatch({ type: "ADD_TO_CART", payload: product });
+    const productWithColor = {
+      ...product,
+      selectedColor: selectedColor || null, // null si no se pasa nada
+    };
+    dispatch({ type: "ADD_TO_CART", payload: productWithColor });
     setAdded(true);
   };
 
