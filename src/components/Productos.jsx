@@ -76,6 +76,7 @@ function Productos() {
                     {/* <img src={product.miniatura || "../../imagenes/foto.png"} className="card-img-top" alt="..." /> */}
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{product.nombre_producto}</h5>
+                      {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
                       <p>{limitText(product.descripcion, 100)}</p>
                       <p className="card-text mt-auto">${product.precio_venta}</p>
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>

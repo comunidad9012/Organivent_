@@ -89,6 +89,10 @@ function ProductoDetail() {
                     {selectedColor && (
                       <p className="mt-2 text-sm text-gray-500">Color seleccionado: {selectedColor.name}</p>
                     )}
+
+                    {selectedColor == null && (
+                      <p className="mt-2 text-sm text-red-500">Por favor selecciona un color</p>
+                    )}
                   </div>
                 )}
 
