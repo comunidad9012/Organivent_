@@ -87,16 +87,22 @@ function FormProductoModern() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col md:flex-row p-6 bg-background rounded-lg shadow-lg text-start">
           
-          <div className="md:w-1/2 m-4">
+          {/* Sección de imágenes */}
+          <div className="md:w-1/2 space-y-4">
             <img 
               src="https://placehold.co/600x600.png" 
               alt="Imagen del producto" 
-              className="w-full h-auto rounded-lg" 
+              className="w-full h-auto rounded-lg shadow" 
             />
-            <div className="flex space-x-2 mt-4">
-              <img src="https://placehold.co/100x100.png" className="w-16 h-16 border rounded cursor-pointer" />
-              <img src="https://placehold.co/100x100.png" className="w-16 h-16 border rounded cursor-pointer" />
-              <img src="https://placehold.co/100x100.png" className="w-16 h-16 border rounded cursor-pointer" />
+            <div className="flex space-x-2">
+              {[1, 2, 3].map((i) => (
+                <img 
+                  key={i} 
+                  src={`https://placehold.co/100x100.png?text=${i}`} 
+                  className="w-16 h-16 border rounded cursor-pointer hover:opacity-80 transition" 
+                  alt={`Vista ${i}`} 
+                />
+              ))}
             </div>
           </div>
 
@@ -115,7 +121,7 @@ function FormProductoModern() {
             </div>
 
             <div className="mb-2">
-              <label className="block mb-2 font-bold">Descripción:</label>
+              <p className="block m-2 font-bold">Descripción:</p>
               <Editor
                 apiKey='1hyldt9u4byda8tjkhrxwy3zqocdzt2fujo24fy4spgi9wmc'
                 onInit={(evt, editor) => editorRef.current = editor}
@@ -139,65 +145,65 @@ function FormProductoModern() {
 
 
             {/* Añadir colores disponibles */}
-<div className="mb-6">
-  <label className="block mb-2 font-bold">Colores disponibles:</label>
-  <div className="flex items-center gap-2">
-    <input
-      type="text"
-      placeholder="Nombre del color"
-      value={nuevoColor.name || ''}
-      onChange={(e) => setNuevoColor(prev => ({ ...prev, name: e.target.value }))}
-      className="border p-1 rounded"
-    />
-    <input
-      type="color"
-      value={nuevoColor.hex || '#000000'}
-      onChange={(e) => setNuevoColor(prev => ({ ...prev, hex: e.target.value }))}
-      className="w-10 h-10 p-0 border rounded"
-    />
-    <button
-      type="button"
-      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-      onClick={() => {
-        if (nuevoColor.name && nuevoColor.hex) {
-          setProducto(prev => ({
-            ...prev,
-            colores: [...prev.colores, nuevoColor]
-          }));
-          setNuevoColor({ name: '', hex: '#000000' });
-        }
-      }}
-    >
-      Añadir
-    </button>
-  </div>
+            <div className=" bg-gray-100 p-4 rounded-lg">
+              <span className="block mb-2 ">Colores disponibles:</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Nombre del color"
+                  value={nuevoColor.name || ''}
+                  onChange={(e) => setNuevoColor(prev => ({ ...prev, name: e.target.value }))}
+                  className="border p-1 rounded"
+                />
+                <input
+                  type="color"
+                  value={nuevoColor.hex || '#000000'}
+                  onChange={(e) => setNuevoColor(prev => ({ ...prev, hex: e.target.value }))}
+                  className="w-10 h-10 p-0 border rounded"
+                />
+                <button
+                  type="button"
+                  className="button-pretty"
+                  onClick={() => {
+                    if (nuevoColor.name && nuevoColor.hex) {
+                      setProducto(prev => ({
+                        ...prev,
+                        colores: [...prev.colores, nuevoColor]
+                      }));
+                      setNuevoColor({ name: '', hex: '#000000' });
+                    }
+                  }}
+                >
+                  Añadir
+                </button>
+              </div>
 
-  {/* Mostrar colores añadidos */}
-  <div className="flex gap-2 mt-2 flex-wrap">
-    {producto.colores.map((color, index) => (
-      <div key={index} className="flex items-center gap-1">
-        <div
-          className="w-6 h-6 rounded-full border"
-          style={{ backgroundColor: color.hex }}
-          title={color.name}
-        />
-        <span className="text-sm">{color.name}</span>
-        <button
-          type="button"
-          className="text-red-500 ml-1"
-          onClick={() => {
-            setProducto(prev => ({
-              ...prev,
-              colores: prev.colores.filter((_, i) => i !== index)
-            }));
-          }}
-        >
-          ✕
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+              {/* Mostrar colores añadidos */}
+              <div className="flex gap-2 mt-2 flex-wrap">
+                {producto.colores.map((color, index) => (
+                  <div key={index} className="flex items-center gap-1">
+                    <div
+                      className="w-6 h-6 rounded-full border"
+                      style={{ backgroundColor: color.hex }}
+                      title={color.name}
+                    />
+                    <span className="text-sm">{color.name}</span>
+                    <button
+                      type="button"
+                      className="text-red-500 ml-1"
+                      onClick={() => {
+                        setProducto(prev => ({
+                          ...prev,
+                          colores: prev.colores.filter((_, i) => i !== index)
+                        }));
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
 
 
 
