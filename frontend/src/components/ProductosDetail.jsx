@@ -59,7 +59,7 @@ function ProductoDetail() {
           </div>
           <div className="md:w-1/2 md:pl-6">
               <h2 className="text-2xl font-bold text-foreground mt-5 mr-5">{Producto.nombre_producto}</h2>
-              <p className="text-xl text-primary">${Producto.precio_venta}</p>
+              <h5 className="text-3xl text-primary my-4">${Producto.precio_venta}</h5>
               <div className="flex items-center mt-2">
                   <span className="text-yellow-500">★★★★☆</span>
                   {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}
