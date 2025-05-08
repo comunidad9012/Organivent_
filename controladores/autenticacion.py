@@ -22,6 +22,7 @@ def login():
         session['user_id'] = str(usuario['_id'])
         session['rol'] = usuario.get('rol', "user") 
         user = {
+            "id": str(usuario["_id"]), 
             "nombre_usuario": usuario["nombre_usuario"],
             "rol": session['rol']
         }
