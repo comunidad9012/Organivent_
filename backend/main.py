@@ -8,6 +8,7 @@ from controladores.Productos_controlador import Productos_bp
 from controladores.img_controlador import imgs_bp
 from controladores.Categoria_controlador import Categoria_bp
 from controladores.autenticacion import auth_bp
+from controladores.Pedidos_controlador import Pedidos_bp 
 
 load_dotenv()
 
@@ -27,6 +28,7 @@ app.register_blueprint(Productos_bp)
 app.register_blueprint(imgs_bp)
 app.register_blueprint(Categoria_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(Pedidos_bp)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):

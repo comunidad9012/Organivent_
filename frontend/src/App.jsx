@@ -34,8 +34,6 @@ function App() {
                   <Route path='/' element={<Navigate to={PrivateRoutes.PRIVATE} />} /> 
 
                   <Route path={PublicRoutes.LOGIN} element={<Login/>} />
-                  {/* <Route path={PublicRoutes.CREATE_CLIENT} element={<useCreateClient />} /> */}
-                  {/* VER COMO SE COMPORTA EL DE ARRIBA CREATECLIENT creo que ya lo puedo sacas*/}
 
                   <Route path={PublicRoutes.VIEW_PRODUCT} element={<ProductosDetail />} />
 

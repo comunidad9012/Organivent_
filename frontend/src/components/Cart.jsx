@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import { useCart } from "./context/CartContext";
+import Loading from "../utilities/Loading";
+import useCrearPedido from "./hooks/useCrearPedido";
+
 
 export default function Cart() {
 
   const { cart, dispatch } = useCart();
   const [subtotal, setSubtotal] = useState(0);
-
+  const { handleComprar, loading, messagePedido } = useCrearPedido();
 
   // para que se actualice el subtotal segun los cambios en el carrito
   useEffect(() => {
     const total = cart.reduce((acc, item) => acc + item.precio_venta * (item.quantity || 1), 0);
     setSubtotal(total);
   }, [cart]);
-  
+
 
 
   return (
@@ -21,27 +24,25 @@ export default function Cart() {
           <div className="flex-1">
             <h2 className="text-3xl font-bold mb-4">Carrito</h2>
 
-      {/* Productos */}
-
-
-            {cart.length === 0 ? (
-        <p>El carrito está vacío</p>
-      ) : (
-        <ul>
+          {/* Productos */}
+          {cart.length === 0 ? (
+            <p>El carrito está vacío</p>
+          ) : (
+            <ul>
           {cart.map((product, index) => (
             <li key={index} className="flex items-start p-4 border border-zinc-300 rounded-lg">
               <img src="https://placehold.co/200x200" alt="Product Image" className="w-48 h-48 object-cover mr-4" />
               <div className="flex flex-col justify-between">
                 <h2 className="text-lg text-left font-semibold mt-2 mx-4">{product.nombre_producto}</h2>
                 {product.selectedColor && (
-  <div className="flex items-center mx-4 my-1">
-    <span className="text-sm text-muted-foreground mr-2">Color: {product.selectedColor.name}</span>
-    <div
-      className="w-5 h-5 rounded-full border border-gray-400"
-      style={{ backgroundColor: product.selectedColor.hex }}
-    ></div>
-  </div>
-)}
+                  <div className="flex items-center mx-4 my-1">
+                    <span className="text-sm text-muted-foreground mr-2">Color: {product.selectedColor.name}</span>
+                    <div
+                      className="w-5 h-5 rounded-full border border-gray-400"
+                      style={{ backgroundColor: product.selectedColor.hex }}
+                    ></div>
+                  </div>
+                )}
 
                 <div className="flex items-center mx-4">
                 <button
@@ -102,9 +103,14 @@ export default function Cart() {
                 <span>${subtotal.toLocaleString()}</span>
               </div>
 
+              {loading && <Loading/>}
 
+              <button className="button-pretty" onClick={handleComprar} disabled={loading}>
+                {loading ? "Procesando..." : "Continuar compra"}
+              </button>
 
-              <button className="button-pretty">Continuar compra</button>
+              {messagePedido && <p>{messagePedido}</p>}
+
           </div>
     </div>
   )
