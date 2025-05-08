@@ -4,6 +4,7 @@ import { persistLocalStorage, clearLocalStorage } from "../utilities/localStorag
 export const UserKey = 'user';
 
 const EmptyUserState = {
+  id: null,
   nombre_usuario: null,
   // token: sessionStorage.getItem("token") || null, //como puede ser que el token ya tenga un valor y no el usuario?
   rol: null

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
 import { Helmet } from 'react-helmet';
+import Loading from '../utilities/Loading';
 import '../styles/loading.css';
 
 function FormProductoModern() {
@@ -77,6 +78,11 @@ function FormProductoModern() {
       <h1 className="text-3xl font-bold text-center my-5">
         {id ? 'Editar Producto' : 'Nuevo Producto'}
       </h1>
+
+
+
+      {loading && <Loading/>}
+
 
       {message && (
         <div className={`alert ${colorMessage === 'verde' ? 'alert-success' : 'alert-danger'}`}>
@@ -204,12 +210,6 @@ function FormProductoModern() {
                 ))}
               </div>
             </div>
-
-
-
-
-
-
 
             <button 
               type="submit" 
