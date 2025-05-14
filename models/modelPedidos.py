@@ -27,7 +27,6 @@ class PedidosModel:
         for item in pedidos:
             item['_id'] = str(item['_id'])
         response = json_util.dumps(pedidos)
-        print(response)
         return Response(response, mimetype="application/json")
 
 

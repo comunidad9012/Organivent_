@@ -1,22 +1,23 @@
 from flask import Blueprint, request, current_app, jsonify, session
 from models.modelPedidos import PedidosModel
 from models.modelClient import ClientModel
+from controladores.autenticacion import token_required
 
 Pedidos_bp = Blueprint('Pedidos', __name__, url_prefix='/Pedidos')
 
 
-@Pedidos_bp.route("/checkSession", methods=["GET"])
-def check_session():
-    if "user_id" in session:
-        client_model = ClientModel(current_app)
-        usuario = client_model.get_usuario_by_id(session["user_id"])
+# @Pedidos_bp.route("/checkSession", methods=["GET"])
+# def check_session():
+#     if "user_id" in session:
+#         client_model = ClientModel(current_app)
+#         usuario = client_model.get_usuario_by_id(session["user_id"])
         
-        return jsonify({
-            "usuario": usuario["nombre_usuario"] if usuario else None,
-            "rol": session.get("rol")
-        })
-    else:
-        return jsonify({"usuario": None, "rol": None}), 401
+#         return jsonify({
+#             "usuario": usuario["nombre_usuario"] if usuario else None,
+#             "rol": session.get("rol")
+#         })
+#     else:
+#         return jsonify({"usuario": None, "rol": None}), 401
 
 
 @Pedidos_bp.post("/createPedido")
@@ -27,13 +28,15 @@ def create_pedido():
     return response
 
 @Pedidos_bp.get("/showPedidos")
-def show_pedidos():
-    if 'usuario' not in session or session.get('rol') != 'admin':
+@token_required
+def show_pedidos(data):  # data viene del token decodificado
+    if data.get('rol') != 'admin':
         return jsonify({"error": "Acceso denegado"}), 403
 
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.show_pedidos()
     return response
+
 
 @Pedidos_bp.get("/viewPedido/<id>")
 def view_pedido(id):
