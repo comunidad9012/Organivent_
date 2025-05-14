@@ -32,7 +32,7 @@ function Navbar() {
 
                 {/* Menú */}
                 <div className="flex items-center gap-4">
-                    {userState.rol === Roles.ADMIN && (
+                    {userState.rol === Roles.ADMIN && location.pathname !== `/private/${PrivateRoutes.ADMIN_PEDIDOS}` && (
                         <Link to={`/private/${PrivateRoutes.ADMIN_PEDIDOS}`} className="fancy">
                         <span className="top-key"></span>
                         <span className="text">Pedidos</span>
