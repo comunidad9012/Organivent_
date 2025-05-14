@@ -1,5 +1,6 @@
-import os
+import os #para acceder a las variables de entorno .env
 from dotenv import load_dotenv
+
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_pymongo import PyMongo
@@ -13,7 +14,7 @@ from controladores.Pedidos_controlador import Pedidos_bp
 load_dotenv()
 
 app = Flask(__name__, static_folder='../images', static_url_path='/images')
-CORS(app)
+CORS(app, supports_credentials=True, origins=["http://localhost:5173"]) # Esto hace que soporte las credenciales (que vienen en header de las peticiones http) y el origen de la app frontend puerto 5173 de vite para poder ver las cookies
 
 app.config['MONGO_URI'] = os.getenv('MONGOURL')
 app.secret_key = os.getenv("SECRET_KEY")
@@ -21,7 +22,7 @@ mongo = PyMongo(app)  # Esto debería configurar mongo correctamente
 
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), '../images')
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['Access-Control-Allow-Credentials'] = "true"
+app.config['Access-Control-Allow-Credentials'] = "true" #Y ESTO?    
 
 app.register_blueprint(Client_bp)
 app.register_blueprint(Productos_bp)

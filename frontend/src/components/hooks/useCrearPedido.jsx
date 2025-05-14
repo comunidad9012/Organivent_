@@ -2,12 +2,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-
-
-
 import store from "../../redux/store";
 import { useSelector } from "react-redux";
-
 
 function useCrearPedido() {
   const [loading, setLoading] = useState(false);
@@ -32,8 +28,6 @@ function useCrearPedido() {
       })),
       total: cart.reduce((acc, item) => acc + item.precio_venta * (item.quantity || 1), 0),
     };
-
-    console.log("Data a enviar:", data);
 
     try {
       const response = await fetch("http://localhost:5000/Pedidos/createPedido", {

@@ -5,6 +5,7 @@ import { lazy } from "react"
 import RoleGuard from "../guards/rol.guard";
 import Cart from "../components/Cart";
 import FormProducto from "../components/FormProducto";
+import AdminPedidos from "../components/AdminPedidos";
 
 const HomeUser = lazy(() => import('./HomeUser'));
 const Admin = lazy(() => import('./Admin'));
@@ -24,13 +25,9 @@ function Private() {
           <Route path={`${PrivateRoutes.ADMIN}/*`} element={<Admin />} />
           <Route path={PrivateRoutes.CREATE_PRODUCT} element={<FormProducto />} /> 
           <Route path={`${PrivateRoutes.EDIT_PRODUCT}/:id`} element={<FormProducto />} />
+          <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<AdminPedidos />} />
 
         </Route>
-
-            {/* ver si es asi la ruta */}
-        
-        {/* esto es para tener acceso a todas las rutas que una vez que te logueate puede entrar */}
-        {/* <Route path={PrivateRoutes.SETTINGS} element={<Settings />} />  esto es a la bartola*/}
       </RoutesWhitNotFound>
   )
 }

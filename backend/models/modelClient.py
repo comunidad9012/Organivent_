@@ -34,6 +34,11 @@ class ClientModel:
     def get_usuario_by_username(self, username):
         return self.mongo.db.Clientes.find_one({"nombre_usuario": username})
 
+    def get_usuario_by_id(self, user_id):
+        from bson.objectid import ObjectId
+        return self.mongo.db.Clientes.find_one({"_id": ObjectId(user_id)})
+
+
     def show_clients(self):
         clients = list(self.mongo.db.Clientes.find().sort('_id', -1))
         for item in clients:

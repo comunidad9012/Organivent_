@@ -17,7 +17,6 @@ class PedidosModel:
                 'estado': 'pendiente',  # por defecto
                 'fecha': datetime.now()
             }
-            print(f"Creando pedido: {pedido_data}")
             self.mongo.db.Pedidos.insert_one(pedido_data)
             return {"mensaje": "Pedido creado exitosamente"}
         else:
@@ -28,7 +27,20 @@ class PedidosModel:
         for item in pedidos:
             item['_id'] = str(item['_id'])
         response = json_util.dumps(pedidos)
+        print(response)
         return Response(response, mimetype="application/json")
+
+
+    # def show_pedidos(self):
+    #     pedidos = self.pedidos_collection.find()
+    #     lista_pedidos = []
+    #     for pedido in pedidos:
+    #         pedido['_id'] = str(pedido['_id'])
+    #         pedido['usuarioId'] = str(pedido['usuarioId'])  # Por si querés mostrarlo
+    #         lista_pedidos.append(pedido)
+    #     return jsonify(lista_pedidos), 200
+
+
 
     def get_pedido_by_id(self, pedido_id):
         pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})

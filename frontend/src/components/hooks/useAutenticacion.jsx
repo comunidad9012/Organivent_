@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createUser, resetUser, UserKey } from "../../redux/userSlice";
+import { createUser, resetUser } from "../../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { PrivateRoutes, PublicRoutes } from "../../models/routes";
-import { clearLocalStorage } from "../../utilities/localStorage.utility";
-
 
 function useAutenticacion() {
 
@@ -21,27 +19,30 @@ function useAutenticacion() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    //este effect es para que cuando viaje a ruta /login se borre el usuario del localstorage y no pueda volver a la ruta en la que estaba (evita inconsistencias)
+    //este effect es para que cuando viaje a ruta /login se borre el usuario de redux y no pueda volver a la ruta en la que estaba (evita inconsistencias)
     useEffect(() => {
         if (window.location.pathname === `/${PublicRoutes.LOGIN}`) {
-          clearLocalStorage(UserKey);
-          dispatch(resetUser());
+            dispatch(resetUser());
+            //   clearLocalStorage(UserKey);
         }
       }, []);
       
 
   const handleInicioSesion = async (e) => {
-    e.preventDefault(); //esto esta igual que otros submit de fomularios
+    e.preventDefault(); 
     try {
         // setLoading(true);
         const response = await fetch("http://localhost:5000/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user }),
+            credentials: "include" //le dice al navegador: “enviá las cookies (como la de jwt) con esta solicitud, y también aceptá las cookies que vengan del backend”
         });
         const data = await response.json();
         if (response.ok) {
-            dispatch(createUser(data));  // Guarda en Redux
+            // Guarda en Redux
+            dispatch(createUser(data));
+            console.log("Usuario logueado: ", data);
             navigate(`/${PrivateRoutes.PRIVATE}`, {replace: true}); //el replace es para remplazar /login por /private en la ruta
             setMessageAuth('¡Autenticación exitosa!');
         } else {
