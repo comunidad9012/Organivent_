@@ -5,7 +5,6 @@ import CartProduct from './CartProduct';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
-import { Radio, RadioGroup } from '@headlessui/react'
 
 function ProductoDetail() {
   const [Producto, setProducto] = useState({});

@@ -7,6 +7,7 @@ export const PublicRoutes = {
 export const PrivateRoutes = {
     PRIVATE: 'private',
     ADMIN : 'admin',
+    ADMIN_PEDIDOS : 'Pedidos',
     CREATE_PRODUCT : 'Productos/editor',
     EDIT_PRODUCT : 'Productos/edit',
     USER : 'homeUser',

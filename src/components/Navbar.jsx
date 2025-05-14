@@ -33,9 +33,9 @@ function Navbar() {
                 {/* Menú */}
                 <div className="flex items-center gap-4">
                     {userState.rol === Roles.ADMIN && (
-                        <Link to="/holiiiiss" className="fancy">
+                        <Link to={`/private/${PrivateRoutes.ADMIN_PEDIDOS}`} className="fancy">
                         <span className="top-key"></span>
-                        <span className="text">Cositas de admin</span>
+                        <span className="text">Pedidos</span>
                         <span className="bottom-key-1"></span>
                         <span className="bottom-key-2"></span>
                         </Link>
@@ -132,7 +132,7 @@ function Navbar() {
 
 
                 </div>
-                )}
+             )} 
             </div>
         </nav>
 
