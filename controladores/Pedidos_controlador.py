@@ -1,18 +1,36 @@
-from flask import Blueprint, request, current_app, jsonify
+from flask import Blueprint, request, current_app, jsonify, session
 from models.modelPedidos import PedidosModel
+from models.modelClient import ClientModel
 
 Pedidos_bp = Blueprint('Pedidos', __name__, url_prefix='/Pedidos')
+
+
+@Pedidos_bp.route("/checkSession", methods=["GET"])
+def check_session():
+    if "user_id" in session:
+        client_model = ClientModel(current_app)
+        usuario = client_model.get_usuario_by_id(session["user_id"])
+        
+        return jsonify({
+            "usuario": usuario["nombre_usuario"] if usuario else None,
+            "rol": session.get("rol")
+        })
+    else:
+        return jsonify({"usuario": None, "rol": None}), 401
+
 
 @Pedidos_bp.post("/createPedido")
 def create_pedido():
     data = request.json
-    print("Datos recibidos en createPedido:", data)  # <-- Esto es clave
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.create_pedido(data)
     return response
 
 @Pedidos_bp.get("/showPedidos")
 def show_pedidos():
+    if 'usuario' not in session or session.get('rol') != 'admin':
+        return jsonify({"error": "Acceso denegado"}), 403
+
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.show_pedidos()
     return response
