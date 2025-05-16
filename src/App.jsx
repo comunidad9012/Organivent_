@@ -15,7 +15,7 @@ import Loading from "./utilities/Loading";
 import User from "./pages/User";
 
 const Login = lazy(() => import('./components/Login')); 
-const Private = lazy(() => import('./PrivateUser'));
+const PrivateUser = lazy(() => import('./PrivateUser'));
 //esto de lazy es para que cargue el componente solo cuando se necesite, no al principio, recien cuando llame a Private lo va a cargar.
 
 function App() {  
@@ -42,7 +42,7 @@ function App() {
 
                   
                   <Route element={<AuthGuard />}>
-                    <Route path={`${PrivateRoutes.PRIVATE}/*`} element={<Private />} />
+                    <Route path={`${PrivateRoutes.PRIVATE}/*`} element={<PrivateUser />} />
                   </Route>
 
                 </RoutesWhitNotFound>

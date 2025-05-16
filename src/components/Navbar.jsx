@@ -15,7 +15,7 @@ function Navbar() {
     const location = useLocation(); // Obtener la ubicación actual
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
 
-    const isInPrivate = location.pathname.startsWith("/private");
+    const isInPrivate = location.pathname.startsWith(`/${PrivateRoutes.PRIVATE}`);
     
     return (
         <nav className="bg-gray-100 px-4 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
@@ -30,15 +30,14 @@ function Navbar() {
                 </Link>
                 )}
 
-                {isInPrivate && location.pathname !== `/private/${PrivateRoutes.USER}` && (
-                    <Link to={`/private/${PrivateRoutes.USER}`} className="flex items-center gap-2 font-bold text-lg relative fancy">
+                {isInPrivate && (
+                    <Link to={`/${PrivateRoutes.PRIVATE}`} className="flex items-center gap-2 font-bold text-lg relative fancy">
                         <span className="top-key"></span>
                         <span className="text">Inicio</span>
                         <span className="bottom-key-1"></span>
                         <span className="bottom-key-2"></span>
                     </Link>
                 )}
-
 
             {/* Menú */}
                 {/* usuario no autenticado */}
@@ -53,8 +52,8 @@ function Navbar() {
 
                 {/* Acciones del administrador */}
                 <div className="flex items-center gap-4">
-                    {userState.rol === Roles.ADMIN && location.pathname !== `/private/${PrivateRoutes.ADMIN_PEDIDOS}` && (
-                        <Link to={`/private/${PrivateRoutes.ADMIN_PEDIDOS}`} className="fancy">
+                    {userState.rol === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}` && (
+                        <Link to={`/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}`} className="fancy">
                         <span className="top-key"></span>
                         <span className="text">Pedidos</span>
                         <span className="bottom-key-1"></span>
@@ -62,8 +61,8 @@ function Navbar() {
                         </Link>
                     )}
 
-                    {userState.rol === Roles.ADMIN && location.pathname !== `/private/${PrivateRoutes.CREATE_PRODUCT}` && (
-                        <Link to={`/private/${PrivateRoutes.CREATE_PRODUCT}`} className="fancy">
+                    {userState.rol === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.CREATE_PRODUCT}` && (
+                        <Link to={`/private/admin/${PrivateRoutes.CREATE_PRODUCT}`} className="fancy">
                         <span className="top-key"></span>
                         <span className="text">Añadir producto</span>
                         <span className="bottom-key-1"></span>
