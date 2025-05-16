@@ -36,7 +36,7 @@ export const AuthGuard = () => {
     }, [])
     
 
-    if (isAuthenticated === null) return <div><Loading/></div> //poner Loading
+    if (isAuthenticated === null) return <div><Loading/></div>
     return isAuthenticated ? <Outlet /> : <Navigate replace to={PublicRoutes.LOGIN} />
 }
 
