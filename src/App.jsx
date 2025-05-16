@@ -12,9 +12,10 @@ import { Suspense, lazy } from "react";
 import { FiltersProvider } from "./components/context/filters";
 import { CartProvider } from "./components/context/CartContext";
 import Loading from "./utilities/Loading";
+import User from "./pages/User";
 
 const Login = lazy(() => import('./components/Login')); 
-const Private = lazy(() => import('./Private/Private'));
+const Private = lazy(() => import('./PrivateUser'));
 //esto de lazy es para que cargue el componente solo cuando se necesite, no al principio, recien cuando llame a Private lo va a cargar.
 
 function App() {  
@@ -31,12 +32,15 @@ function App() {
                 {/* en vez de poner Routes directamente ponemos RoutesWhitNotFound ya que dentro del mismo tenemos a Routes*/}
                 <RoutesWhitNotFound>
                   {/* ver como reordenar para que el cliente pueda ver los productos sin loguearse */}
-                  <Route path='/' element={<Navigate to={PrivateRoutes.PRIVATE} />} /> 
-
-                  <Route path={PublicRoutes.LOGIN} element={<Login/>} />
-
+                  <Route path="/" element={<Navigate to={PublicRoutes.HOME}/>}/>
+                  
+                  <Route path={PublicRoutes.HOME} element={<User />} />
                   <Route path={PublicRoutes.VIEW_PRODUCT} element={<ProductosDetail />} />
 
+                  <Route path={PublicRoutes.LOGIN} element={<Login/>} />
+                  {/* debo poner en el carrito que antes pase por el login, osea la ruta de aca arriba */}
+
+                  
                   <Route element={<AuthGuard />}>
                     <Route path={`${PrivateRoutes.PRIVATE}/*`} element={<Private />} />
                   </Route>

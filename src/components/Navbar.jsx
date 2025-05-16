@@ -9,20 +9,20 @@ import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
 import Logout from "./Logout";
-import { PrivateRoutes } from "../models/routes";
+import { PrivateRoutes, PublicRoutes } from "../models/routes";
 
 function Navbar() {
     const location = useLocation(); // Obtener la ubicación actual
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
+
+    const isInPrivate = location.pathname.startsWith("/private");
     
     return (
         <nav className="bg-gray-100 px-4 fixed top-0 left-0 w-full shadow-lg h-20 z-50">
             <div className="flex justify-around items-center mx-auto h-full">
-                
-                {/* Logo */}
-                {/* DEJAR EL INICIO EN CUALQUIER PARTE PORQUE SE SUPONE QUE EL USUARIO PUEDE VER LOS PRODUCTOS SIN NECESIDAD DE LOGUEARSE */}
-                {location.pathname !== '/' && (
-                <Link to="/" className="flex items-center gap-2 font-bold text-lg relative fancy">
+
+                {location.pathname !== `/${PublicRoutes.HOME}` && !isInPrivate && (
+                <Link to={`/${PublicRoutes.HOME}` } className="flex items-center gap-2 font-bold text-lg relative fancy">
                     <span className="top-key"></span>
                     <span className="text">Inicio</span>
                     <span className="bottom-key-1"></span>
@@ -30,7 +30,28 @@ function Navbar() {
                 </Link>
                 )}
 
-                {/* Menú */}
+                {isInPrivate && location.pathname !== `/private/${PrivateRoutes.USER}` && (
+                    <Link to={`/private/${PrivateRoutes.USER}`} className="flex items-center gap-2 font-bold text-lg relative fancy">
+                        <span className="top-key"></span>
+                        <span className="text">Inicio</span>
+                        <span className="bottom-key-1"></span>
+                        <span className="bottom-key-2"></span>
+                    </Link>
+                )}
+
+
+            {/* Menú */}
+                {/* usuario no autenticado */}
+                {userState.rol === null && location.pathname !== `/${PublicRoutes.LOGIN}` && (
+                    <Link to={`/${PublicRoutes.LOGIN}`} className="fancy">
+                    <span className="top-key"></span>
+                    <span className="text">Iniciar sesión</span>
+                    <span className="bottom-key-1"></span>
+                    <span className="bottom-key-2"></span>
+                    </Link>
+                )}
+
+                {/* Acciones del administrador */}
                 <div className="flex items-center gap-4">
                     {userState.rol === Roles.ADMIN && location.pathname !== `/private/${PrivateRoutes.ADMIN_PEDIDOS}` && (
                         <Link to={`/private/${PrivateRoutes.ADMIN_PEDIDOS}`} className="fancy">
@@ -51,15 +72,14 @@ function Navbar() {
                     )}
                 </div>
 
-                {/* Acciones del usuario */}
+                {/* por defecto de cualquiera que esté logueado */}
                 {userState.rol !== null && (
                 <div className="flex items-center gap-4">
                     <Categorias />
                     <SearchForm />
-                    {/* <p className="text-lg text-black mx-4">¡Hola {userState.nombre_usuario}!</p> */}
                     <p className="text-lg  text-black mx-4 whitespace-nowrap">¡Hola {userState.nombre_usuario}!</p>
 
-
+                {/* Acciones del usuario */}
                     {userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` && (
                     <Link to={`/private/${PrivateRoutes.CART}`}>
                         <button className="flex p-2 hover:bg-gray-200 rounded">

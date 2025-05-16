@@ -1,7 +1,7 @@
 export const PublicRoutes = {
     LOGIN : 'login',
+    HOME: 'home',
     VIEW_PRODUCT : 'Productos/viewproduct/:id',
-    CREATE_CLIENT : 'createClient',
 }
 
 export const PrivateRoutes = {
@@ -10,7 +10,7 @@ export const PrivateRoutes = {
     ADMIN_PEDIDOS : 'Pedidos',
     CREATE_PRODUCT : 'Productos/editor',
     EDIT_PRODUCT : 'Productos/edit',
-    USER : 'homeUser',
+    USER : 'User',
     CART : 'cart',
     
     // DASHBOARD : 'dashboard',
@@ -18,4 +18,4 @@ export const PrivateRoutes = {
     // SETTINGS : 'settings'
 }
 
-// localhost:5173/private/user
+// localhost:5173/private/User

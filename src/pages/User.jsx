@@ -1,11 +1,11 @@
 import Productos from "../components/Productos"
 
-function HomeUser() {
+function User() {
   return (
     <>
-    <h1 className="text-center">Home User Privado</h1>
+    <h1 className="text-center">User Privado</h1>
     <Productos />
     </>
     )
 }
-export default HomeUser
+export default User
