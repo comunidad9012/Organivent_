@@ -11,3 +11,5 @@ function RoleGuard() {
     return userState.rol === Roles.ADMIN ? <Outlet /> : <Navigate replace to={PrivateRoutes.USER} />;
   }
   export default RoleGuard;
+
+  //quizas aca puedo pasarle por props el rol y el path al que quiero redirigir
