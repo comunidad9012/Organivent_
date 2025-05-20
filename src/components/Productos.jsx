@@ -79,7 +79,11 @@ function Productos() {
                       {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
                       <p>{limitText(product.descripcion, 100)}</p>
                       <p className="card-text mt-auto">${product.precio_venta}</p>
+                      {userState.rol === null ?
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
+                      : 
+                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más en user</Link>
+                      }
                       <br />
 
 

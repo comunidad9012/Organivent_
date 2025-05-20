@@ -20,10 +20,10 @@ const cartReducer = (state, action) => {
   switch (action.type) {
 
     case "ADD_TO_CART": {
-      const existing = state.find(item => isSameProduct(item, action.payload));
+      const existing = state.find(item => isSameProduct(item, action.payload)); //esto se fija si hay uno igual en el carrito
 
       if (existing) {
-        return state.map(item =>
+        return state.map(item => //ahora se fija CUAL es el que ya existe y a ese le suma 1
           isSameProduct(item, action.payload)
             ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
@@ -34,7 +34,7 @@ const cartReducer = (state, action) => {
     }
 
 
-    case "INCREMENT_QUANTITY": {
+    case "INCREMENT_QUANTITY": { //esto lo utilizan los botones de + y - del carrito
       return state.map((item) =>
         item._id === action.payload
           ? { ...item, quantity: item.quantity + 1 }
