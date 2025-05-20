@@ -1,5 +1,6 @@
 import { createContext, useReducer, useContext, useEffect } from "react";
 import { clearLocalStorage, persistLocalStorage } from "../../utilities/localStorage.utility";
+import isSameProduct from "../../utilities/isSameProduct";
 
 export const CartKey = "cart";
 
@@ -17,17 +18,21 @@ const getInitialCart = () => {
 // Reducer para manejar las acciones del carrito
 const cartReducer = (state, action) => {
   switch (action.type) {
+
     case "ADD_TO_CART": {
-      const existing = state.find((item) => item._id === action.payload._id);
+      const existing = state.find(item => isSameProduct(item, action.payload));
+
       if (existing) {
         return state.map(item =>
-          item._id === action.payload._id
-            ? { ...item, quantity: (item.quantity || 1) + 1 } //creo que acá esta el detalle de que si el id esta le suma uno al carrito, buenisimo pero que contenga esto del color
+          isSameProduct(item, action.payload)
+            ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
-        ); //creo que por aca podria ponerle que si el color seleccionado de determinado producto no es igual no lo sume como uno igual sino que lo ponga aparte
+        );
       }
+
       return [...state, { ...action.payload, quantity: 1 }];
     }
+
 
     case "INCREMENT_QUANTITY": {
       return state.map((item) =>
