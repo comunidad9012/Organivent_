@@ -16,7 +16,7 @@ function PrivateUser() {
         
         <Route path={PrivateRoutes.USER} element={<User />} />
         <Route path={PrivateRoutes.CART} element={<Cart />}/>
-        <Route path={PublicRoutes.VIEW_PRODUCT} element={<ProductosDetail />} />
+        <Route path={`/User/${PrivateRoutes.VIEW_PRODUCT_PRIVATE}`} element={<ProductosDetail />} />
 
         
           {/* aca puedo poner el roleGuard para el admin y arriba para el del usuario y los path a los que deriva si los saca corriendo */}

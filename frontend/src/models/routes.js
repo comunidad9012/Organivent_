@@ -12,6 +12,7 @@ export const PrivateRoutes = {
     EDIT_PRODUCT : 'Productos/edit',
     USER : 'User',
     CART : 'cart',
+    VIEW_PRODUCT_PRIVATE : 'Productos/viewproduct/:id',
     
     // DASHBOARD : 'dashboard',
     // PROFILE : 'profile',
