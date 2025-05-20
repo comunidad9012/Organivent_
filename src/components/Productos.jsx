@@ -82,7 +82,7 @@ function Productos() {
                       {userState.rol === null ?
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       : 
-                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más en user</Link>
+                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       }
                       <br />
 
