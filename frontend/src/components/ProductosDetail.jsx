@@ -99,11 +99,15 @@ function ProductoDetail() {
     
               <div className="flex flex-col justify-end mt-4">
               
-              {userState.rol === Roles.USER && (
-                <CartProduct product={Producto} selectedColor={selectedColor} />
+              {userState.rol !== Roles.ADMIN && (
+                <CartProduct 
+                  product={Producto} 
+                  selectedColor={selectedColor} 
+
+                  //aca sería pasarle los selectedCaracteristicas que sean necesarias pasandosela como props
+                />
               )}
-                {/* ESTE BOTON NO SE MANTIENE COMO QUE YA ESTA EN EL CARRITO SINO QUE deja añadir mas del mismo y salen los dos en el carrito, tenia pensado dejar esto para cuando cuztomizan dos productos que son el mismo pero con diferentes caracteristicas (ejemplo color) como en mercado libre */}
-                  {/* bueno al final lo arreglé sacandole el $oid del _id (vonviendo string lo que volvia del back en view_product) y con esto el boton funciona normalmente peeeeeero quizas no estaria mal permitirle a usuario poner mas de un mismo producto con diferentes caracteristicas*/}
+
               </div>
           </div>
       </div>
