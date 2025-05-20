@@ -22,9 +22,9 @@ const cartReducer = (state, action) => {
       if (existing) {
         return state.map(item =>
           item._id === action.payload._id
-            ? { ...item, quantity: (item.quantity || 1) + 1 }
+            ? { ...item, quantity: (item.quantity || 1) + 1 } //creo que acá esta el detalle de que si el id esta le suma uno al carrito, buenisimo pero que contenga esto del color
             : item
-        );
+        ); //creo que por aca podria ponerle que si el color seleccionado de determinado producto no es igual no lo sume como uno igual sino que lo ponga aparte
       }
       return [...state, { ...action.payload, quantity: 1 }];
     }
