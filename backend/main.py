@@ -19,6 +19,12 @@ CORS(app, supports_credentials=True, origins=["http://localhost:5173"]) # Esto h
 app.config['MONGO_URI'] = os.getenv('MONGOURL')
 app.secret_key = os.getenv("SECRET_KEY")
 mongo = PyMongo(app)  # Esto debería configurar mongo correctamente
+try:
+    mongo.cx.server_info()  # Esto lanza error si no puede conectar
+    print("✅ Conexión a MongoDB exitosa.")
+except Exception as e:
+    print("❌ Error al conectar con MongoDB:", e)
+
 
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), '../images')
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -36,4 +42,4 @@ def serve_image(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000) #Esto permite que otros contenedores como frontend o tu navegador accedan a Flask.
