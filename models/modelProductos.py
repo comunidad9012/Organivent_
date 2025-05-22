@@ -36,7 +36,7 @@ class ProductosModel:
 
         
     def show_Productos(self):
-        Productos=list(self.mongo.db.Productos.find().sort('_id', -1))
+        Productos=list(self.mongo.db.Productos.find().sort('_id', -1)) #este _id es el de mongo
         for item in Productos:
             item['_id'] = str(item['_id'])
         response=json_util.dumps(Productos)
@@ -64,11 +64,11 @@ class ProductosModel:
         return Response(response, mimetype="application/json")
 
     def get_productos_by_categoria(self, id_categoria):
-        productos = list(self.mongo.db.Productos.find({"categoria": id_categoria})) #-------------aca va el id de la categoria no el nombre
+        productos = list(self.mongo.db.Productos.find({"categoria": id_categoria}))
         for producto in productos:
             producto['_id'] = str(producto['_id'])
         response=json_util.dumps(productos)
-        return Response(response, mimetype="application/json") #añadi esto como el otro para que funcione
+        return Response(response, mimetype="application/json")
 
     def update_product(self, product_id, data):
         try:

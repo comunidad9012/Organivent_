@@ -1,0 +1,12 @@
+{
+    "cors": {
+      "enabled": true,
+      "rules": [
+        {
+          "allowedOrigins": ["*"],
+          "allowedMethods": ["GET","POST","PUT","DELETE"],
+          "allowedHeaders": ["*"]
+        }
+      ]
+    }
+  }
