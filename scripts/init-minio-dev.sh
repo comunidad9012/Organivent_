@@ -22,7 +22,7 @@ echo "✔✔ Configuración completada! Bucket ${MINIO_BUCKET} listo"
 
 # Listar buckets para ver que existe
 echo "Buckets actuales:"
-mc ls minio
+mc ls minioñ
 
 # Archivo de prueba
 echo "Archivo de prueba :)" > prueba.txt #crea el archivo con su contenido
