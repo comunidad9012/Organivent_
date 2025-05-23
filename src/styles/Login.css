@@ -1,0 +1,235 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+.containerLogin {
+    background-color: #fff;
+    border-radius: 13px;
+    box-shadow: 25px 30px 55px #5557;
+    position: relative;
+    overflow: hidden;
+    /* revisar por aca para ver el ancho y largo del contenedor de forma responsiva */
+    width: 1020px;
+    height: 600px;
+    /* max-width: 100%;
+    min-height: 700px; */
+  }
+
+  .form-containerLogin {
+    position: absolute;
+    /* top: 0; */
+    width: 60%;
+    height: 100%;
+    padding: 0px 40px;
+    transition: all 0.6s ease-in-out;
+  }
+
+  .sign-in-containerLogin {
+    /* left: 0;
+    width: 50%; */
+    z-index: 2;
+  }
+
+  .sign-up-containerLogin {
+    /* left: 0; */
+    /* width: 50%; */
+    opacity: 0;
+    z-index: 1;
+  }
+
+/* form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 50px;
+}
+
+h1 {
+  color: var(--grad-clr1);
+} */
+
+
+  .containerLogin.right-panel-active .sign-in-containerLogin {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  .containerLogin.right-panel-active .sign-up-containerLogin {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+  }
+
+  .overlay-containerLogin {
+    position: absolute;
+    top: 0;
+    left: 60%;
+    width: 40%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 9;
+  }
+
+  .overlay {
+    background: var(--linear-grad);
+    /* background-repeat: no-repeat; */
+    /* background-size: cover; */
+    /* background-position: 0 0; */
+    color: white;
+    position: relative;
+    left: -150%;
+    height: 100%;
+    width: 250%;
+    /* transform: translateX(0); */
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .overlay-panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 40px;
+    text-align: center;
+    /* top: 0; */
+    height: 100%;
+    width: 400px;
+    /* transform: translateX(0); */
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .overlay-left {
+    right: 60%;
+    transform: translateX(-12%);
+  }
+
+  .overlay-right {
+    right: 0;
+    transform: translateX(0%);
+  }
+
+  .overlay-panel h1 {
+    color: #fff;
+  }
+
+  /* p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 25px 0 35px;
+  } */
+
+  /* VER SI DESPUES LO SACO PARA AFUERA esto es del mensaje para superponerse a los componentes*/
+  .floating-alert {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    width: fit-content;
+    max-width: 90%;
+  }
+  
+
+  .overlay-panel button {
+    border: none;
+    background-color: transparent;
+
+  }
+
+  .infield{
+    position: relative;
+    margin: 8px 0px;
+    width: 100%;
+  }
+
+  /* input {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #f3f3f3;
+    border: none;
+    outline: none;
+  }
+
+  label {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%);
+    width: 0%;
+    height: 2px;
+    background: var(--linear-grad);
+    transition: 0.3s;
+  }
+
+  input:focus ~ label {
+    width: 100%;
+  } */
+
+  /* button {
+    border-radius: 20px;
+    border: 1px solid var(--grad-clr1);
+    background: var(--grad-clr2);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  } */
+
+  .form-containerLogin button{
+    margin-top: 17px;
+    transition: 80ms ease-in;
+  }
+
+  /* .form-containerLogin button:hover{
+    background: #fff;
+    cursor: var(--grad-clr1);
+  } */
+
+  .containerLogin.right-panel-active .overlay-containerLogin {
+    transform: translateX(-150%);
+  }
+
+  .containerLogin.right-panel-active .overlay {
+    transform: translateX(50%);
+  }
+
+  .containerLogin.right-panel-active .overlay-left {
+    transform: translateX(25%);
+  }
+
+  .containerLogin.right-panel-active .overlay-right {
+    transform: translateX(35%);
+  }
+
+  .containerLogin.right-panel-active .sign-in-containerLogin {
+    transform: translateX(20%);
+    opacity: 0;
+  }
+
+  .containerLogin.right-panel-active .sign-up-containerLogin {
+    transform: translateX(66.7%);
+    opacity: 1;
+    z-index: 5;
+    animation: show 0.6s;
+  }
+
+  @keyframes show {
+    0%, 50% {
+      opacity: 0;
+      z-index: 1;
+    }
+    50.1%, 100% {
+      opacity: 1;
+      z-index: 5;
+    }
+  }
