@@ -56,7 +56,7 @@ services:
       - minio
     volumes:
       - ./scripts/init-minio-dev.sh:/init-minio-dev.sh
-    entrypoint: /init-minio-dev.sh
+    entrypoint: ["/bin/sh", "-c", "chmod +x /init-minio-dev.sh && /init-minio-dev.sh"]
     env_file: ./backend/.env
 
 volumes:
