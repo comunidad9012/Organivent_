@@ -9,16 +9,24 @@ class ProductosModel:
         self.mongo = PyMongo(app)
 
     def create_Productos(self, data):
+        print("Datos recibidos en backend:", data)
+
         if 'nombre_producto' in data:
+            # Obtener imágenes del JSON recibido
+            imagenes = data.get('imagenes')
+            if not imagenes:
+                imagenes = ["imgs/imagenes/default.jpg"]  # Imagen por defecto si no se recibe ninguna
+
             Productos_data = {
-                'nombre_producto':data['nombre_producto'], 
-                'descripcion':data['descripcion'],
-                'precio_venta':data['precio_venta'],
-                'colores':data['colores'],
-                'imagenes':data.get('imagenes',[]) # acepta una lista de URLs
-                #'stock':data['stock'],
-                #'miniatura':data['miniatura']
-                }
+                'nombre_producto': data['nombre_producto'],
+                'descripcion': data['descripcion'],
+                'precio_venta': data['precio_venta'],
+                'colores': data['colores'],
+                'imagenes': imagenes
+                # 'stock': data['stock'],  # Descomentá si vas a usarlo
+                # 'miniatura': data['miniatura']  # Igual que esto
+            }
+
             self.mongo.db.Productos.insert_one(Productos_data)
             return {"contenido": "exitoso"}
         else:
@@ -44,7 +52,7 @@ class ProductosModel:
         return Response(response, mimetype="application/json")
 
     def specific_product(self,id):
-        Productos=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
+        producto=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
         if not producto:
             return Response(json_util.dumps({"error": "Producto no encontrado"}), mimetype="application/json", status=404)
         producto['_id'] = str(producto['_id'])
