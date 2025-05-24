@@ -12,12 +12,13 @@ function FormProductoModern() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [colorMessage, setColorMessage] = useState('');
-
+  const [imagenes, setImagenes] = useState([]);
   const [producto, setProducto] = useState({
     nombre_producto: '',
     descripcion: '',
     precio_venta: '',
-    colores: [] 
+    imagenes_urls: [],// array para imagenes
+    colores: [],
   });
 
   const [nuevoColor, setNuevoColor] = useState({ name: '', hex: '#000000' });
@@ -41,32 +42,80 @@ function FormProductoModern() {
     setProducto(prev => ({ ...prev, descripcion }));
   };
 
-  const handleSubmit = (event) => {
+  const handleImageUpload = (e) => {
+    setImagenes(Array.from(e.target.files));
+  };
+
+  
+  const subirImagenes = async () => {
+    if (!imagenes || imagenes.length === 0) {
+      console.warn("No hay imágenes para subir");
+      return [];
+    }
+    console.log("Subiendo imágenes...");
+  
+    const imagenes_urls = [];
+  
+    for (let i = 0; i < imagenes.length; i++) {
+      const formData = new FormData();
+      formData.append('file', imagenes[i]);
+  
+      try {
+        const response = await fetch('http://localhost:5000/imgs/upload', {
+          method: 'POST',
+          body: formData
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Error al subir la imagen ${i + 1}`);
+        }
+  
+        const data = await response.json();
+        console.log("Respuesta del back completa:", data);
+        imagenes_urls.push(data.location);
+  
+      } catch (error) {
+        console.error('Error al subir imagen:', error);
+      }
+    }
+    return imagenes_urls;
+  };
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    const url = id 
-      ? `http://localhost:5000/Productos/update/${id}` 
+  
+    const nuevasUrls = await subirImagenes();
+  
+    const finalProducto = {
+      ...producto,
+      imagenes: [...(producto.imagenes || []), ...nuevasUrls]
+    };
+  
+    const url = id
+      ? `http://localhost:5000/Productos/update/${id}`
       : 'http://localhost:5000/Productos/createProductos';
+  
     const method = id ? 'PUT' : 'POST';
-
+  
     fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(producto)
+      body: JSON.stringify(finalProducto)
     })
-    .then(response => response.json())
-    .then(data => {
-      setLoading(false);
-      setMessage(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
-      setColorMessage('verde');
-      setTimeout(() => navigate("/"), 2000);
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      setLoading(false);
-      setMessage('Error al procesar el producto.');
-      setColorMessage('rojo');
-    });
+      .then(response => response.json())
+      .then(data => {
+        setLoading(false);
+        setMessage(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
+        setColorMessage('verde');
+        setTimeout(() => navigate("/"), 2000);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setLoading(false);
+        setMessage('Error al procesar el producto.');
+        setColorMessage('rojo');
+      });
   };
 
   return (
@@ -96,7 +145,7 @@ function FormProductoModern() {
           {/* Sección de imágenes */}
           <div className="md:w-1/2 space-y-4">
             <img 
-              src="https://placehold.co/600x600.png" 
+              src={producto.imagenes_urls?.[0] ||"https://placehold.co/600x600.png"}
               alt="Imagen del producto" 
               className="w-full h-auto rounded-lg shadow" 
             />
@@ -126,6 +175,36 @@ function FormProductoModern() {
               <label></label>
             </div>
 
+            {/*AGREGADO AHORA-----------------------------------------------*/}
+            <div className="mb-4">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </div>
+            <div className="flex space-x-2">
+              {producto.imagenes_urls.map((url, index) => (
+                <div key={index} className="relative w-24 h-24">
+                  <img src={url} alt={`Imagen ${index}`} className="w-full h-full object-cover rounded" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProducto(prev => ({
+                        ...prev,
+                        imagenes_urls: prev.imagenes_urls.filter((_, i) => i !== index)
+                      }));
+                    }}
+                    className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/*FIN AGREGADO AHORA--------------------------------------------------------------------*/}
             <div className="mb-2">
               <p className="block m-2 font-bold">Descripción:</p>
               <Editor

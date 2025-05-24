@@ -14,7 +14,8 @@ class ProductosModel:
                 'nombre_producto':data['nombre_producto'], 
                 'descripcion':data['descripcion'],
                 'precio_venta':data['precio_venta'],
-                'colores':data['colores']
+                'colores':data['colores'],
+                'imagenes':data.get('imagenes',[]) # acepta una lista de URLs
                 #'stock':data['stock'],
                 #'miniatura':data['miniatura']
                 }
@@ -44,9 +45,10 @@ class ProductosModel:
 
     def specific_product(self,id):
         Productos=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
-        Productos['_id'] = str(Productos['_id'])
-        response=json_util.dumps(Productos)
-        return Response(response, mimetype="application/json")
+        if not producto:
+            return Response(json_util.dumps({"error": "Producto no encontrado"}), mimetype="application/json", status=404)
+        producto['_id'] = str(producto['_id'])
+        return Response(json_util.dumps(producto), mimetype="application/json")
     
     def find_Productos(self, palabra):
         regex = re.compile(f".*{re.escape(palabra)}.*", re.IGNORECASE)
@@ -82,6 +84,8 @@ class ProductosModel:
                 update_fields['precio_venta'] = data['precio_venta']
             if 'colores' in data:
                 update_fields['colores'] = data['colores']
+            if 'imagenes' in data:
+                update_fields['imagenes'] = data['imagenes'] # listado nuevo o modificado
             # if 'miniatura' in data:
             #     update_fields['miniatura'] = data['miniatura']
 
