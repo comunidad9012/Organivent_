@@ -1,5 +1,5 @@
 import os
-from flask import Blueprint, request, current_app, jsonify, send_from_directory
+from flask import Blueprint, request, current_app, jsonify, send_from_directory, redirect
 from werkzeug.utils import secure_filename
 from models.modelProductos import ProductosModel
 from models.modelImgs import ImagesModel
@@ -26,7 +26,7 @@ def upload_file():
             img_model = ImagesModel(current_app)
             img_model.save_image_db(filename, file_url)
 
-            return jsonify({'location': file_url}), 200
+            return jsonify({'location': f"http://localhost:5000/imgs/imagenes/{filename}"}), 200
 
         except Exception as e:
             print(f"Error al subir a MinIO: {e}")
@@ -34,8 +34,15 @@ def upload_file():
 
     return jsonify({'error': 'No se recibió archivo'}), 400
 
+
 @imgs_bp.get('/gallery')
 def gallery():
-    img_model=ImagesModel(current_app)
-    response=img_model.show_gallery()
+    img_model = ImagesModel(current_app)
+    response = img_model.show_gallery()
     return response
+
+
+@imgs_bp.route('/imagenes/<path:filename>')
+def proxy_minio(filename):
+    # Redirige al navegador hacia MinIO (puerto 9000)
+    return redirect(f"http://localhost:9000/product-images/{filename}")
