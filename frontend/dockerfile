@@ -7,14 +7,13 @@ WORKDIR /app
 # Copiar package.json y package-lock.json
 COPY package*.json ./
 
-# Instalar las dependencias saltandose las advertencia.
+# Instalar las dependencias
 RUN npm install --legacy-peer-deps 
 
 # Copiar el resto de los archivos del proyecto
 COPY . .
 
-# Exponer el puerto que Vite usa por defecto
+# Exponer el puerto que el servidor web utilizará
 EXPOSE 5173
 
-# Correr el servidor de desarrollo de Vite
-ENTRYPOINT ["npm", "run", "dev", "--", "--host"]
+ENTRYPOINT [ "npm", "run", "dev", "--", "--host" ]
