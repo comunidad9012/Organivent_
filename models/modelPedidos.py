@@ -30,17 +30,6 @@ class PedidosModel:
         return Response(response, mimetype="application/json")
 
 
-    # def show_pedidos(self):
-    #     pedidos = self.pedidos_collection.find()
-    #     lista_pedidos = []
-    #     for pedido in pedidos:
-    #         pedido['_id'] = str(pedido['_id'])
-    #         pedido['usuarioId'] = str(pedido['usuarioId'])  # Por si querés mostrarlo
-    #         lista_pedidos.append(pedido)
-    #     return jsonify(lista_pedidos), 200
-
-
-
     def get_pedido_by_id(self, pedido_id):
         pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
         if pedido:
