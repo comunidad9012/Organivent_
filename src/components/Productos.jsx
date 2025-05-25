@@ -69,11 +69,16 @@ function Productos() {
         {Productos.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
           <div className="row justify-content-center mt-4">
+            
             {currentProducts.map((product, index) => (
               <Fragment key={product._id}>
                 <div className="col-md-3 mt-4">
                   <div className="card h-100">
-                    {/* <img src={product.miniatura || "../../imagenes/foto.png"} className="card-img-top" alt="..." /> */}
+                  <img
+                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+                    alt={product.nombre_producto}
+                    className="card-img-top"
+                  />
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{product.nombre_producto}</h5>
                       {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
