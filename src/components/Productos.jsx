@@ -94,8 +94,8 @@ function Productos() {
 
                       {userState.rol === Roles.ADMIN ?
                         <>
-                          {/* <Link to={`/Productos/edit/${product._id}`} className="btn btn-warning mt-2"> */}
-                          <Link to={`/private/${PrivateRoutes.EDIT_PRODUCT}/${product._id}`} className="btn btn-warning mt-2">
+                          {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
+                          <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
                           Editar
                           </Link>
                           <DeleteProduct product={product} setColorMessage={setColorMessage} setProductos={setProductos} setMessage={setMessage}/>
