@@ -45,13 +45,20 @@ const AdminPedidos = () => {
                       <p><strong>Cantidad:</strong> {prod.cantidad}</p>
                       <p className="flex items-center gap-2">
                         <strong>Color:</strong>
-                        <span
-                          className="inline-block w-4 h-4 rounded-full border-1 border-gray-300"
-                          style={{ backgroundColor: prod.color.hex }}
-                          title={prod.color.name}
-                        ></span>
-                        {prod.color.name}
+                        {prod.color?.hex ? (
+                          <>
+                            <span
+                              className="inline-block w-4 h-4 rounded-full border-1 border-gray-300"
+                              style={{ backgroundColor: prod.color.hex }}
+                              title={prod.color.name}
+                            ></span>
+                            {prod.color.name}
+                          </>
+                        ) : (
+                          <span className="text-gray-500 italic">Sin color</span>
+                        )}
                       </p>
+
                     </div>
                   ))}
                 </div>

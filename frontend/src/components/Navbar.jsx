@@ -75,7 +75,7 @@ function Navbar() {
                 {userState.rol !== null && (
                 <div className="flex items-center gap-4">
                     <Categorias />
-                    <SearchForm />
+                    {/* <SearchForm /> */}
                     <p className="text-lg  text-black mx-4 whitespace-nowrap">¡Hola {userState.nombre_usuario}!</p>
 
                 {/* Acciones del usuario */}

@@ -45,7 +45,7 @@ function useCrearPedido() {
       if (result.mensaje === "Pedido creado exitosamente") {
         setMessagePedido("¡Pedido creado con éxito!");
         dispatch({ type: "CLEAR_CART" });
-        setTimeout(() => navigate("/"), 2000); // o a una página de confirmación
+        setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000); // o a una página de confirmación
       } else {
         setMessagePedido("Error al crear el pedido: " + (result.error || "Respuesta inesperada"));
       }
