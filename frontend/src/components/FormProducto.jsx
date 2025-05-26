@@ -4,6 +4,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { Helmet } from 'react-helmet';
 import Loading from '../utilities/Loading';
 import '../styles/loading.css';
+import { PrivateRoutes } from '../models/routes';
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -108,7 +109,7 @@ function FormProductoModern() {
         setLoading(false);
         setMessage(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
         setColorMessage('verde');
-        setTimeout(() => navigate("/"), 2000);
+        setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
       })
       .catch(error => {
         console.error('Error:', error);
@@ -185,23 +186,24 @@ function FormProductoModern() {
               />
             </div>
             <div className="flex space-x-2">
-              {producto.imagenes_urls.map((url, index) => (
-                <div key={index} className="relative w-24 h-24">
-                  <img src={url} alt={`Imagen ${index}`} className="w-full h-full object-cover rounded" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setProducto(prev => ({
-                        ...prev,
-                        imagenes_urls: prev.imagenes_urls.filter((_, i) => i !== index)
-                      }));
-                    }}
-                    className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
+            {Array.isArray(producto.imagenes_urls) && producto.imagenes_urls.map((url, index) => (
+              <div key={index} className="relative w-24 h-24">
+                <img src={url} alt={`Imagen ${index}`} className="w-full h-full object-cover rounded" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProducto(prev => ({
+                      ...prev,
+                      imagenes_urls: prev.imagenes_urls.filter((_, i) => i !== index)
+                    }));
+                  }}
+                  className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+
             </div>
 
             {/*FIN AGREGADO AHORA--------------------------------------------------------------------*/}
