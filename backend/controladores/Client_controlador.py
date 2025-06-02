@@ -1,5 +1,6 @@
 from flask import Blueprint, request, current_app
 from models.modelClient import ClientModel
+from models.modelAdmin import AdminModel
 
 Client_bp = Blueprint('Client', __name__, url_prefix='/Client')
 
@@ -32,9 +33,10 @@ def show_clients():
 
     Returns:
         Response: A response object containing the list of clients.
+        
     """
-    client_model = ClientModel(current_app)
-    response = client_model.show_clients()
+    Admin_model = AdminModel(current_app)
+    response = Admin_model.show_clients()
     return response
 
 @Client_bp.get("/viewClient/<id>")
@@ -48,8 +50,8 @@ def specific_client(id):
     Returns:
         Response: A response object containing the client's details.
     """
-    client_model = ClientModel(current_app)
-    response = client_model.specific_client(id)
+    Admin_model = AdminModel(current_app)
+    response = Admin_model.specific_client(id)
     return response
 
 @Client_bp.post("/find_client")
@@ -65,6 +67,6 @@ def find_client():
     """
     data = request.json
     palabra = data['palabra']
-    client_model = ClientModel(current_app)
-    response = client_model.find_client(palabra=palabra)
+    Admin_model = AdminModel(current_app)
+    response = Admin_model.find_client(palabra=palabra)
     return response
