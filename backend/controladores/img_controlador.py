@@ -11,28 +11,35 @@ imgs_bp = Blueprint('imgs', __name__, url_prefix='/imgs')
 
 @imgs_bp.post('/upload')
 def upload_file():
-    if 'file' in request.files:
-        file = request.files['file']
-        filename = secure_filename(file.filename)
+    if 'file' not in request.files:
+     return jsonify({'error': 'No se recibió archivo'}), 400
 
-        # Leer el archivo y prepararlo como stream para MinIO
+    # Puede ser una lista de archivos
+    files = request.files.getlist('file')
+    imagenes_urls = []
+
+    for file in files:
+        if file.filename == '':
+            continue
+
+        filename = secure_filename(file.filename)
         file_stream = BytesIO(file.read())
 
-        # Subir a MinIO
         try:
-            file_url = upload_to_minio(file_stream, filename, file.mimetype)
+            upload_to_minio(file_stream, filename, file.mimetype)
+            file_url = f"http://localhost:5000/imgs/imagenes/{filename}"
 
-            # Guardar en MongoDB
+            # Guardar en MongoDB (opcional si lo haces por producto después)
             img_model = ImagesModel(current_app)
             img_model.save_image_db(filename, file_url)
 
-            return jsonify({'location': f"http://localhost:5000/imgs/imagenes/{filename}"}), 200
+            imagenes_urls.append(file_url)
 
         except Exception as e:
             print(f"Error al subir a MinIO: {e}")
-            return jsonify({'error': 'Falló la subida a MinIO'}), 500
+            return jsonify({'error': f'Falló la subida de {filename}'}), 500
 
-    return jsonify({'error': 'No se recibió archivo'}), 400
+    return jsonify({'locations': imagenes_urls}), 200
 
 
 @imgs_bp.get('/gallery')

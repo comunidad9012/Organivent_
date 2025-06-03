@@ -18,7 +18,7 @@ function FormProductoModern() {
     nombre_producto: '',
     descripcion: '',
     precio_venta: '',
-    imagenes_urls: [],// array para imagenes
+    imagenes: [],// array para imagenes
     colores: [],
   });
 
@@ -44,7 +44,15 @@ function FormProductoModern() {
   };
 
   const handleImageUpload = (e) => {
-    setImagenes(Array.from(e.target.files));
+    const files = Array.from(e.target.files);
+    const total = files.length + producto.imagenes.length;
+  
+    if (total > 10) {
+      alert("Máximo 10 imágenes por producto.");
+      return;
+    }
+  
+    setImagenes(files);
   };
 
   
@@ -53,34 +61,29 @@ function FormProductoModern() {
       console.warn("No hay imágenes para subir");
       return [];
     }
-    console.log("Subiendo imágenes...");
-  
-    const imagenes_urls = [];
-  
-    for (let i = 0; i < imagenes.length; i++) {
-      const formData = new FormData();
-      formData.append('file', imagenes[i]);
-  
-      try {
-        const response = await fetch('http://localhost:5000/imgs/upload', {
-          method: 'POST',
-          body: formData
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Error al subir la imagen ${i + 1}`);
-        }
-  
-        const data = await response.json();
-        console.log("Respuesta del back completa:", data);
-        imagenes_urls.push(data.location);
-  
-      } catch (error) {
-        console.error('Error al subir imagen:', error);
-      }
+    
+  const formData = new FormData();
+  imagenes.forEach((img) => formData.append('file', img));
+
+  try {
+    const response = await fetch('http://localhost:5000/imgs/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al subir imágenes");
     }
-    return imagenes_urls;
-  };
+
+    const data = await response.json();
+    console.log("Respuesta del back:", data);
+    return data.locations || [];
+
+  } catch (error) {
+    console.error("Error al subir imágenes:", error);
+    return [];
+  }
+};
   
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -178,33 +181,69 @@ function FormProductoModern() {
 
             {/*AGREGADO AHORA-----------------------------------------------*/}
             <div className="mb-4">
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </div>
-            <div className="flex space-x-2">
-            {Array.isArray(producto.imagenes_urls) && producto.imagenes_urls.map((url, index) => (
-              <div key={index} className="relative w-24 h-24">
-                <img src={url} alt={`Imagen ${index}`} className="w-full h-full object-cover rounded" />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProducto(prev => ({
-                      ...prev,
-                      imagenes_urls: prev.imagenes_urls.filter((_, i) => i !== index)
-                    }));
-                  }}
-                  className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+              <p className="mb-2 font-semibold">
+                Fotos · {producto.imagenes + imagenes.length}/10 — Puedes agregar un máximo de 10 fotos.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {/* Imágenes ya cargadas */}
+                {producto.imagenes.map((url, index) => (
+                  <div key={`cargada-${index}`} className="relative w-24 h-24">
+                    <img src={url} alt={`img-${index}`} className="w-full h-full object-cover rounded shadow" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProducto(prev => ({
+                          ...prev,
+                          imagenes: prev.imagenes.filter((_, i) => i !== index)
+                        }));
+                      }}
+                      className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
 
+                {/* Imágenes recién seleccionadas */}
+                {imagenes.map((img, index) => (
+                  <div key={`nueva-${index}`} className="relative w-24 h-24">
+                    <img src={URL.createObjectURL(img)} alt={`preview-${index}`} className="w-full h-full object-cover rounded shadow" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagenes(prev => prev.filter((_, i) => i !== index));
+                      }}
+                      className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+
+                {/* Botón "Agregar foto" */}
+                {(producto.imagenes.length + imagenes.length) < 10 && (
+                  <label className="w-24 h-24 flex items-center justify-center bg-gray-200 text-gray-600 rounded cursor-pointer hover:bg-gray-300">
+                    <span className="text-sm text-center">Agregar foto</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        const total = files.length + producto.imagenes.length + imagenes.length;
+                        if (total > 10) {
+                          alert("Máximo 10 imágenes por producto.");
+                          return;
+                        }
+                        setImagenes(prev => [...prev, ...files]);
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
             </div>
+
 
             {/*FIN AGREGADO AHORA--------------------------------------------------------------------*/}
             <div className="mb-2">
