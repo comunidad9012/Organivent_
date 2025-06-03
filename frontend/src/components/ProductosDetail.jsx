@@ -11,6 +11,7 @@ function ProductoDetail() {
   const { id } = useParams();
 
   const [selectedColor, setSelectedColor] = useState(null);
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
 
 
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
@@ -18,7 +19,12 @@ function ProductoDetail() {
   useEffect(() => {
     fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
       .then(response => response.json())
-      .then(data => setProducto(data))
+      .then(data => {
+        setProducto(data);
+        if (data.imagenes && data.imagenes.length > 0) {
+          setImagenSeleccionada(data.imagenes[0]);
+        }
+      })
       .catch(error => console.error('Error fetching data:', error));
   }, [id]);
 
@@ -33,28 +39,27 @@ function ProductoDetail() {
 
       <div className="flex flex-col md:flex-row p-6 bg-background rounded-lg shadow-lg text-start">
           <div className="md:w-1/2 m-4">
-              <img 
-                  src="https://placehold.co/600x600.png" 
-                  alt="Zip Tote Basket" 
-                  className="w-full h-auto rounded-lg" 
-              />
-              <div className="flex space-x-2 mt-4">
-                  <img 
-                      src="https://placehold.co/100x100.png" 
-                      alt="Thumbnail 1" 
-                      className="w-16 h-16 border rounded cursor-pointer" 
-                  />
-                  <img 
-                      src="https://placehold.co/100x100.png" 
-                      alt="Thumbnail 2" 
-                      className="w-16 h-16 border rounded cursor-pointer" 
-                  />
-                  <img 
-                      src="https://placehold.co/100x100.png" 
-                      alt="Thumbnail 3" 
-                      className="w-16 h-16 border rounded cursor-pointer" 
-                  />
-              </div>
+          <img 
+            src={imagenSeleccionada || "https://placehold.co/600x600.png"} 
+            alt="Imagen principal del producto" 
+            className="w-full h-auto rounded-lg shadow" 
+          />
+
+          {Producto.imagenes && Producto.imagenes.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-4">
+              {Producto.imagenes.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt={`Miniatura ${index}`}
+                  className={`w-16 h-16 object-cover rounded cursor-pointer border-2 transition ${
+                    imagenSeleccionada === img ? "border-black" : "border-transparent"
+                  }`}
+                  onClick={() => setImagenSeleccionada(img)}
+                />
+              ))}
+            </div>
+          )}
           </div>
           <div className="md:w-1/2 md:pl-6">
               <h2 className="text-2xl font-bold text-foreground mt-5 mr-5">{Producto.nombre_producto}</h2>
