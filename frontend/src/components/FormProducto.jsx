@@ -18,7 +18,7 @@ function FormProductoModern() {
     nombre_producto: '',
     descripcion: '',
     precio_venta: '',
-    imagenes: [],// array para imagenes
+    imagenes: [],
     colores: [],
   });
 
@@ -33,6 +33,15 @@ function FormProductoModern() {
         .catch(error => console.error('Error al cargar el producto:', error));
     }
   }, [id]);
+
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  
+  // limpia los objetos URL generados con URL.createObjectURL
+  useEffect(() => {
+    return () => {
+      imagenes.forEach(img => URL.revokeObjectURL(img));
+    };
+  }, [imagenes]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -61,29 +70,29 @@ function FormProductoModern() {
       console.warn("No hay imágenes para subir");
       return [];
     }
-    
-  const formData = new FormData();
-  imagenes.forEach((img) => formData.append('file', img));
 
-  try {
-    const response = await fetch('http://localhost:5000/imgs/upload', {
-      method: 'POST',
-      body: formData
-    });
+    const formData = new FormData();
+    imagenes.forEach((img) => formData.append('file', img));
 
-    if (!response.ok) {
-      throw new Error("Error al subir imágenes");
+    try {
+      const response = await fetch('http://localhost:5000/imgs/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al subir imágenes");
+      }
+
+      const data = await response.json();
+      console.log("Respuesta del back:", data);
+      return data.locations || [];
+
+    } catch (error) {
+      console.error("Error al subir imágenes:", error);
+      return [];
     }
-
-    const data = await response.json();
-    console.log("Respuesta del back:", data);
-    return data.locations || [];
-
-  } catch (error) {
-    console.error("Error al subir imágenes:", error);
-    return [];
-  }
-};
+  };
   
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -144,29 +153,52 @@ function FormProductoModern() {
       )}
 
       <form onSubmit={handleSubmit}>
+        {/* SECCIÓN DE IMAGENES */}
         <div className="flex flex-col md:flex-row p-6 bg-background rounded-lg shadow-lg text-start">
-          
-          {/* Sección de imágenes */}
+          {/* Columna izquierda */}
           <div className="md:w-1/2 space-y-4">
-            <img 
-              src={producto.imagenes_urls?.[0] ||"https://placehold.co/600x600.png"}
-              alt="Imagen del producto" 
-              className="w-full h-auto rounded-lg shadow" 
-            />
-            <div className="flex space-x-2">
-              {[1, 2, 3].map((i) => (
+          {/* Imagen principal */}
+          <img 
+            src={
+              imagenSeleccionada ||
+              (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
+              "https://placehold.co/600x600.png"
+            }
+            alt="Imagen del producto" 
+            className="w-full h-auto rounded-lg shadow object-contain" 
+          />
+
+          {/* Miniaturas debajo de la principal */}
+          <div className="flex flex-wrap gap-2">
+            {/* Imágenes ya cargadas */}
+            {producto.imagenes.map((url, index) => (
+              <img 
+                key={`existente-${index}`}
+                src={url} 
+                alt={`img-${index}`} 
+                className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
+                onClick={() => setImagenSeleccionada(url)}
+              />
+            ))}
+
+            {/* Imágenes recién seleccionadas */}
+            {imagenes.map((img, index) => {
+              const previewUrl = URL.createObjectURL(img);
+              return (
                 <img 
-                  key={i} 
-                  src={`https://placehold.co/100x100.png?text=${i}`} 
-                  className="w-16 h-16 border rounded cursor-pointer hover:opacity-80 transition" 
-                  alt={`Vista ${i}`} 
+                  key={`nueva-${index}`}
+                  src={previewUrl}
+                  alt={`preview-${index}`} 
+                  className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
+                  onClick={() => setImagenSeleccionada(previewUrl)}
                 />
-              ))}
-            </div>
+              );
+            })}
           </div>
-
+        </div>
+          {/* Columna derecha */}
           <div className="md:w-1/2 md:pl-6 m-4">
-
+            {/* Nombre producto */}
             <div className="infield mb-6">
               <input 
                 required
@@ -179,16 +211,22 @@ function FormProductoModern() {
               <label></label>
             </div>
 
-            {/*AGREGADO AHORA-----------------------------------------------*/}
+            {/* Carga de imagenes */}
             <div className="mb-4">
               <p className="mb-2 font-semibold">
                 Fotos · {producto.imagenes + imagenes.length}/10 — Puedes agregar un máximo de 10 fotos.
               </p>
-              <div className="flex flex-wrap gap-3">
-                {/* Imágenes ya cargadas */}
+              <div className="flex space-x-2 flex-wrap">
+                {/* Miniaturas de imágenes ya cargadas */}
                 {producto.imagenes.map((url, index) => (
                   <div key={`cargada-${index}`} className="relative w-24 h-24">
-                    <img src={url} alt={`img-${index}`} className="w-full h-full object-cover rounded shadow" />
+                    <img 
+                      key={`existente-${index}`}
+                      src={url} 
+                      alt={`img-${index}`} 
+                      className="w-full h-full object-cover rounded"
+                      onClick={() => setImagenSeleccionada(url)}
+                    />
                     <button
                       type="button"
                       onClick={() => {
@@ -197,28 +235,37 @@ function FormProductoModern() {
                           imagenes: prev.imagenes.filter((_, i) => i !== index)
                         }));
                       }}
-                      className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-full"
+                      className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-red-700"
                     >
                       ✕
                     </button>
                   </div>
                 ))}
 
-                {/* Imágenes recién seleccionadas */}
-                {imagenes.map((img, index) => (
-                  <div key={`nueva-${index}`} className="relative w-24 h-24">
-                    <img src={URL.createObjectURL(img)} alt={`preview-${index}`} className="w-full h-full object-cover rounded shadow" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setImagenes(prev => prev.filter((_, i) => i !== index));
-                      }}
-                      className="absolute top-0 right-0 bg-red-600 text-white text-xs px-1 rounded-full"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                {/* Miniaturas de imágenes recién seleccionadas */}
+                {imagenes.map((img, index) => {
+                  const previewUrl = URL.createObjectURL(img);
+                  return (
+                    <div key={`nueva-${index}`} className="relative w-24 h-24">
+                      <img 
+                        key={`nueva-${index}`}
+                        src={previewUrl}
+                        alt={`preview-${index}`} 
+                        className="w-full h-full object-cover rounded"
+                        onClick={() => setImagenSeleccionada(previewUrl)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagenes(prev => prev.filter((_, i) => i !== index));
+                        }}
+                        className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded-full shadow hover:bg-red-700"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
 
                 {/* Botón "Agregar foto" */}
                 {(producto.imagenes.length + imagenes.length) < 10 && (
@@ -243,9 +290,8 @@ function FormProductoModern() {
                 )}
               </div>
             </div>
-
-
-            {/*FIN AGREGADO AHORA--------------------------------------------------------------------*/}
+            
+            {/* Descripción */}
             <div className="mb-2">
               <p className="block m-2 font-bold">Descripción:</p>
               <Editor
@@ -257,6 +303,7 @@ function FormProductoModern() {
               />
             </div>
 
+            {/* Precio */}
             <div className="infield mb-6">
               <input 
                 required
@@ -268,7 +315,6 @@ function FormProductoModern() {
               />
               <label></label>
             </div>
-
 
             {/* Añadir colores disponibles */}
             <div className=" bg-gray-100 p-4 rounded-lg">
@@ -331,6 +377,7 @@ function FormProductoModern() {
               </div>
             </div>
 
+            {/* Botón de carga de producto */}
             <button 
               type="submit" 
               // className="button-pretty w-full"
@@ -339,12 +386,10 @@ function FormProductoModern() {
             >
               {loading ? 'Cargando...' : id ? 'Actualizar producto' : 'Cargar producto'}
             </button>
+
           </div>
         </div>
       </form>
-
-
-      
     </div>
   );
 }

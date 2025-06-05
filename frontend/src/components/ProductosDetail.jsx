@@ -37,10 +37,10 @@ function ProductoDetail() {
       {/* <h1>{Producto.nombre_producto}</h1>
       <div dangerouslySetInnerHTML={{ __html: Producto.nombre_producto }} /> */}
 
-      <div className="flex flex-col lg:flex-row gap-6 bg-background rounded-lg shadow-lg p-6">
+      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 bg-white rounded-2xl shadow-2xl p-6 lg:p-10 transition-all duration-300">
         { /* Sección de imágenes */}
         <div className="w-full lg:w-1/2 flex flex-col">
-          <div className="w-full h-[400px] flex items-center justify-center overflow-hidden bg-white rounded">
+          <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[550px] flex items-center justify-center overflow-hidden bg-white rounded-lg">
             <img 
               src={imagenSeleccionada || "https://placehold.co/600x600.png"} 
               alt="Imagen principal del producto" 
@@ -66,9 +66,9 @@ function ProductoDetail() {
         </div>
 
         {/* Sección de detalle */}
-        <div className="w-full lg:w-1/2 flex flex-col">
-          <h2 className="text-3xl font-bold text-foreground">{Producto.nombre_producto}</h2>
-          <h5 className="text-2xl text-primary my-4">${Producto.precio_venta}</h5>
+        <div className="w-full lg:w-1/2 flex flex-col gap-4">
+          <h2 className="text-4xl font-bold text-gray-800 leading-tight">{Producto.nombre_producto}</h2>
+          <h5 className="text-3xl text-green-600 my-2 font-semibold">${Producto.precio_venta}</h5>
           <div className="flex items-center mt-2">
               <span className="flex items-center text-yellow-500">★★★★☆</span>
               {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}
@@ -76,7 +76,7 @@ function ProductoDetail() {
 
           <div 
             dangerouslySetInnerHTML={{ __html: Producto.descripcion }} 
-            className="mt-2 mr-5 text-muted-foreground"
+            className="mt-4 text-base text-gray-600 leading-relaxed max-w-full overflow-hidden break-words"
           />
           {/* <p className="mt-2 text-muted-foreground">
               The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
