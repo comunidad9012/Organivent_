@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Editor } from '@tinymce/tinymce-react';
 import { Helmet } from 'react-helmet';
+import axios from 'axios';
 import Loading from '../utilities/Loading';
 import '../styles/loading.css';
 import { PrivateRoutes } from '../models/routes';
@@ -20,10 +21,31 @@ function FormProductoModern() {
     precio_venta: '',
     imagenes: [],
     colores: [],
+    categoria: '',
   });
-
+  const [categorias, setCategorias] = useState([]);
+  const [nuevaCategoria, setNuevaCategoria] = useState({ 
+    nombre_categoria: '', 
+    descripcion: '', 
+    subcategorias: [] 
+  });
+  const [mostrarFormularioCategoria, setMostrarFormularioCategoria] = useState(false);
   const [nuevoColor, setNuevoColor] = useState({ name: '', hex: '#000000' });
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
 
+  // Obtener las categorías al cargar
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/Categoria/showCategorias");
+        setCategorias(res.data);
+      } catch (err) {
+        console.error("Error al cargar categorías:", err);
+      }
+    };
+        
+    fetchCategorias();
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -34,7 +56,6 @@ function FormProductoModern() {
     }
   }, [id]);
 
-  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   
   // limpia los objetos URL generados con URL.createObjectURL
   useEffect(() => {
@@ -372,6 +393,98 @@ function FormProductoModern() {
               </div>
 
             </div>
+          </div>
+
+          {/* Sección Categoria */}
+          <div className="infield mb-6 bg-gray-100 p-4 rounded-lg">
+            <div className="flex gap-2">
+              <select 
+                className="w-full p-2 border rounded"
+                value={producto.categoria || ''}
+                onChange={(e) => setProducto(prev => ({ ...prev, categoria: e.target.value }))}
+              >
+                <option value="">Seleccionar categoría</option>
+                {categorias.map((cat) => (
+                  <option key={cat._id} value={cat.nombre_categoria}>
+                    {cat.nombre_categoria}
+                  </option>
+                ))}
+              </select>
+              {/* Agregar categoria */}
+              <button 
+                type="button" 
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                onClick={() => setMostrarFormularioCategoria(true)}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Crear categoria */}
+            {mostrarFormularioCategoria && (
+              <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+                <h4 className="font-bold mb-3">Nueva Categoría</h4>
+                
+                <div className="grid gap-3">
+                  <input
+                    type="text"
+                    placeholder="Nombre"
+                    className="p-2 border rounded"
+                    value={nuevaCategoria.nombre_categoria}
+                    onChange={(e) => setNuevaCategoria(prev => ({ ...prev, nombre_categoria: e.target.value }))}
+                  />
+                  
+                  <input
+                    type="text"
+                    placeholder="Descripción"
+                    className="p-2 border rounded"
+                    value={nuevaCategoria.descripcion}
+                    onChange={(e) => setNuevaCategoria(prev => ({ ...prev, descripcion: e.target.value }))}
+                  />
+                  
+                  <input
+                    type="text"
+                    placeholder="Subcategorías (separadas por coma)"
+                    className="p-2 border rounded"
+                    onChange={(e) =>
+                      setNuevaCategoria(prev => ({ 
+                        ...prev, 
+                        subcategorias: e.target.value.split(",").map(s => s.trim()) 
+                      }))
+                    }
+                  />
+                  
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      onClick={async () => {
+                        try {
+                          await axios.post("http://localhost:5000/Categoria/createCategoria", nuevaCategoria);
+                          setMostrarFormularioCategoria(false);
+                          setNuevaCategoria({ nombre_categoria: '', descripcion: '', subcategorias: [] });
+                          
+                          // Actualizar lista de categorías
+                          const res = await axios.get("http://localhost:5000/Categoria/showCategorias");
+                          setCategorias(res.data);
+                        } catch (err) {
+                          console.error("Error al crear categoría:", err);
+                        }
+                      }}
+                    >
+                      Guardar categoría
+                    </button>
+                    
+                    <button 
+                      className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
+                      onClick={() => setMostrarFormularioCategoria(false)}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Descripción */}
