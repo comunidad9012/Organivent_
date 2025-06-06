@@ -59,6 +59,8 @@ const AdminPedidos = () => {
                         )}
                       </p>
 
+                      {/* arreglo para cuando el producto no tiene color que mostrar*/}
+
                     </div>
                   ))}
                 </div>

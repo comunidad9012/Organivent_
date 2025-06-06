@@ -110,6 +110,7 @@ function FormProductoModern() {
         setMessage(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
         setColorMessage('verde');
         setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
+        // arreglo en la redireccion de la pagina estando en admin
       })
       .catch(error => {
         console.error('Error:', error);

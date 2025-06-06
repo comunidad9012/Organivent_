@@ -1,10 +1,16 @@
-export const PublicRoutes = {
+// routes.ts
+export interface RouteMap {
+    [key: string]: string;
+  }
+
+
+  export const PublicRoutes: RouteMap = {
     LOGIN : 'login',
     HOME: 'home',
     VIEW_PRODUCT : 'Productos/viewproduct/:id',
 }
 
-export const PrivateRoutes = {
+export const PrivateRoutes: RouteMap ={
     PRIVATE: 'private',
     ADMIN : 'admin',
     ADMIN_PEDIDOS : 'Pedidos',

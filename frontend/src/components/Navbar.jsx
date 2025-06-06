@@ -76,6 +76,7 @@ function Navbar() {
                 <div className="flex items-center gap-4">
                     <Categorias />
                     {/* <SearchForm /> */}
+                    {/* aca solo saqué el serch*/}
                     <p className="text-lg  text-black mx-4 whitespace-nowrap">¡Hola {userState.nombre_usuario}!</p>
 
                 {/* Acciones del usuario */}
