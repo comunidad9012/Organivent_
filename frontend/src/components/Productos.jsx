@@ -96,7 +96,6 @@ function Productos() {
                         <>
                           {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
                           <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
-                          {/* aca se arregló la direccion de la ruta para actualizar productos desde private/admin*/}
                           Editar
                           </Link>
                           <DeleteProduct product={product} setColorMessage={setColorMessage} setProductos={setProductos} setMessage={setMessage}/>

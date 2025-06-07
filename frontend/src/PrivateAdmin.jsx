@@ -18,7 +18,7 @@ function PrivateAdmin() {
 
           <Route path={PrivateRoutes.UPDATE_PRODUCT} element={<FormProductoModern />} />
 
-          {/* aca se reordenaron las rutas para que funcionen*/}
+
 
           <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<AdminPedidos />} />
           <Route path={PrivateRoutes.VIEW_PRODUCT_PRIVATE} element={<ProductoDetail />} />
