@@ -22,12 +22,32 @@ class PedidosModel:
         else:
             return {"error": "Datos insuficientes para crear el pedido"}
 
+    # def show_pedidos(self):
+    #     pedidos = list(self.mongo.db.Pedidos.find().sort('_id', -1))
+    #     for item in pedidos:
+    #         item['_id'] = str(item['_id'])
+    #     response = json_util.dumps(pedidos)
+    #     return Response(response, mimetype="application/json")
+
     def show_pedidos(self):
         pedidos = list(self.mongo.db.Pedidos.find().sort('_id', -1))
-        for item in pedidos:
-            item['_id'] = str(item['_id'])
+        for pedido in pedidos:
+            pedido['_id'] = str(pedido['_id'])
+
+            # Agregar nombre y email de usuario
+            usuario = self.mongo.db.Clientes.find_one({"_id": ObjectId(pedido["usuarioId"])})
+            pedido["usuarioNombre"] = usuario["nombre"] if usuario else "Usuario no encontrado"
+            pedido["usuarioEmail"] = usuario["email"] if usuario else "Email no encontrado"
+
+            # Agregar nombre de producto a cada producto en el pedido
+            for prod in pedido.get("productos", []):
+                producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+                prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
+                prod["productoId"] = str(prod["productoId"])  # para mantener todo serializable
+
         response = json_util.dumps(pedidos)
         return Response(response, mimetype="application/json")
+
 
 
     def get_pedido_by_id(self, pedido_id):
