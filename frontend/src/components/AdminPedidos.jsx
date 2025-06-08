@@ -17,12 +17,12 @@ const AdminPedidos = () => {
       <h2 className="text-2xl font-bold mb-4">Pedidos de Usuarios</h2>
       <table className="min-w-full border-collapse border border-gray-300 shadow-md">
         <thead className="bg-gray-100">
-          <tr>
-            <th className="border border-gray-300 p-2">ID Pedido</th>
-            <th className="border border-gray-300 p-2">Usuario</th>
-            <th className="border border-gray-300 p-2">Total</th>
-            <th className="border border-gray-300 p-2">Fecha</th>
-            <th className="border border-gray-300 p-2">Productos</th>
+          <tr className="border border-gray-300 p-2">
+            <th>ID Pedido</th>
+            <th>Usuario</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Productos</th>
           </tr>
         </thead>
         <tbody>

@@ -174,7 +174,7 @@ function FormProductoModern() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="p-6 bg-background rounded-lg shadow-lg space-y-6">
+        <div className="p-4 bg-background rounded-lg shadow-lg space-y-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Columna izquierda */}
             <div className="md:w-1/2 space-y-4">

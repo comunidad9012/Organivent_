@@ -21,7 +21,7 @@ function Login() {
                 </Helmet>
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="form-containerLogin sign-up-containerLogin align-content-center">
-                    <form onSubmit={handleRegister}>
+                    <form className="form-pretty" onSubmit={handleRegister}>
                         <h1>Crear cuenta</h1>
                         <div className="infield">
                             <input 
@@ -87,7 +87,7 @@ function Login() {
                 
                 {/* Iniciar sesión --------------------------------------- */}
                 <div className="form-containerLogin sign-in-containerLogin align-content-center">
-                    <form onSubmit={handleInicioSesion}>
+                    <form className="form-pretty" onSubmit={handleInicioSesion}>
                         <h1>Iniciar sesión</h1>
                         <div className="infield">
                             <input 
