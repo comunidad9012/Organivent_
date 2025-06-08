@@ -4,16 +4,17 @@ export interface RouteMap {
   }
 
 
-  export const PublicRoutes: RouteMap = {
-    LOGIN : 'login',
-    HOME: 'home',
-    VIEW_PRODUCT : 'Productos/viewproduct/:id',
+export const PublicRoutes: RouteMap = {
+  LOGIN : 'login',
+  HOME: 'home',
+  VIEW_PRODUCT : 'Productos/viewproduct/:id',
 }
 
 export const PrivateRoutes: RouteMap ={
     PRIVATE: 'private',
     ADMIN : 'admin',
     ADMIN_PEDIDOS : 'Pedidos',
+    ADMIN_VIEW_PEDIDO : 'Pedidos/viewPedido/:id',
     CREATE_PRODUCT : 'Productos/create',
     UPDATE_PRODUCT: 'Productos/update/:id',
     USER : 'User',

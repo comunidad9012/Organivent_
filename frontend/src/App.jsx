@@ -15,7 +15,7 @@ import Loading from "./utilities/Loading";
 import User from "./pages/User";
 
 const Login = lazy(() => import('./components/Login')); 
-const PrivateUser = lazy(() => import('./PrivateUser'));
+const PrivateUser = lazy(() => import('./rutes/PrivateUser'));
 //esto de lazy es para que cargue el componente solo cuando se necesite, no al principio, recien cuando llame a Private lo va a cargar.
 
 function App() {  

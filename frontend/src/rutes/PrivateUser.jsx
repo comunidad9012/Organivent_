@@ -1,13 +1,13 @@
 import { Navigate, Route } from "react-router-dom"
-import { PrivateRoutes, PublicRoutes } from "./models/routes"
-import RoutesWhitNotFound from "./utilities/routesWhitNotFound.utility"
+import { PrivateRoutes, PublicRoutes } from "../models/routes"
+import RoutesWhitNotFound from "../utilities/routesWhitNotFound.utility"
 import { lazy } from "react"
-import RoleGuard from "./guards/rol.guard";
-import Cart from "./components/Cart";
-import ProductosDetail from "./components/ProductosDetail";
+import RoleGuard from "../guards/rol.guard";
+import Cart from "../components/Cart";
+import ProductosDetail from "../components/ProductosDetail";
 import PrivateAdmin from "./PrivateAdmin";
 
-const User = lazy(() => import('./pages/User'));
+const User = lazy(() => import('../pages/User'));
 
 function PrivateUser() {
   return (
