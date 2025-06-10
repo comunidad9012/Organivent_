@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Clock3, Truck, ShoppingCart, PackageCheck } from "lucide-react";
-import { useNavigate } from 'react-router-dom'
+import { Clock3, Truck, ShoppingCart } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import Loading from "../utilities/Loading"
 
 const AdminPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
-  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(true); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://localhost:5000/Pedidos/showPedidos", {
@@ -12,78 +14,87 @@ const AdminPedidos = () => {
     })
       .then(res => res.json())
       .then(data => setPedidos(data))
-      .catch(err => console.error("Error al obtener pedidos:", err));
+      .catch(err => console.error("Error al obtener pedidos:", err))
+      .finally(() => setIsLoading(false)); 
   }, []);
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-6">
       <h2 className="text-2xl font-bold mb-4">Pedidos de Usuarios</h2>
 
-      {pedidos.map((p, idx) => (
-        <div
-          key={p._id}
-          onClick={() => navigate(`viewPedido/${p._id}`)}
-          className="shadow cursor-pointer hover:bg-blue-50 rounded-lg shadow-md p-4 flex flex-col md:flex-row justify-between gap-4 border-l-4 border-blue-500"
-        >
-          {/* ID + Cliente */}
-          <div className="flex-1">
-            <p className="text-sm text-gray-500 mb-1">
-              <strong>ID:</strong> {p._id}
-            </p>
-            <p className="text-lg font-semibold">
-              {p.usuarioNombre || "Usuario desconocido"}
-            </p>
-            <p className="text-sm text-gray-500">{p.usuarioEmail || "-"}</p>
-          </div>
-
-          {/* Entrega + Fecha */}
-          <div className="flex-1 text-sm text-gray-600 space-y-1">
-            <div className="flex items-center gap-2">
-              <Truck className="w-4 h-4" />
-              <span>Entrega: {p.entrega || "Express"}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock3 className="w-4 h-4" />
-              <span>
-                {p.fecha?.$date
-                  ? new Date(p.fecha.$date).toLocaleString()
-                  : "Fecha no disponible"}
-              </span>
-            </div>
-          </div>
-
-          {/* Productos */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="w-4 h-4" />
-              <span>{p.productos.length} productos</span>
-            </div>
-            <ul className="mt-2 pl-5 list-disc text-sm text-gray-600">
-              {p.productos.map((prod, i) => (
-                <li key={i}>
-                  {prod.productoNombre || "Producto"} x{prod.cantidad}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Total + Estado */}
-          <div className="flex flex-col items-end justify-between text-right">
-            <p className="text-xl font-bold text-blue-600">
-              ${parseFloat(p.total).toFixed(2)}
-            </p>
-            <span
-              className={`text-xs font-medium mt-2 px-3 py-1 rounded-full ${
-                p.estado === "Listo para enviar"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-orange-100 text-orange-800"
-              }`}
+      {isLoading ? (
+        <Loading />
+      ) : pedidos.length > 0 ? (
+        <div className="space-y-4">
+          {pedidos.map((p) => (
+            <div
+              key={p._id}
+              onClick={() => navigate(`viewPedido/${p._id}`)}
+              className="shadow cursor-pointer hover:bg-blue-50 rounded-lg shadow-md p-4 flex flex-col md:flex-row justify-between gap-4 border-l-4 border-blue-500"
             >
-              {p.estado || "Pendiente"}
-            </span>
-          </div>
+              {/* ID + Cliente */}
+              <div className="flex-1">
+                <p className="text-sm text-gray-500 mb-1">
+                  <strong>ID:</strong> {p._id}
+                </p>
+                <p className="text-lg font-semibold">
+                  {p.usuarioNombre || "Usuario desconocido"}
+                </p>
+                <p className="text-sm text-gray-500">{p.usuarioEmail || "-"}</p>
+              </div>
+
+              {/* Entrega + Fecha */}
+              <div className="flex-1 text-sm text-gray-600 space-y-1">
+                <div className="flex items-center gap-2">
+                  <Truck className="w-4 h-4" />
+                  <span>Entrega: {p.entrega || "Express"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock3 className="w-4 h-4" />
+                  <span>
+                    {p.fecha?.$date
+                      ? new Date(p.fecha.$date).toLocaleString()
+                      : "Fecha no disponible"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Productos */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4" />
+                  <span>{p.productos.length} productos</span>
+                </div>
+                <ul className="mt-2 pl-5 list-disc text-sm text-gray-600">
+                  {p.productos.map((prod, i) => (
+                    <li key={i}>
+                      {prod.productoNombre || "Producto"} x{prod.cantidad}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Total + Estado */}
+              <div className="flex flex-col items-end justify-between text-right">
+                <p className="text-xl font-bold text-blue-600">
+                  ${parseFloat(p.total).toFixed(2)}
+                </p>
+                <span
+                  className={`text-xs font-medium mt-2 px-3 py-1 rounded-full ${
+                    p.estado === "Listo para enviar"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-orange-100 text-orange-800"
+                  }`}
+                >
+                  {p.estado || "Pendiente"}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      ) : (
+        <p className="text-gray-500">No hay pedidos por el momento.</p>
+      )}
     </div>
   );
 };
