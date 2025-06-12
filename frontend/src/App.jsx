@@ -31,14 +31,12 @@ function App() {
                 <Navbar />
                 {/* en vez de poner Routes directamente ponemos RoutesWhitNotFound ya que dentro del mismo tenemos a Routes*/}
                 <RoutesWhitNotFound>
-                  {/* ver como reordenar para que el cliente pueda ver los productos sin loguearse */}
                   <Route path="/" element={<Navigate to={PublicRoutes.HOME}/>}/>
                   
                   <Route path={PublicRoutes.HOME} element={<User />} />
                   <Route path={PublicRoutes.VIEW_PRODUCT} element={<ProductosDetail />} />
 
                   <Route path={PublicRoutes.LOGIN} element={<Login/>} />
-                  {/* debo poner en el carrito que antes pase por el login, osea la ruta de aca arriba */}
 
                   
                   <Route element={<AuthGuard />}>

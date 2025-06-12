@@ -12,9 +12,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-
 import EstadoPedido from './Estado_Pedido/EstadoPedido'
 import { EstadosPedido } from './Estado_Pedido/enums'
+
+import { Toaster } from "sonner";
+import { toast } from "sonner"
 
 const AdminDetailPedido = () => {
   const { id } = useParams()
@@ -37,19 +39,28 @@ const AdminDetailPedido = () => {
       { withCredentials: true }
     )
       .then(() => {
-        alert("Estado actualizado");
+        toast.success("Se cambió el estado correctamente");
         setPedido({ ...pedido, estado: estadoPedido });
-        setEstadoPedido("");          // ⬅️ Limpiar selección
-        setSelectKey(prev => prev + 1); // ⬅️ Forzar que <Select> se reinicie
+        setEstadoPedido("");
+        setSelectKey(prev => prev + 1);
       })
-      .catch(err => console.error("Error al cambiar estado:", err));
+      .catch(err => {
+        console.error("Error al cambiar estado:", err);
+        toast.error("Error al cambiar el estado del pedido. Por favor, inténtalo de nuevo más tarde.");
+      });
   };
+  
   
 
   if (!pedido) return <p className="p-6 text-gray-500">Cargando pedido...</p>
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
+
+       {/* Mensaje */}
+       <Toaster position="bottom-right" richColors />
+
+
       {/* Cabecera */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Pedido #{pedido._id}</h2>
