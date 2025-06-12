@@ -2,9 +2,8 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import {
-  Clock, Mail, User, Truck, ShoppingCart, ImageIcon
+  Clock, Mail, User, Truck, ShoppingCart, ImageIcon, ArrowRight
 } from 'lucide-react'
-
 import {
   Select,
   SelectContent,
@@ -20,25 +19,30 @@ import { EstadosPedido } from './Estado_Pedido/enums'
 const AdminDetailPedido = () => {
   const { id } = useParams()
   const [pedido, setPedido] = useState(null)
-  const [estadoPedido, setEstadoPedido] = useState(""); //estadoPedido || "Pendiente"}
+  const [estadoPedido, setEstadoPedido] = useState("");
+  const [selectKey, setSelectKey] = useState(0); // ⬅️ Para forzar reset visual del select
+
 
   useEffect(() => {
     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`)
       .then(res => setPedido(res.data))
-      .catch(err => console.error(err))
-  }, [id])
+      .catch(err => console.error(err));
+  }, [id]);
+  
 
   const cambiarEstado = () => {
     axios.put(
       `http://localhost:5000/Pedidos/updateState/${pedido._id}`,
       { nuevo_estado: estadoPedido },
-      { withCredentials: true } // ⬅️ esto asegura que se envíe la cookie 'jwt'
+      { withCredentials: true }
     )
-    .then(() => {
-      alert("Estado actualizado");
-      setPedido({ ...pedido, estado: estadoPedido });
-    })
-    .catch(err => console.error("Error al cambiar estado:", err));
+      .then(() => {
+        alert("Estado actualizado");
+        setPedido({ ...pedido, estado: estadoPedido });
+        setEstadoPedido("");          // ⬅️ Limpiar selección
+        setSelectKey(prev => prev + 1); // ⬅️ Forzar que <Select> se reinicie
+      })
+      .catch(err => console.error("Error al cambiar estado:", err));
   };
   
 
@@ -65,42 +69,31 @@ const AdminDetailPedido = () => {
           <Mail className="w-4 h-4" /> {pedido.usuarioEmail}
         </p>
       </div>
-
+      
       {/* Estado y entrega */}
       <div className="flex flex-wrap items-center gap-4">
-        {/* <span className={`text-sm px-4 py-1 rounded-full font-medium ${
-          pedido.estado === "Listo para enviar"
-            ? "bg-green-100 text-green-800"
-            : "bg-orange-100 text-orange-800"
-        }`}>
-          {pedido.estado || "Pendiente"}
-        </span> */}
+        
+      <EstadoPedido estado={pedido.estado} />
 
+        <ArrowRight />
 
-      <Select onValueChange={(value) => setEstadoPedido(value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Seleccionar estado" /><EstadoPedido estado={estadoPedido || "Pendiente"} />
-          <SelectValue/>
-        </SelectTrigger>
-        <SelectContent>
-          {EstadosPedido.map((estado) => (
-            <SelectItem key={estado} value={estado}>
-              {estado}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-        <span className="flex items-center gap-2 text-sm text-gray-600">
-          <Truck className="w-4 h-4" />
-          Entrega: {pedido.entrega || "Express"}
-        </span>
-        {/* <button
-          onClick={cambiarEstado}
-          className="ml-auto bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition"
+        <Select
+          key={selectKey} // ⬅️ Forzar nuevo render
+          value={estadoPedido}
+          onValueChange={(value) => setEstadoPedido(value)}
         >
-          Cambiar estado
-        </button> */}
+          <SelectTrigger className="bg-white border border-gray-300 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <SelectValue placeholder="Cambiar estado" />
+          </SelectTrigger>
+          <SelectContent className="bg-gray-50 border border-gray-200 shadow-lg rounded">
+            {EstadosPedido.map((estado) => (
+              <SelectItem key={estado} value={estado}>
+                <EstadoPedido estado={estado} />
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <button
           onClick={cambiarEstado}
           disabled={!estadoPedido}
@@ -110,6 +103,11 @@ const AdminDetailPedido = () => {
         >
           Cambiar estado
         </button>
+
+        <span className="flex items-center gap-2 text-sm text-gray-600">
+          <Truck className="w-4 h-4" />
+          Entrega: {pedido.entrega || "Express"}
+        </span>
 
       </div>
 
@@ -163,3 +161,103 @@ const AdminDetailPedido = () => {
 }
 
 export default AdminDetailPedido
+
+// import { useState, useEffect } from "react";
+// import { useParams } from "react-router-dom";
+// import axios from "axios";
+
+// const estados = [
+//   { value: "Pendiente", color: "bg-orange-100 text-orange-700" },
+//   { value: "Aceptado", color: "bg-green-100 text-green-700" },
+//   { value: "Listo", color: "bg-yellow-100 text-yellow-800" },
+//   { value: "Cancelado", color: "bg-red-100 text-red-700" },
+//   { value: "Entregado", color: "bg-blue-100 text-blue-700" },
+// ];
+
+// const AdminDetailPedido = () => {
+//   const { id } = useParams();
+//   const [pedido, setPedido] = useState(null);
+//   const [estadoPedido, setEstadoPedido] = useState("");
+//   const [modoEdicion, setModoEdicion] = useState(false);
+
+//   useEffect(() => {
+//     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`)
+//       .then(res => {
+//         setPedido(res.data);
+//         setEstadoPedido(res.data.estado);
+//       })
+//       .catch(err => console.error(err));
+//   }, [id]);
+
+//   const cambiarEstado = () => {
+//     axios.put(
+//       `http://localhost:5000/Pedidos/updateState/${pedido._id}`,
+//       { nuevo_estado: estadoPedido },
+//       { withCredentials: true }
+//     )
+//     .then(() => {
+//       alert("Estado actualizado");
+//       setPedido({ ...pedido, estado: estadoPedido });
+//       setModoEdicion(false);
+//     })
+//     .catch(err => console.error("Error al cambiar estado:", err));
+//   };
+
+//   if (!pedido) return <div className="text-center mt-10">Cargando pedido...</div>;
+
+//   const estadoActual = estados.find(e => e.value === pedido.estado);
+
+//   return (
+//     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-8">
+//       <h2 className="text-xl font-bold mb-4">Detalle del Pedido</h2>
+
+//       <div className="mb-4">
+//         <span className="font-semibold">Estado actual: </span>
+//         <span className={`px-2 py-1 rounded-full text-sm font-semibold ${estadoActual?.color}`}>
+//           {pedido.estado}
+//         </span>
+//       </div>
+
+//       {modoEdicion ? (
+//         <div className="space-y-4">
+//           <select
+//             value={estadoPedido}
+//             onChange={(e) => setEstadoPedido(e.target.value)}
+//             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+//           >
+//             <option value="" disabled>Seleccionar nuevo estado</option>
+//             {estados.map((estado) => (
+//               <option key={estado.value} value={estado.value}>
+//                 {estado.value}
+//               </option>
+//             ))}
+//           </select>
+
+//           <div className="flex gap-2">
+//             <button
+//               onClick={cambiarEstado}
+//               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md"
+//             >
+//               Confirmar cambio
+//             </button>
+//             <button
+//               onClick={() => setModoEdicion(false)}
+//               className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-md"
+//             >
+//               Cancelar
+//             </button>
+//           </div>
+//         </div>
+//       ) : (
+//         <button
+//           onClick={() => setModoEdicion(true)}
+//           className="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded-md"
+//         >
+//           Cambiar estado
+//         </button>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AdminDetailPedido;

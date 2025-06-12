@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Clock3, Truck, ShoppingCart } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import Loading from "../utilities/Loading"
+import EstadoPedido from "./Estado_Pedido/EstadoPedido";
 
 const AdminPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -79,15 +80,7 @@ const AdminPedidos = () => {
                 <p className="text-xl font-bold text-blue-600">
                   ${parseFloat(p.total).toFixed(2)}
                 </p>
-                <span
-                  className={`text-xs font-medium mt-2 px-3 py-1 rounded-full ${
-                    p.estado === "Listo para enviar"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-orange-100 text-orange-800"
-                  }`}
-                >
-                  {p.estado || "Pendiente"}
-                </span>
+                <EstadoPedido estado={p.estado} />
               </div>
             </div>
           ))}
