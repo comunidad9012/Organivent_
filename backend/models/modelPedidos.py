@@ -5,6 +5,8 @@ from bson.objectid import ObjectId
 from datetime import datetime
 
 class PedidosModel:
+    ESTADOS_VALIDOS = ["Pendiente", "Aceptado", "Listo", "Cancelado", "Entregado"]
+    
     def __init__(self, app):
         self.mongo = PyMongo(app)
 
@@ -14,7 +16,7 @@ class PedidosModel:
                 'usuarioId': data['usuarioId'],
                 'productos': data['productos'],  # lista de productos con cantidad
                 'total': data.get('total', 0),
-                'estado': 'pendiente',  # por defecto
+                'estado': 'Pendiente',  # por defecto
                 'fecha': datetime.now()
             }
             self.mongo.db.Pedidos.insert_one(pedido_data)
@@ -97,3 +99,19 @@ class PedidosModel:
         except Exception as e:
             print(f"Error al actualizar el pedido: {e}")
             return {"error": "Error interno"}, 500
+
+    def update_state(self, pedido_id, nuevo_estado):
+        if nuevo_estado not in self.ESTADOS_VALIDOS:
+            raise ValueError("Estado no reconocido.")
+
+        pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
+        if not pedido:
+            raise ValueError("Pedido no encontrado.")
+
+        result = self.mongo.db.Pedidos.update_one(
+            {"_id": ObjectId(pedido_id)},
+            {"$set": {"estado": nuevo_estado}}
+        )
+
+        if result.modified_count == 0:
+            raise ValueError("El estado no fue modificado.")

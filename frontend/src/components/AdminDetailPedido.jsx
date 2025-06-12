@@ -5,9 +5,22 @@ import {
   Clock, Mail, User, Truck, ShoppingCart, ImageIcon
 } from 'lucide-react'
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+
+import EstadoPedido from './Estado_Pedido/EstadoPedido'
+import { EstadosPedido } from './Estado_Pedido/enums'
+
 const AdminDetailPedido = () => {
   const { id } = useParams()
   const [pedido, setPedido] = useState(null)
+  const [estadoPedido, setEstadoPedido] = useState(""); //estadoPedido || "Pendiente"}
 
   useEffect(() => {
     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`)
@@ -16,11 +29,18 @@ const AdminDetailPedido = () => {
   }, [id])
 
   const cambiarEstado = () => {
-    const nuevoEstado = pedido.estado === "Listo para enviar" ? "pendiente" : "Listo para enviar"
-    axios.put(`http://localhost:5000/Pedidos/updateEstado/${pedido._id}`, { estado: nuevoEstado })
-      .then(() => setPedido(prev => ({ ...prev, estado: nuevoEstado })))
-      .catch(err => console.error("Error al cambiar estado:", err))
-  }
+    axios.put(
+      `http://localhost:5000/Pedidos/updateState/${pedido._id}`,
+      { nuevo_estado: estadoPedido },
+      { withCredentials: true } // ⬅️ esto asegura que se envíe la cookie 'jwt'
+    )
+    .then(() => {
+      alert("Estado actualizado");
+      setPedido({ ...pedido, estado: estadoPedido });
+    })
+    .catch(err => console.error("Error al cambiar estado:", err));
+  };
+  
 
   if (!pedido) return <p className="p-6 text-gray-500">Cargando pedido...</p>
 
@@ -48,23 +68,49 @@ const AdminDetailPedido = () => {
 
       {/* Estado y entrega */}
       <div className="flex flex-wrap items-center gap-4">
-        <span className={`text-sm px-4 py-1 rounded-full font-medium ${
+        {/* <span className={`text-sm px-4 py-1 rounded-full font-medium ${
           pedido.estado === "Listo para enviar"
             ? "bg-green-100 text-green-800"
             : "bg-orange-100 text-orange-800"
         }`}>
-          {pedido.estado || "pendiente"}
-        </span>
+          {pedido.estado || "Pendiente"}
+        </span> */}
+
+
+      <Select onValueChange={(value) => setEstadoPedido(value)}>
+        <SelectTrigger>
+          <SelectValue placeholder="Seleccionar estado" /><EstadoPedido estado={estadoPedido || "Pendiente"} />
+          <SelectValue/>
+        </SelectTrigger>
+        <SelectContent>
+          {EstadosPedido.map((estado) => (
+            <SelectItem key={estado} value={estado}>
+              {estado}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
         <span className="flex items-center gap-2 text-sm text-gray-600">
           <Truck className="w-4 h-4" />
           Entrega: {pedido.entrega || "Express"}
         </span>
-        <button
+        {/* <button
           onClick={cambiarEstado}
           className="ml-auto bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition"
         >
           Cambiar estado
+        </button> */}
+        <button
+          onClick={cambiarEstado}
+          disabled={!estadoPedido}
+          className={`ml-auto px-4 py-1 rounded transition text-white ${
+            estadoPedido ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
+          }`}
+        >
+          Cambiar estado
         </button>
+
       </div>
 
       {/* Productos */}

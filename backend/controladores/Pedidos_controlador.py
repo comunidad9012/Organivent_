@@ -1,4 +1,4 @@
-from flask import Blueprint, request, current_app, jsonify, session
+from flask import Blueprint, request, current_app, jsonify, session, Response
 from models.modelPedidos import PedidosModel
 from models.modelClient import ClientModel
 from controladores.autenticacion import token_required
@@ -44,3 +44,36 @@ def update_pedido(id):
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.update_pedido(id, data)
     return response
+
+@Pedidos_bp.put("/updateState/<id>")
+@token_required
+def update_state(token_data, id):
+    json_data = request.json
+    nuevo_estado = json_data.get("nuevo_estado")
+
+    if token_data.get('rol') != 'admin':
+        return jsonify({"error": "Acceso denegado"}), 403
+
+    if not nuevo_estado:
+        return jsonify({"error": "Estado nuevo no proporcionado"}), 400
+
+    try:
+        pedidos_model = PedidosModel(current_app)
+        pedido_actual = pedidos_model.get_pedido_by_id(id)
+
+       # Si el resultado es un Response (por ejemplo, jsonify({...})), extraé el JSON
+        if isinstance(pedido_actual, Response):
+            pedido_actual = pedido_actual.get_json()
+
+        if not pedido_actual:
+            return jsonify({"error": "Pedido no encontrado"}), 404
+
+        if pedido_actual["estado"] == nuevo_estado:
+            return jsonify({"mensaje": "El estado ya es el mismo. No se realizaron cambios."}), 200
+
+        pedidos_model.update_state(id, nuevo_estado) 
+        return jsonify({"mensaje": "Estado actualizado correctamente"}), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+
