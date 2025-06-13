@@ -13,8 +13,6 @@ import limitText from '../utilities/limitText.jsx';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
-  const [message, setMessage] = useState(""); // Mensaje de éxito o error
-  const [colorMessage, setColorMessage] = useState('');
   
   const { filters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
@@ -28,9 +26,6 @@ function Productos() {
   const currentProducts = Productos.slice(startIndex, endIndex);
   const totalPages = Math.ceil(Productos.length / itemsPerPage);
 
-
-
-  //const [loading, setLoading] = useState(false); // Para mostrar un spinner mientras se cargan los productos
 
 
   // Fetch para obtener los productos y tambien por categoría
@@ -61,10 +56,6 @@ function Productos() {
 
       <div className="text-center">
       <h1>Productos</h1>
-
-        {/* Muestra un mensaje de éxito o error */}
-        {message && <div className={`alert ${colorMessage === 'verde' ? 'alert-success' : colorMessage === "rojo" ? 'alert-danger' : 'alert-info'}`}>{message}</div>}
-
 
         {Productos.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
@@ -98,7 +89,7 @@ function Productos() {
                           <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
                           Editar
                           </Link>
-                          <DeleteProduct product={product} setColorMessage={setColorMessage} setProductos={setProductos} setMessage={setMessage}/>
+                          <DeleteProduct product={product} setProductos={setProductos}/>
                         </>
                         :
                         <>

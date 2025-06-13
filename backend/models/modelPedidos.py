@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 from datetime import datetime
 
 class PedidosModel:
-    ESTADOS_VALIDOS = ["Pendiente", "Aceptado", "Listo", "Cancelado", "Entregado"]
+    ESTADOS_VALIDOS = ["Pendiente", "Aceptado", "Listo para la entrega", "Cancelado", "Entregado"]
     
     def __init__(self, app):
         self.mongo = PyMongo(app)

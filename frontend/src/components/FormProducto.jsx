@@ -6,14 +6,13 @@ import axios from 'axios';
 import Loading from '../utilities/Loading';
 import '../styles/loading.css';
 import { PrivateRoutes } from '../models/routes';
+import { toast } from 'sonner';
 
 function FormProductoModern() {
   const { id } = useParams();
   const editorRef = useRef(null);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [colorMessage, setColorMessage] = useState('');
   const [imagenes, setImagenes] = useState([]);
   const [producto, setProducto] = useState({
     nombre_producto: '',
@@ -140,15 +139,13 @@ function FormProductoModern() {
       .then(response => response.json())
       .then(data => {
         setLoading(false);
-        setMessage(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
-        setColorMessage('verde');
+        toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
         setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
       })
       .catch(error => {
         console.error('Error:', error);
         setLoading(false);
-        setMessage('Error al procesar el producto.');
-        setColorMessage('rojo');
+        toast.error(id ? 'Error al actualizar el producto.' : 'Error al crear el producto.');
       });
   };
 
@@ -165,13 +162,6 @@ function FormProductoModern() {
 
 
       {loading && <Loading/>}
-
-
-      {message && (
-        <div className={`alert ${colorMessage === 'verde' ? 'alert-success' : 'alert-danger'}`}>
-          {message}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit}>
         <div className="p-4 bg-background rounded-lg shadow-lg space-y-6">

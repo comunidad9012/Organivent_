@@ -15,7 +15,6 @@ import {
 import EstadoPedido from './Estado_Pedido/EstadoPedido'
 import { EstadosPedido } from './Estado_Pedido/enums'
 
-import { Toaster } from "sonner";
 import { toast } from "sonner"
 
 const AdminDetailPedido = () => {
@@ -56,11 +55,6 @@ const AdminDetailPedido = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-
-       {/* Mensaje */}
-       <Toaster position="bottom-right" richColors />
-
-
       {/* Cabecera */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Pedido #{pedido._id}</h2>
