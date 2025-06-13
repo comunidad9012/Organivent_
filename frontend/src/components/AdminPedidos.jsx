@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Clock3, Truck, ShoppingCart } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import Loading from "../utilities/Loading"
-import EstadoPedido from "./Estado_Pedido/EstadoPedido";
+import EstadoPedido from "../models/Estado_Pedido/EstadoPedido";
+import FilterState from "./FilterState";
 
 const AdminPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
+  const [estadoFiltro, setEstadoFiltro] = useState("");
+
   const [isLoading, setIsLoading] = useState(true); 
   const navigate = useNavigate();
 
@@ -21,18 +24,21 @@ const AdminPedidos = () => {
 
   return (
     <div className="p-6">
+      <FilterState estado={estadoFiltro} setEstado={setEstadoFiltro} />
       <h2 className="text-2xl font-bold mb-4">Pedidos de Usuarios</h2>
 
       {isLoading ? (
         <Loading />
       ) : pedidos.length > 0 ? (
         <div className="space-y-4">
-          {pedidos.map((p) => (
-            <div
-              key={p._id}
-              onClick={() => navigate(`viewPedido/${p._id}`)}
-              className="shadow cursor-pointer hover:bg-blue-50 rounded-lg shadow-md p-4 flex flex-col md:flex-row justify-between gap-4 border-l-4 border-blue-500"
-            >
+          {pedidos
+            .filter(p => estadoFiltro === "" || p.estado === estadoFiltro)
+            .map((p) => (
+              <div
+                key={p._id}
+                onClick={() => navigate(`viewPedido/${p._id}`)}
+                className="shadow cursor-pointer hover:bg-blue-50 rounded-lg shadow-md p-4 flex flex-col md:flex-row justify-between gap-4 border-l-4 border-blue-500"
+              >
               {/* ID + Cliente */}
               <div className="flex-1">
                 <p className="text-sm text-gray-500 mb-1">
