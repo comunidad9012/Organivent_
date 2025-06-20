@@ -5,6 +5,7 @@ import CartProduct from './CartProduct';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
+import Precio from '../utilities/Precio';
 
 function ProductoDetail() {
   const [Producto, setProducto] = useState({});
@@ -66,9 +67,9 @@ function ProductoDetail() {
         </div>
 
         {/* Sección de detalle */}
-        <div className="w-full lg:w-1/2 flex flex-col gap-4">
+        <div className="w-full lg:w-1/2 flex flex-col gap-4 items-center">
           <h2 className="text-4xl font-bold text-gray-800 leading-tight">{Producto.nombre_producto}</h2>
-          <h5 className="text-3xl text-green-600 my-2 font-semibold">${Producto.precio_venta}</h5>
+          <Precio valor={Number(Producto.precio_venta)} className={"text-2xl text-blue-700 my-2 font-semibold"}/>
           <div className="flex items-center mt-2">
               <span className="flex items-center text-yellow-500">★★★★☆</span>
               {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}

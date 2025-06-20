@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
+import Precio from '../utilities/Precio.jsx';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -74,11 +75,11 @@ function Productos() {
                       <h5 className="card-title">{product.nombre_producto}</h5>
                       {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
                       <p>{limitText(product.descripcion, 100)}</p>
-                      <p className="card-text mt-auto">${product.precio_venta}</p>
+                      <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
                       {userState.rol === null ?
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       : 
-                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
+                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link> 
                       }
                       <br />
 

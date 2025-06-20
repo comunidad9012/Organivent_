@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useCart } from "./context/CartContext";
 import Loading from "../utilities/Loading";
 import useCrearPedido from "./hooks/useCrearPedido";
+import Precio from "../utilities/Precio";
 
 
 export default function Cart() {
@@ -62,7 +63,8 @@ export default function Cart() {
                   <span className="text-sm text-muted-foreground ml-2 mx-4">+50 disponibles</span>
                 </div>
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-xl font-bold mx-4">${product.precio_venta}</span>
+                  <Precio valor={Number(product.precio_venta)} className="mx-4 font-semibold text-xl text-blue-700"/>
+
                   <button
                     onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product })}
                     className="text-red-500 hover:text-red-700"> Eliminar
@@ -90,7 +92,7 @@ export default function Cart() {
               <h3 className="text-lg font-bold mb-4">Resumen de compra</h3>
               <div className="flex justify-between mb-2">
                 <span>Productos ({cart.reduce((acc, item) => acc + (item.quantity || 1), 0)})</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <Precio valor={Number(subtotal)} className={"text-blue-700"}/>
               </div>
               
               <div className="flex justify-between mb-2">
@@ -100,7 +102,7 @@ export default function Cart() {
 
               <div className="flex justify-between font-bold mb-4">
                 <span>Total</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <Precio valor={Number(subtotal)} className="text-xl font-bold text-blue-700"/>
               </div>
 
               {loading && <Loading/>}
@@ -108,6 +110,7 @@ export default function Cart() {
               <button className="button-pretty" onClick={handleComprar} disabled={loading}>
                 {loading ? "Procesando..." : "Continuar compra"}
               </button>
+              {/* cambiar esto, poner un mensaje toast en ves de esto que no se ve*/}
 
               {messagePedido && <p>{messagePedido}</p>}
 
