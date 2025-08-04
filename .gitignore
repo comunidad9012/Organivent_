@@ -1,0 +1,23 @@
+# ==== Frontend ====
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# ==== Backend ====
+# Python cache
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
+
+# Entorno virtual
+backend/venv/
+
+# Archivos de entorno
+backend/.env
+
+# ==== General ====
+*.log
+.DS_Store
+.idea/
+.vscode/
