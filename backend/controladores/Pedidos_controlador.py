@@ -2,6 +2,8 @@ from flask import Blueprint, request, current_app, jsonify, session, Response
 from models.modelPedidos import PedidosModel
 from models.modelClient import ClientModel
 from controladores.autenticacion import token_required
+from bson import json_util
+
 
 Pedidos_bp = Blueprint('Pedidos', __name__, url_prefix='/Pedidos')
 
@@ -14,20 +16,36 @@ def create_pedido():
 
 @Pedidos_bp.get("/showPedidos")
 @token_required
-def show_pedidos(data):  # data viene del token decodificado
-    if data.get('rol') != 'admin':
-        return jsonify({"error": "Acceso denegado"}), 403
-
+def show_pedidos(data): #data viene del token decodificado
     pedidos_model = PedidosModel(current_app)
-    response = pedidos_model.show_pedidos()
+
+    if data.get('rol') == 'admin':
+        response = pedidos_model.show_pedidos()  # todos los pedidos
+    else:
+        response = pedidos_model.show_pedidos_by_user(data["id"])  # solo los suyos (del usuario logueado)
+    
     return response
 
 
 @Pedidos_bp.get("/viewPedido/<id>")
-def view_pedido(id):
+@token_required
+def view_pedido(data, id):
     pedidos_model = PedidosModel(current_app)
-    response = pedidos_model.get_pedido_by_id(id)
-    return response
+    
+    # 1️⃣ Obtener sin serializar
+    pedido = pedidos_model.get_pedido_by_id_raw(id)
+    if not pedido:
+        return jsonify({"error": "Pedido no encontrado"}), 404
+
+    # 2️⃣ Validar permisos
+    if data.get('rol') != 'admin' and str(pedido["usuarioId"]) != str(data["id"]):
+        return jsonify({"error": "Acceso denegado"}), 403
+
+    # 3️⃣ Serializar y devolver
+    pedido_serializado = pedidos_model._serialize_pedido(pedido)
+    return Response(json_util.dumps(pedido_serializado), mimetype="application/json")
+
+
 
 @Pedidos_bp.delete("/deletePedido/<id>")
 def delete_pedido(id):
@@ -59,7 +77,7 @@ def update_state(token_data, id):
 
     try:
         pedidos_model = PedidosModel(current_app)
-        pedido_actual = pedidos_model.get_pedido_by_id(id)
+        pedido_actual = pedidos_model.get_pedido_by_id_raw(id)
 
        # Si el resultado es un Response (por ejemplo, jsonify({...})), extraé el JSON
         if isinstance(pedido_actual, Response):

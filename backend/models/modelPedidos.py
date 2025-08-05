@@ -52,30 +52,93 @@ class PedidosModel:
 
 
 
-    def get_pedido_by_id(self, pedido_id):
-        try:
-            pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
-            if not pedido:
-                return {"error": "Pedido no encontrado"}, 404
+    # def get_pedido_by_id(self, pedido_id):
+    #     try:
+    #         pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
+    #         if not pedido:
+    #             return {"error": "Pedido no encontrado"}, 404
 
-            pedido['_id'] = str(pedido['_id'])
+    #         pedido['_id'] = str(pedido['_id'])
 
-            # Agregar nombre y email de usuario
-            usuario = self.mongo.db.Clientes.find_one({"_id": ObjectId(pedido["usuarioId"])})
-            pedido["usuarioNombre"] = usuario["nombre"] if usuario else "Usuario no encontrado"
-            pedido["usuarioEmail"] = usuario["email"] if usuario else "Email no encontrado"
+    #         # Agregar nombre y email de usuario
+    #         usuario = self.mongo.db.Clientes.find_one({"_id": ObjectId(pedido["usuarioId"])})
+    #         pedido["usuarioNombre"] = usuario["nombre"] if usuario else "Usuario no encontrado"
+    #         pedido["usuarioEmail"] = usuario["email"] if usuario else "Email no encontrado"
 
-            # Agregar nombre del producto a cada item del pedido
-            for prod in pedido.get("productos", []):
-                producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
-                prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
-                prod["productoId"] = str(prod["productoId"])  # hacer serializable
+    #         # Agregar nombre del producto a cada item del pedido
+    #         for prod in pedido.get("productos", []):
+    #             producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+    #             prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
+    #             prod["productoId"] = str(prod["productoId"])  # hacer serializable
 
-            response = json_util.dumps(pedido)
-            return Response(response, mimetype="application/json")
+    #         response = json_util.dumps(pedido)
+    #         return Response(response, mimetype="application/json")
         
-        except Exception as e:
-            return {"error": f"Error al obtener el pedido: {str(e)}"}, 500
+    #     except Exception as e:
+    #         return {"error": f"Error al obtener el pedido: {str(e)}"}, 500
+
+
+
+    #me quede en duda si esto si o no
+    def show_pedidos_by_user(self, user_id):
+        pedidos = list(self.mongo.db.Pedidos.find({"usuarioId": ObjectId(user_id)}).sort('_id', -1))
+        # return self._serialize_pedidos(pedidos) 
+        for pedido in pedidos:
+            self._serialize_pedido(pedido)
+        return Response(json_util.dumps(pedidos), mimetype="application/json")
+
+    
+    
+    # def get_pedido_by_id(self, pedido_id, check_owner=False):
+    #     pedido = self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
+    #     if not pedido:
+    #         return {"error": "Pedido no encontrado"}, 404
+    #     return self._serialize_pedido(pedido)
+
+    # # --- Métodos auxiliares ---
+    # def _serialize_pedidos(self, pedidos):
+    #     for pedido in pedidos:
+    #         self._serialize_pedido(pedido)
+    #     return Response(json_util.dumps(pedidos), mimetype="application/json")
+
+    # def _serialize_pedido(self, pedido):
+    #     pedido['_id'] = str(pedido['_id'])
+    #     pedido['usuarioId'] = str(pedido['usuarioId'])
+
+    #     usuario = self.mongo.db.Clientes.find_one({"_id": ObjectId(pedido["usuarioId"])})
+    #     pedido["usuarioNombre"] = usuario["nombre"] if usuario else "Usuario no encontrado"
+    #     pedido["usuarioEmail"] = usuario["email"] if usuario else "Email no encontrado"
+
+    #     for prod in pedido.get("productos", []):
+    #         producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+    #         prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
+    #         prod["productoId"] = str(prod["productoId"])
+
+    #     return pedido
+
+    def get_pedido_by_id_raw(self, pedido_id):
+        """Obtiene un pedido sin serializar para poder validar antes."""
+        try:
+            return self.mongo.db.Pedidos.find_one({"_id": ObjectId(pedido_id)})
+        except Exception:
+            return None
+
+    def _serialize_pedido(self, pedido):
+        """Convierte un pedido de Mongo en un dict serializable a JSON."""
+        pedido['_id'] = str(pedido['_id'])
+        pedido['usuarioId'] = str(pedido['usuarioId'])
+
+        usuario = self.mongo.db.Clientes.find_one({"_id": ObjectId(pedido["usuarioId"])})
+        pedido["usuarioNombre"] = usuario["nombre"] if usuario else "Usuario no encontrado"
+        pedido["usuarioEmail"] = usuario["email"] if usuario else "Email no encontrado"
+
+        for prod in pedido.get("productos", []):
+            producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+            prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
+            prod["productoId"] = str(prod["productoId"])
+
+        return pedido
+
 
 
     def delete_pedido(self, pedido_id):

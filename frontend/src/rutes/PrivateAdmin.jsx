@@ -3,7 +3,7 @@ import { PrivateRoutes } from "../models/routes"
 import RoutesWhitNotFound from "../utilities/routesWhitNotFound.utility"
 import { lazy } from "react"
 
-import AdminPedidos from "../components/AdminPedidos";
+import ListaPedidos from "../components/ListaPedidos";
 import ProductoDetail from "../components/ProductosDetail";
 import FormProductoModern from "../components/FormProducto";
 import AdminDetailPedido from "../components/AdminDetailPedido";
@@ -21,7 +21,7 @@ function PrivateAdmin() {
 
 
 
-          <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<AdminPedidos />} />
+          <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<ListaPedidos />} />
           <Route path={PrivateRoutes.ADMIN_VIEW_PEDIDO} element={<AdminDetailPedido />} />
 
           <Route path={PrivateRoutes.VIEW_PRODUCT_PRIVATE} element={<ProductoDetail />} />

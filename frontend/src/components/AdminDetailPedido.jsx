@@ -25,9 +25,15 @@ const AdminDetailPedido = () => {
 
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`)
+    axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`, { withCredentials: true })
       .then(res => setPedido(res.data))
-      .catch(err => console.error(err));
+      .catch(err => {
+        if (err.response?.status === 403) {
+          setPedido({ error: "No tienes permiso para ver este pedido" });
+        } else {
+          console.error(err);
+        }
+      });
   }, [id]);
   
 

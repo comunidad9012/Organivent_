@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import store from "../../redux/store";
 import { useSelector } from "react-redux";
+import { PrivateRoutes } from "../../models/routes";
 
 function useCrearPedido() {
   const [loading, setLoading] = useState(false);

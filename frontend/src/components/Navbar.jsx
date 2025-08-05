@@ -104,6 +104,15 @@ function Navbar() {
                     </Link>
                     )}
 
+                    {userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.USER_PEDIDOS}` && (
+                        <Link to={`/private/${PrivateRoutes.USER_PEDIDOS}`} className="fancy">
+                        <span className="top-key"></span>
+                        <span className="text">Pedidos</span>
+                        <span className="bottom-key-1"></span>
+                        <span className="bottom-key-2"></span>
+                        </Link>
+                    )}
+
                     <Logout />
 
                     {/* Profile dropdown VER*/}

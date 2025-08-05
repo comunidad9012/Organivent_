@@ -69,7 +69,8 @@ function Productos() {
                   <img
                     src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
                     alt={product.nombre_producto}
-                    className="card-img-top"
+                    className="card-img-top w-full h-60 object-contain mt-4"
+                    // style={{ backgroundColor: '#f9f9f9' }}
                   />
                     <div className="card-body d-flex flex-column">
                       <h5 className="card-title">{product.nombre_producto}</h5>

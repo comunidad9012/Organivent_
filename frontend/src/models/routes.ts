@@ -13,6 +13,7 @@ export const PublicRoutes: RouteMap = {
 export const PrivateRoutes: RouteMap ={
     PRIVATE: 'private',
     ADMIN : 'admin',
+    USER_PEDIDOS : 'UserPedidos',
     ADMIN_PEDIDOS : 'Pedidos',
     ADMIN_VIEW_PEDIDO : 'Pedidos/viewPedido/:id',
     CREATE_PRODUCT : 'Productos/create',
