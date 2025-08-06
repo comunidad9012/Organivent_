@@ -20,29 +20,27 @@ def show_pedidos(data): #data viene del token decodificado
     pedidos_model = PedidosModel(current_app)
 
     if data.get('rol') == 'admin':
-        response = pedidos_model.show_pedidos()  # todos los pedidos
+        return pedidos_model.show_pedidos() # Devuelve todos los pedidos
     else:
-        response = pedidos_model.show_pedidos_by_user(data["id"])  # solo los suyos (del usuario logueado)
-    
-    return response
+        return pedidos_model.show_pedidos_by_user(data["id"]) # Devuelve los pedidos del usuario autenticado
 
 
 @Pedidos_bp.get("/viewPedido/<id>")
 @token_required
 def view_pedido(data, id):
     pedidos_model = PedidosModel(current_app)
-    
-    # 1️⃣ Obtener sin serializar
-    pedido = pedidos_model.get_pedido_by_id_raw(id)
-    if not pedido:
+
+     # 1️⃣ Obtener sin serializar
+    pedido_raw = pedidos_model.get_pedido_by_id_raw(id)
+    if not pedido_raw:
         return jsonify({"error": "Pedido no encontrado"}), 404
 
     # 2️⃣ Validar permisos
-    if data.get('rol') != 'admin' and str(pedido["usuarioId"]) != str(data["id"]):
+    if data.get('rol') != 'admin' and str(pedido_raw.get("usuarioId")) != data["id"]:
         return jsonify({"error": "Acceso denegado"}), 403
 
     # 3️⃣ Serializar y devolver
-    pedido_serializado = pedidos_model._serialize_pedido(pedido)
+    pedido_serializado = pedidos_model._serialize_pedido(pedido_raw)
     return Response(json_util.dumps(pedido_serializado), mimetype="application/json")
 
 

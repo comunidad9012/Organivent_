@@ -17,7 +17,7 @@ import { EstadosPedido } from '../models/Estado_Pedido/enums'
 
 import { toast } from "sonner"
 
-const AdminDetailPedido = () => {
+const DetallePedido = () => {
   const { id } = useParams()
   const [pedido, setPedido] = useState(null)
   const [estadoPedido, setEstadoPedido] = useState("");
@@ -177,4 +177,4 @@ const AdminDetailPedido = () => {
   )
 }
 
-export default AdminDetailPedido
+export default DetallePedido

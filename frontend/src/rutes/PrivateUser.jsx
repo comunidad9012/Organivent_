@@ -7,6 +7,7 @@ import Cart from "../components/Cart";
 import ProductosDetail from "../components/ProductosDetail";
 import PrivateAdmin from "./PrivateAdmin";
 import ListaPedidos from "../components/ListaPedidos";
+import DetallePedido from "../components/DetallePedido";
 
 const User = lazy(() => import('../pages/User'));
 
@@ -17,6 +18,7 @@ function PrivateUser() {
         
         <Route path={PrivateRoutes.USER} element={<User />} />
         <Route path={PrivateRoutes.USER_PEDIDOS} element={<ListaPedidos />} />
+        <Route path={PrivateRoutes.USER_VIEW_PEDIDO} element={<DetallePedido/>} />
         <Route path={PrivateRoutes.CART} element={<Cart />}/>
         <Route path={`/User/${PrivateRoutes.VIEW_PRODUCT_PRIVATE}`} element={<ProductosDetail />} />
 
