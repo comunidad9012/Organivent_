@@ -49,8 +49,8 @@ function DeleteProduct({ product, setProductos }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="m-4">
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-500 rounded-md" onClick={handleDelete}>Eliminar</AlertDialogAction>
+          <AlertDialogCancel className="rounded">Cancelar</AlertDialogCancel>
+          <AlertDialogAction className="bg-red-500 rounded" onClick={handleDelete}>Eliminar</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
