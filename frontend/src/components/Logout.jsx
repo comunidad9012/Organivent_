@@ -7,7 +7,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -40,7 +39,7 @@ function Logout() {
       <AlertDialogTrigger asChild>
         <button
           type="button"
-          className="block w-full px-4 py-2 text-sm text-red-500 hover:bg-gray-100"
+          className="block w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50"
         >
           Sign out
         </button>

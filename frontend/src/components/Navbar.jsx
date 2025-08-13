@@ -8,13 +8,30 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
-import Logout from "./Logout";
 import { PrivateRoutes, PublicRoutes } from "../models/routes";
 import ProfileDropdown from "./ProfileDropdown";
+
+import { ShoppingCart } from 'lucide-react';
+
+import { useCart } from "./context/CartContext";
+import { useState, useEffect } from "react";
 
 function Navbar() {
     const location = useLocation(); // Obtener la ubicación actual
     const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
+    const { cart } = useCart();
+
+    const [animate, setAnimate] = useState(false);
+    // Cada vez que cambie la cantidad total, activamos la animación
+    const totalItems = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
+    useEffect(() => {
+        if (totalItems > 0) {
+          setAnimate(true);
+          const timeout = setTimeout(() => setAnimate(false), 600); // duración de animación
+          return () => clearTimeout(timeout);
+        }
+      }, [totalItems]);
+
 
     const isInPrivate = location.pathname.startsWith(`/${PrivateRoutes.PRIVATE}`);
     
@@ -90,25 +107,23 @@ function Navbar() {
 
                     {userState.rol === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` && (
                     <Link to={`/private/${PrivateRoutes.CART}`}>
-                        <button className="flex p-2 hover:bg-gray-200 rounded">
+                        <button className="relative flex p-2 hover:bg-gray-200 rounded">
                         {/* Icono carrito */}
-                        <svg
-                            color="black"
-                            className="icon"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            height="1.5em"
-                            width="3em"
-                        >
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
+                        <div className="relative">
+                            <ShoppingCart className="w-6 h-6" />
+                            {totalItems > 0 && (
+          <span
+            className={`absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 transition-transform ${
+              animate ? "animate-bounce" : ""
+            }`}
+          >
+            {totalItems}
+          </span>
+        )}
+                        </div>
                         </button>
+
+
                     </Link>
                     )}
 

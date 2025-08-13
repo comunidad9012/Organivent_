@@ -1,69 +1,148 @@
+// import React, { useState, useEffect } from 'react';
+// import { useContext } from 'react'
+// import { FiltersContext } from './context/filters.jsx' 
+
+// function Categorias() {
+//     const [listaCategorias, setListaCategorias] = useState([]);
+//     const {filters , setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
+//     //AGREGAR filters PARA VER QUE SE ELIJIÓ
+
+
+//     // //logica de filtros
+//     // const minPriceFilterId = useId()
+
+//     // const handleChangeMinPrice = (event) => {
+//     //     setFilters(prevState => ({
+//     //       ...prevState,
+//     //       minPrice: event.target.value
+//     //     }))
+//     //   }
+    
+  
+//       //fech de categorias
+//       useEffect(() => {
+//         fetch('http://localhost:5000/Categoria/showCategorias')
+//             .then((response) => response.json())
+//             .then((data) => setListaCategorias(data))
+//             .catch((error) => console.error('Error fetching categories:', error));
+//     }, []);
+
+//       return (
+//         <section className='filters'>
+    
+//           {/* <div>
+//             <label htmlFor={minPriceFilterId}>Precio a partir de:</label>
+//             <input
+//               type='range'
+//               id={minPriceFilterId}
+//               min='0'
+//               max='1000'
+//               onChange={handleChangeMinPrice}
+//               value={filters.minPrice}
+//             />
+//             <span>${filters.minPrice}</span>
+//           </div> */}
+    
+//           <div className="nav-item dropdown">
+//             <a className="nav-link dropdown-toggle text-black" role="button" data-bs-toggle="dropdown" href=''> 
+//                 {/* le saque el href arriba*/}
+//                 Categorías
+//                 {filters.category && <p className="badge bg-secondary mx-2">{filters.category}</p>}
+
+//             </a>
+//             <ul className="dropdown-menu">
+//                 <li>
+//                 {/* cambiar el alert alert-info por algo mas normal pero que lo diferencie del resto */}
+//                     <div className="dropdown-item alert alert-info" onClick={() => setFilters((prevFilters) => ({
+//                           ...prevFilters,
+//                           category: "",
+//                           id_categoria: ""
+//                         }))}>
+//                         Todas las categorías
+//                     </div>
+//                 </li>
+//                 {listaCategorias.map((categoria) => (
+//                     <li key={categoria._id}>
+//                         <div className="dropdown-item" 
+                  
+//                         onClick={() => 
+//                               setFilters((prevFilters) => ({
+//                               ...prevFilters,
+//                               category: categoria.nombre_categoria,
+//                               id_categoria: categoria._id
+//                               }))}>
+//                             {categoria.nombre_categoria}
+//                         </div>
+//                     </li>
+//                 ))}
+//             </ul>
+//         </div>
+    
+//         </section>
+//       )
+// }
+// export default Categorias;
+
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from "lucide-react";
+
 import React, { useState, useEffect } from 'react';
 import { useContext } from 'react'
 import { FiltersContext } from './context/filters.jsx' 
 
+
 function Categorias() {
-    const [listaCategorias, setListaCategorias] = useState([]);
-    const {filters , setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
-    //AGREGAR filters PARA VER QUE SE ELIJIÓ
-
-
-    // //logica de filtros
-    // const minPriceFilterId = useId()
-
-    // const handleChangeMinPrice = (event) => {
-    //     setFilters(prevState => ({
-    //       ...prevState,
-    //       minPrice: event.target.value
-    //     }))
-    //   }
-    
+      const [listaCategorias, setListaCategorias] = useState([]);
+      const {filters , setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
+      //AGREGAR filters PARA VER QUE SE ELIJIÓ
   
-      //fech de categorias
-      useEffect(() => {
-        fetch('http://localhost:5000/Categoria/showCategorias')
-            .then((response) => response.json())
-            .then((data) => setListaCategorias(data))
-            .catch((error) => console.error('Error fetching categories:', error));
-    }, []);
-
-      return (
-        <section className='filters'>
+  
+      // //logica de filtros
+      // const minPriceFilterId = useId()
+  
+      // const handleChangeMinPrice = (event) => {
+      //     setFilters(prevState => ({
+      //       ...prevState,
+      //       minPrice: event.target.value
+      //     }))
+      //   }
+      
     
-          {/* <div>
-            <label htmlFor={minPriceFilterId}>Precio a partir de:</label>
-            <input
-              type='range'
-              id={minPriceFilterId}
-              min='0'
-              max='1000'
-              onChange={handleChangeMinPrice}
-              value={filters.minPrice}
-            />
-            <span>${filters.minPrice}</span>
-          </div> */}
-    
-          <div className="nav-item dropdown">
-            <a className="nav-link dropdown-toggle text-black" role="button" data-bs-toggle="dropdown" href=''> 
-                {/* le saque el href arriba*/}
+        //fech de categorias
+        useEffect(() => {
+          fetch('http://localhost:5000/Categoria/showCategorias')
+              .then((response) => response.json())
+              .then((data) => setListaCategorias(data))
+              .catch((error) => console.error('Error fetching categories:', error));
+      }, []);
+  
+        return (
+          <DropdownMenu>
+             <DropdownMenuTrigger asChild>
+              <div className="flex items-center text-gray-700 space-x-2 px-2 py-1 mt-1 rounded-md hover:bg-gray-100 transition">
                 Categorías
-                {filters.category && <p className="badge bg-secondary mx-2">{filters.category}</p>}
-
-            </a>
-            <ul className="dropdown-menu">
-                <li>
-                {/* cambiar el alert alert-info por algo mas normal pero que lo diferencie del resto */}
-                    <div className="dropdown-item alert alert-info" onClick={() => setFilters((prevFilters) => ({
+                <ChevronDown className="w-4 h-4 mx-2 text-gray-600" />
+              </div>
+            </DropdownMenuTrigger>
+              
+            <DropdownMenuContent className="bg-white dark:bg-zinc-900  right-0 z-50  mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 ring-black/5">
+              <DropdownMenuItem className="px-4 py-2 hover:bg-blue-50">
+              <div className="block w-full text-sm text-blue-500" onClick={() => setFilters((prevFilters) => ({
                           ...prevFilters,
                           category: "",
                           id_categoria: ""
                         }))}>
                         Todas las categorías
                     </div>
-                </li>
-                {listaCategorias.map((categoria) => (
-                    <li key={categoria._id}>
-                        <div className="dropdown-item" 
+              </DropdownMenuItem>
+              {listaCategorias.map((categoria) => (
+                        <div key={categoria._id} className="dropdown-item" 
                   
                         onClick={() => 
                               setFilters((prevFilters) => ({
@@ -71,14 +150,16 @@ function Categorias() {
                               category: categoria.nombre_categoria,
                               id_categoria: categoria._id
                               }))}>
-                            {categoria.nombre_categoria}
+                             <DropdownMenuItem className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                              {categoria.nombre_categoria}
+                            </DropdownMenuItem>
                         </div>
-                    </li>
                 ))}
-            </ul>
-        </div>
-    
-        </section>
-      )
-}
-export default Categorias;
+             
+              
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+        )
+  }
+  export default Categorias;
