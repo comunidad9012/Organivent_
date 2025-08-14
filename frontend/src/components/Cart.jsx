@@ -26,11 +26,11 @@ export default function Cart() {
           <div className="mt-8 flex flex-col md:flex-row gap-4 w-full">
             {/* Columna izquierda: mensaje */}
             <div className="flex-2 flex items-center justify-center bg-white border rounded-lg shadow-md p-6">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 w-full">
                 {/* Ícono */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="w-16 h-16 text-gray-600"
+                  className="w-16 h-16 text-gray-600 ml-8"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -44,7 +44,7 @@ export default function Cart() {
                     ¡Añade productos al carrito y descubre tus descuentos!
                   </p>
                 </div>
-                  <a href="/tienda" className="text-blue-600 hover:underline text-sm mt-2 inline-block">
+                  <a href="/tienda" className="text-blue-600 hover:underline text-sm mt-2 inline-block justify-items-end">
                     Descubrir productos
                   </a>
               </div>

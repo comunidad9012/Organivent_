@@ -1,5 +1,5 @@
 import { useState, useEffect , Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useContext } from 'react'
 import CartProduct from './CartProduct.jsx';
@@ -17,6 +17,8 @@ function Productos() {
   
   const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
+  
+  const navigate = useNavigate();
 
   //paginacion
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,28 +86,28 @@ function Productos() {
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {currentProducts.map(product => (
-          <div key={product._id} className="card h-full">
+          <div 
+          key={product._id} 
+          onClick={() => navigate(
+            userState.rol === null 
+              ? `/Productos/viewproduct/${product._id}` 
+              : `Productos/viewproduct/${product._id}`
+          )}
+          className="border cursor-pointer hover:shadow-xl rounded-lg p-4"
+        >
+        
             <img
               src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
               alt={product.nombre_producto}
               className="w-full h-60 object-contain mt-4"
                // style={{ backgroundColor: '#f9f9f9' }}
             />
-            <div className="card-body flex flex-col">
+            <div className="card-body flex flex-col gap-4">
               <h5 className="card-title">{product.nombre_producto}</h5>
               <p>{limitText(product.descripcion, 100)}</p>
-
-
-              {userState.rol === null ?
-                      <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
-                      : 
-                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link> 
-                      }
-                      <br />
-
                       
               <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
-              {userState.rol === Roles.ADMIN ? (
+              {userState.rol === Roles.ADMIN && (
                 <>
                  {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
                   <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
@@ -113,8 +115,6 @@ function Productos() {
                   </Link>
                   <DeleteProduct product={product} setProductos={setProductos}/>
                 </>
-              ) : (
-                <CartProduct product={product}/>
               )}
             </div>
           </div>
