@@ -2,7 +2,6 @@ import { useState, useEffect , Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { useContext } from 'react'
-import { FiltersContext } from './context/filters.jsx'
 import CartProduct from './CartProduct.jsx';
 import DeleteProduct from './DeleteProduct.jsx';
 import store from '../redux/store.js';
@@ -11,11 +10,12 @@ import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
+import { FiltersContext } from './context/filters.jsx'
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
   
-  const { filters } = useContext(FiltersContext) //consumo el contexto de los filtros
+  const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
 
   //paginacion
@@ -50,29 +50,35 @@ function Productos() {
 
 
   return (
+    <>
+    <h1 className="text-2xl font-bold">Productos</h1>
     <div className="flex flex-row gap-4">
-  {/* Panel lateral */}
-  <div className="basis-1/6 p-4 bg-gray-50 rounded">
-    <h2 className="text-lg font-semibold mb-2">
-      {filters.id_categoria 
-        ? `Categoría: ${filters.category}`
-        : "Todos los productos"}
-    </h2>
 
-    {filters.id_categoria && (
-      <button 
-        className="text-sm text-red-500 underline"
-        onClick={() => setFilters({ category: "", id_categoria: "" })}
-      >
-        Quitar filtro
-      </button>
-    )}
+  {/* Panel lateral de filtros*/}
+  <div className="basis-1/6 p-4 bg-gray-50 rounded mt-4 text-left">
+    <p className='text-gray-300'>aca podriamos poner "categoria / subcategoria" (componente shadcn-ui) y abajo hacer un fetch con las subcategorias </p>
+    <h5 className="font-semibold mb-2">Categoría</h5>
+
+{filters.id_categoria ? (
+  <div className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+    {filters.category}
+    <button
+      onClick={() => setFilters({ category: "", id_categoria: "" })}
+      className="mx-2 text-blue-500 hover:text-blue-700 focus:outline-none"
+    >
+      ✕
+    </button>
+  </div>
+) : (
+  <p className="text-gray-500">Todos los productos</p>
+)}
+
   </div>
 
   {/* Zona principal */}
   <div className="basis-5/6">
     <div className="text-center">
-      <h1 className="text-2xl font-bold">Productos</h1>
+      
 
       {Productos.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
@@ -134,6 +140,8 @@ function Productos() {
     </div>
   </div>
 </div>
+
+</>
 
   );
 }
