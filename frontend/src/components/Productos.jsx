@@ -11,24 +11,17 @@ import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
 import { FiltersContext } from './context/filters.jsx'
+import Paginacion from './Paginacion.jsx';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
-  
   const navigate = useNavigate();
-
-  //paginacion
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8 ;
-
-  const startIndex = (currentPage - 1) * itemsPerPage; //para definir el comienzo dice donde esta el anterior, lo multiplica por la cantidad de items por pagina para determinar desde que producto empezar a mostrar
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = Productos.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(Productos.length / itemsPerPage);
-
 
 
   // Fetch para obtener los productos y tambien por categoría
@@ -41,6 +34,7 @@ function Productos() {
         const response = await fetch(url);
         const data = await response.json();
         setProductos(data);
+        setCurrentPage(1); // reset página al cambiar filtros
       } catch (error) {
         console.error("Error al obtener los productos:", error);
       }
@@ -49,7 +43,10 @@ function Productos() {
     fetchProductos();
   }, [filters.id_categoria]); // 🔹 Se ejecuta cuando `categoria` cambia
 
-
+  // paginacion
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = Productos.slice(startIndex, endIndex);
 
   return (
     <>
@@ -82,7 +79,7 @@ function Productos() {
     <div className="text-center">
       
 
-      {Productos.length > 0 ? (
+    {currentProducts.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {currentProducts.map(product => (
@@ -126,18 +123,14 @@ function Productos() {
       )}
     </div>
 
-    {/* Paginación */}
-    <div className="mt-4 text-center">
-      {Array.from({ length: totalPages }, (_, i) => (
-        <button
-          key={i}
-          className={`btn mx-1 ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-          onClick={() => setCurrentPage(i + 1)}
-        >
-          {i + 1}
-        </button>
-      ))}
-    </div>
+     {/* Paginar */}
+          <Paginacion
+            totalItems={Productos.length}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage} 
+          />
+  
   </div>
 </div>
 
