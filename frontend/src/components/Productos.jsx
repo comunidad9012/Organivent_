@@ -20,7 +20,7 @@ function Productos() {
 
   //paginacion
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 8 ;
 
   const startIndex = (currentPage - 1) * itemsPerPage; //para definir el comienzo dice donde esta el anterior, lo multiplica por la cantidad de items por pagina para determinar desde que producto empezar a mostrar
   const endIndex = startIndex + itemsPerPage;
@@ -50,83 +50,91 @@ function Productos() {
 
 
   return (
-    <div>
-      <Helmet>
-        <title>Productos</title>
-      </Helmet>
+    <div className="flex flex-row gap-4">
+  {/* Panel lateral */}
+  <div className="basis-1/6 p-4 bg-gray-50 rounded">
+    <h2 className="text-lg font-semibold mb-2">
+      {filters.id_categoria 
+        ? `Categoría: ${filters.category}`
+        : "Todos los productos"}
+    </h2>
 
-      <div className="text-center">
-      <h1>Productos</h1>
+    {filters.id_categoria && (
+      <button 
+        className="text-sm text-red-500 underline"
+        onClick={() => setFilters({ category: "", id_categoria: "" })}
+      >
+        Quitar filtro
+      </button>
+    )}
+  </div>
 
-        {Productos.length > 0 ? (
+  {/* Zona principal */}
+  <div className="basis-5/6">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold">Productos</h1>
+
+      {Productos.length > 0 ? (
           // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
-          <div className="row justify-content-center mt-4">
-            
-            {currentProducts.map((product, index) => (
-              <Fragment key={product._id}>
-                <div className="col-md-3 mt-4">
-                  <div className="card h-100">
-                  <img
-                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
-                    alt={product.nombre_producto}
-                    className="card-img-top w-full h-60 object-contain mt-4"
-                    // style={{ backgroundColor: '#f9f9f9' }}
-                  />
-                    <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">{product.nombre_producto}</h5>
-                      {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
-                      <p>{limitText(product.descripcion, 100)}</p>
-                      <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
-                      {userState.rol === null ?
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        {currentProducts.map(product => (
+          <div key={product._id} className="card h-full">
+            <img
+              src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+              alt={product.nombre_producto}
+              className="w-full h-60 object-contain mt-4"
+               // style={{ backgroundColor: '#f9f9f9' }}
+            />
+            <div className="card-body flex flex-col">
+              <h5 className="card-title">{product.nombre_producto}</h5>
+              <p>{limitText(product.descripcion, 100)}</p>
+
+
+              {userState.rol === null ?
                       <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
                       : 
                       <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link> 
                       }
                       <br />
 
-
-                      {userState.rol === Roles.ADMIN ?
-                        <>
-                          {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
-                          <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
-                          Editar
-                          </Link>
-                          <DeleteProduct product={product} setProductos={setProductos}/>
-                        </>
-                        :
-                        <>
-                          <CartProduct product={product}/>
-                        </>
-                    }
-
-
-
-                    </div>
-                  </div>
-                </div>
-                {index % 3 === 2 && <div className="w-100"></div>}
-              </Fragment>
-            ))}
+                      
+              <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
+              {userState.rol === Roles.ADMIN ? (
+                <>
+                 {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
+                  <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
+                    Editar
+                  </Link>
+                  <DeleteProduct product={product} setProductos={setProductos}/>
+                </>
+              ) : (
+                <CartProduct product={product}/>
+              )}
+            </div>
           </div>
-           ) : (
-            <p>No hay productos disponibles.</p>
-        )}
-      </div>
-
-      {/* Paginación */}
-      <div className="mt-4">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={`btn mx-1 ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
         ))}
       </div>
-
+      
+      ) : (
+        <p>No hay productos disponibles.</p>
+      )}
     </div>
+
+    {/* Paginación */}
+    <div className="mt-4 text-center">
+      {Array.from({ length: totalPages }, (_, i) => (
+        <button
+          key={i}
+          className={`btn mx-1 ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
+          onClick={() => setCurrentPage(i + 1)}
+        >
+          {i + 1}
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
+
   );
 }
 
