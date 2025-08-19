@@ -31,6 +31,7 @@ function FormProductoModern() {
   const [mostrarFormularioCategoria, setMostrarFormularioCategoria] = useState(false);
   const [nuevoColor, setNuevoColor] = useState({ name: '', hex: '#000000' });
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
 
   // Obtener las categorías al cargar
   useEffect(() => {
@@ -77,7 +78,7 @@ function FormProductoModern() {
     const total = files.length + producto.imagenes.length;
   
     if (total > 10) {
-      alert("Máximo 10 imágenes por producto.");
+      toast.error("Máximo 10 imágenes por producto.");
       return;
     }
   
@@ -149,6 +150,24 @@ function FormProductoModern() {
       });
   };
 
+  // Función para obtener todas las imágenes (existentes + nuevas)
+  const getAllImages = () => {
+    const existingImages = producto.imagenes.map(url => ({ type: 'existing', url, original: url }));
+    const newImages = imagenes.map(img => ({ type: 'new', url: URL.createObjectURL(img), original: img }));
+    return [...existingImages, ...newImages];
+  };
+
+  // Funciones para navegar en el carrusel
+  const nextThumbnails = () => {
+    const allImages = getAllImages();
+    const maxIndex = Math.max(0, allImages.length - 3);
+    setCurrentThumbnailIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevThumbnails = () => {
+    setCurrentThumbnailIndex(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div>
       <Helmet>
@@ -184,45 +203,74 @@ function FormProductoModern() {
                   />
                 </div>
 
-                {/* Miniaturas con animaciones */}
-                <div className="flex flex-wrap justify-center gap-3">
-                  {/* Imágenes existentes */}
-                  {producto.imagenes.map((url, index) => (
-                    <div key={`existente-${index}`} className="relative group">
-                      <img 
-                        src={url} 
-                        alt={`img-${index}`} 
-                        className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
-                          imagenSeleccionada === url 
-                            ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
-                            : "border-gray-200 hover:border-indigo-300"
-                        }`}
-                        onClick={() => setImagenSeleccionada(url)}
-                      />
-                    </div>
-                  ))}
+                {/* Carrusel de miniaturas mejorado */}
+                <div className="relative">
+                  {(() => {
+                    const allImages = getAllImages();
+                    const showCarousel = allImages.length > 4;
+                    const visibleImages = showCarousel 
+                      ? allImages.slice(currentThumbnailIndex, currentThumbnailIndex + 4)
+                      : allImages;
 
-                  {/* Imágenes nuevas */}
-                  {imagenes.map((img, index) => {
-                    const previewUrl = URL.createObjectURL(img);
                     return (
-                      <div key={`nueva-${index}`} className="relative group">
-                        <img 
-                          src={previewUrl}
-                          alt={`preview-${index}`} 
-                          className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
-                            imagenSeleccionada === previewUrl 
-                              ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
-                              : "border-gray-200 hover:border-indigo-300"
-                          }`}
-                          onClick={() => setImagenSeleccionada(previewUrl)}
-                        />
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center justify-center gap-2">
+                          {/* Botón anterior */}
+                          {showCarousel && (
+                            <button
+                              type="button"
+                              onClick={prevThumbnails}
+                              disabled={currentThumbnailIndex === 0}
+                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
+                            >
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              </svg>
+                            </button>
+                          )}
+
+                          {/* Miniaturas visibles */}
+                          <div className="flex gap-3 px-2">
+                            {visibleImages.map((image, index) => {
+                              const globalIndex = showCarousel ? currentThumbnailIndex + index : index;
+                              return (
+                                <div key={`${image.type}-${globalIndex}`} className="relative group">
+                                  <img 
+                                    src={image.url} 
+                                    alt={`img-${globalIndex}`} 
+                                    className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
+                                      imagenSeleccionada === image.url 
+                                        ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
+                                        : "border-gray-200 hover:border-indigo-300"
+                                    }`}
+                                    onClick={() => setImagenSeleccionada(image.url)}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Botón siguiente */}
+                          {showCarousel && (
+                            <button
+                              type="button"
+                              onClick={nextThumbnails}
+                              disabled={currentThumbnailIndex >= allImages.length - 4}
+                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
+                            >
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
-                  })}
+                  })()}
                 </div>
               </div>
             </div>
+
             {/* Columna derecha */}
             <div className="md:w-1/2 md:pl-6 space-y-6">
               {/* Nombre producto */}
@@ -299,10 +347,10 @@ function FormProductoModern() {
                   <button
                     type="button"
                     onClick={() => document.getElementById('input-fotos').click()}
-                    className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
+                    className="w-20 h-20 flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 hover:border-indigo-400 transition-all duration-300 group hover:scale-105"
                   >
-                    <span className="text-3xl">+</span>
-                    <span className="text-xs mt-1">Subir</span>
+                    <span className="text-2xl group-hover:scale-110 transition-transform">📸</span>
+                    <span className="text-xs font-medium">Subir</span>
                   </button>
                   <input
                     id="input-fotos"
@@ -314,7 +362,7 @@ function FormProductoModern() {
                       const files = Array.from(e.target.files);
                       const total = files.length + producto.imagenes.length + imagenes.length;
                       if (total > 10) {
-                        alert("Máximo 10 imágenes por producto.");
+                        toast.error("Máximo 10 imágenes por producto.");
                         return;
                       }
                       setImagenes(prev => [...prev, ...files]);
@@ -473,8 +521,10 @@ function FormProductoModern() {
                           // Actualizar lista de categorías
                           const res = await axios.get("http://localhost:5000/Categoria/showCategorias");
                           setCategorias(res.data);
+                          toast.success("Categoría creada exitosamente");
                         } catch (err) {
                           console.error("Error al crear categoría:", err);
+                          toast.error("Error al crear la categoría");
                         }
                       }}
                     >
@@ -482,6 +532,7 @@ function FormProductoModern() {
                     </button>
                     
                     <button 
+                      type="button"
                       className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
                       onClick={() => setMostrarFormularioCategoria(false)}
                     >
@@ -507,10 +558,9 @@ function FormProductoModern() {
           {/* Botón de carga de producto */}
           <button 
             type="submit" 
-              // className="button-pretty w-full"
-              className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-              disabled={loading}
-            >
+            className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+            disabled={loading}
+          >
             {loading ? 'Cargando...' : id ? 'Actualizar producto' : 'Cargar producto'}
           </button>
         </div>
