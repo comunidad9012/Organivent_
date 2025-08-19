@@ -176,7 +176,7 @@ function FormProductoModern() {
                   "https://placehold.co/600x600.png"
                 }
                 alt="Imagen del producto" 
-                className="w-full h-auto rounded-lg shadow object-contain" 
+                className="w-[500px] h-[500px] object-cover rounded-lg shadow" 
               />
 
               {/* Miniaturas debajo de la principal */}
@@ -187,7 +187,9 @@ function FormProductoModern() {
                   key={`existente-${index}`}
                   src={url} 
                   alt={`img-${index}`} 
-                  className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
+                  className={`w-20 h-20 object-cover rounded cursor-pointer border-2 transition ${
+                    imagenSeleccionada === url ? "border-black" : "border-transparent"
+                  }`}
                   onClick={() => setImagenSeleccionada(url)}
                 />
               ))}
@@ -200,7 +202,9 @@ function FormProductoModern() {
                     key={`nueva-${index}`}
                     src={previewUrl}
                     alt={`preview-${index}`} 
-                    className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
+                    className={`w-20 h-20 object-cover rounded cursor-pointer border-2 transition ${
+                      imagenSeleccionada === previewUrl ? "border-black" : "border-transparent"
+                    }`}
                     onClick={() => setImagenSeleccionada(previewUrl)}
                   />
                 );
