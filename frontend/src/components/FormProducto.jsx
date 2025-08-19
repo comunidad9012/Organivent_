@@ -167,48 +167,60 @@ function FormProductoModern() {
         <div className="p-4 bg-background rounded-lg shadow-lg space-y-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Columna izquierda */}
-            <div className="md:w-1/2 space-y-4">
-              {/* Imagen principal */}
-              <img 
-                src={
-                  imagenSeleccionada ||
-                  (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
-                  "https://placehold.co/600x600.png"
-                }
-                alt="Imagen del producto" 
-                className="w-[500px] h-[500px] object-cover rounded-lg shadow" 
-              />
-
-              {/* Miniaturas debajo de la principal */}
-              <div className="flex flex-wrap justify-center gap-2">
-              {/* Imágenes ya cargadas */}
-              {producto.imagenes.map((url, index) => (
-                <img 
-                  key={`existente-${index}`}
-                  src={url} 
-                  alt={`img-${index}`} 
-                  className={`w-20 h-20 object-cover rounded cursor-pointer border-2 transition ${
-                    imagenSeleccionada === url ? "border-black" : "border-transparent"
-                  }`}
-                  onClick={() => setImagenSeleccionada(url)}
-                />
-              ))}
-
-              {/* Imágenes recién seleccionadas */}
-              {imagenes.map((img, index) => {
-                const previewUrl = URL.createObjectURL(img);
-                return (
+            <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="space-y-6">
+                
+                {/* Imagen principal con marco elegante */}
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
                   <img 
-                    key={`nueva-${index}`}
-                    src={previewUrl}
-                    alt={`preview-${index}`} 
-                    className={`w-20 h-20 object-cover rounded cursor-pointer border-2 transition ${
-                      imagenSeleccionada === previewUrl ? "border-black" : "border-transparent"
-                    }`}
-                    onClick={() => setImagenSeleccionada(previewUrl)}
+                    src={
+                      imagenSeleccionada ||
+                      (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
+                      "https://placehold.co/600x600/f8fafc/64748b?text=Imagen+Principal"
+                    }
+                    alt="Imagen del producto" 
+                    className="w-[500px] h-[500px] relative w-full aspect-square object-cover rounded-2xl shadow-xl border-4 border-white" 
                   />
-                );
-              })}
+                </div>
+
+                {/* Miniaturas con animaciones */}
+                <div className="flex flex-wrap justify-center gap-3">
+                  {/* Imágenes existentes */}
+                  {producto.imagenes.map((url, index) => (
+                    <div key={`existente-${index}`} className="relative group">
+                      <img 
+                        src={url} 
+                        alt={`img-${index}`} 
+                        className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
+                          imagenSeleccionada === url 
+                            ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
+                            : "border-gray-200 hover:border-indigo-300"
+                        }`}
+                        onClick={() => setImagenSeleccionada(url)}
+                      />
+                    </div>
+                  ))}
+
+                  {/* Imágenes nuevas */}
+                  {imagenes.map((img, index) => {
+                    const previewUrl = URL.createObjectURL(img);
+                    return (
+                      <div key={`nueva-${index}`} className="relative group">
+                        <img 
+                          src={previewUrl}
+                          alt={`preview-${index}`} 
+                          className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
+                            imagenSeleccionada === previewUrl 
+                              ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
+                              : "border-gray-200 hover:border-indigo-300"
+                          }`}
+                          onClick={() => setImagenSeleccionada(previewUrl)}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
             {/* Columna derecha */}
