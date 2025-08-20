@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { toast } from "sonner"
+import { Trash } from 'lucide-react';
 
 function DeleteProduct({ product, setProductos }) {
 
@@ -35,25 +36,38 @@ function DeleteProduct({ product, setProductos }) {
   };
 
   return (
+    <div onClick={(e) => e.stopPropagation()}>
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <button type="button" className="btn btn-danger mt-2">Borrar</button>
-      </AlertDialogTrigger>
+    <AlertDialogTrigger asChild>
+      <button
+        type="button"
+        className="p-2 rounded bg-red-500 hover:bg-red-600 text-white shadow"
+      >
+        <Trash size={18}/>
+      </button>
+    </AlertDialogTrigger>
+
       <AlertDialogContent className="bg-white dark:bg-zinc-900 shadow-lg">
         <AlertDialogHeader className="m-4">
           <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
           <AlertDialogDescription>
             <strong>
-            Esta acción eliminará el producto "{product.nombre_producto}" y no se podrá deshacer.
+              Esta acción eliminará el producto "{product.nombre_producto}" y no se podrá deshacer.
             </strong>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="m-4">
           <AlertDialogCancel className="rounded">Cancelar</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-500 rounded" onClick={handleDelete}>Eliminar</AlertDialogAction>
+          <AlertDialogAction 
+            className="bg-red-500 rounded" 
+            onClick={handleDelete}
+          >
+            Eliminar
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+  </div>
     
   );
 }

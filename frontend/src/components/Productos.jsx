@@ -1,17 +1,17 @@
 import { useState, useEffect , Fragment } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
 import { useContext } from 'react'
-import CartProduct from './CartProduct.jsx';
 import DeleteProduct from './DeleteProduct.jsx';
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
-import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
 import { FiltersContext } from './context/filters.jsx'
 import Paginacion from './Paginacion.jsx';
+
+import { SquarePen } from 'lucide-react';
+
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -80,47 +80,52 @@ function Productos() {
       
 
     {currentProducts.length > 0 ? (
-          // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {currentProducts.map(product => (
           <div 
-          key={product._id} 
-          onClick={() => navigate(
-            userState.rol === null 
-              ? `/Productos/viewproduct/${product._id}` 
-              : `Productos/viewproduct/${product._id}`
-          )}
-          className="border cursor-pointer hover:shadow-xl rounded-lg p-4"
-        >
-        
+            key={product._id} 
+            onClick={() => navigate(
+              userState.rol === null 
+                ? `/Productos/viewproduct/${product._id}` 
+                : `Productos/viewproduct/${product._id}`
+            )}
+            className="border cursor-pointer hover:shadow-xl rounded-lg p-4 flex flex-col"
+          >
             <img
               src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
               alt={product.nombre_producto}
               className="w-full h-60 object-contain mt-4"
-               // style={{ backgroundColor: '#f9f9f9' }}
             />
-            <div className="card-body flex flex-col gap-4">
+            
+            <div className="card-body flex flex-col flex-1 gap-4">
               <h5 className="card-title">{product.nombre_producto}</h5>
               <p>{limitText(product.descripcion, 100)}</p>
-                      
+              
               <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
+
               {userState.rol === Roles.ADMIN && (
-                <>
-                 {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
-                  <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
-                    Editar
+                <div className="mt-auto flex justify-end gap-2">
+                  {/* Botón editar */}
+                  <Link 
+                    to={`/private/admin/Productos/update/${product._id}`} 
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
+                  >
+                    <SquarePen size={18}/>
                   </Link>
+
+                  {/* Botón borrar */}
                   <DeleteProduct product={product} setProductos={setProductos}/>
-                </>
+                </div>
               )}
             </div>
           </div>
         ))}
       </div>
-      
-      ) : (
-        <p>No hay productos disponibles.</p>
-      )}
+    ) : (
+      <p>No hay productos disponibles.</p>
+    )}
+
     </div>
 
      {/* Paginar */}

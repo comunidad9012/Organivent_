@@ -22,7 +22,8 @@ class ProductosModel:
                 'descripcion': data['descripcion'],
                 'precio_venta': data['precio_venta'],
                 'colores': data['colores'],
-                'imagenes': imagenes
+                'imagenes': imagenes,
+                'categoria': data['categoria']
                 # 'stock': data['stock'],  # Descomentá si vas a usarlo
                 # 'miniatura': data['miniatura']  # Igual que esto
             }
