@@ -18,7 +18,7 @@ function FormProductoModern() {
     nombre_producto: '',
     descripcion: '',
     precio_venta: '',
-    imagenes: [],
+    imagenes: [], 
     colores: [],
     categoria: '',
   });
@@ -31,6 +31,7 @@ function FormProductoModern() {
   const [mostrarFormularioCategoria, setMostrarFormularioCategoria] = useState(false);
   const [nuevoColor, setNuevoColor] = useState({ name: '', hex: '#000000' });
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
 
   // Obtener las categorías al cargar
   useEffect(() => {
@@ -42,7 +43,6 @@ function FormProductoModern() {
         console.error("Error al cargar categorías:", err);
       }
     };
-        
     fetchCategorias();
   }, []);
 
@@ -55,7 +55,6 @@ function FormProductoModern() {
     }
   }, [id]);
 
-  
   // limpia los objetos URL generados con URL.createObjectURL
   useEffect(() => {
     return () => {
@@ -77,14 +76,13 @@ function FormProductoModern() {
     const total = files.length + producto.imagenes.length;
   
     if (total > 10) {
-      alert("Máximo 10 imágenes por producto.");
+      toast.error("Máximo 10 imágenes por producto.");
       return;
     }
   
     setImagenes(files);
   };
 
-  
   const subirImagenes = async () => {
     if (!imagenes || imagenes.length === 0) {
       console.warn("No hay imágenes para subir");
@@ -149,6 +147,24 @@ function FormProductoModern() {
       });
   };
 
+  // Función para obtener todas las imágenes (existentes + nuevas)
+  const getAllImages = () => {
+    const existingImages = producto.imagenes.map(url => ({ type: 'existing', url, original: url }));
+    const newImages = imagenes.map(img => ({ type: 'new', url: URL.createObjectURL(img), original: img }));
+    return [...existingImages, ...newImages];
+  };
+
+  // Funciones para navegar en el carrusel
+  const nextThumbnails = () => {
+    const allImages = getAllImages();
+    const maxIndex = Math.max(0, allImages.length - 3);
+    setCurrentThumbnailIndex(prev => Math.min(prev + 1, maxIndex));
+  };
+
+  const prevThumbnails = () => {
+    setCurrentThumbnailIndex(prev => Math.max(prev - 1, 0));
+  };
+
   return (
     <div>
       <Helmet>
@@ -159,54 +175,97 @@ function FormProductoModern() {
         {id ? 'Editar Producto' : 'Nuevo Producto'}
       </h1>
 
-
-
       {loading && <Loading/>}
 
       <form onSubmit={handleSubmit}>
         <div className="p-4 bg-background rounded-lg shadow-lg space-y-6">
           <div className="flex flex-col md:flex-row gap-6">
             {/* Columna izquierda */}
-            <div className="md:w-1/2 space-y-4">
-              {/* Imagen principal */}
-              <img 
-                src={
-                  imagenSeleccionada ||
-                  (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
-                  "https://placehold.co/600x600.png"
-                }
-                alt="Imagen del producto" 
-                className="w-full h-auto rounded-lg shadow object-contain" 
-              />
-
-              {/* Miniaturas debajo de la principal */}
-              <div className="flex flex-wrap justify-center gap-2">
-              {/* Imágenes ya cargadas */}
-              {producto.imagenes.map((url, index) => (
-                <img 
-                  key={`existente-${index}`}
-                  src={url} 
-                  alt={`img-${index}`} 
-                  className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
-                  onClick={() => setImagenSeleccionada(url)}
-                />
-              ))}
-
-              {/* Imágenes recién seleccionadas */}
-              {imagenes.map((img, index) => {
-                const previewUrl = URL.createObjectURL(img);
-                return (
+            <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="space-y-6">
+                
+                {/* Imagen principal con marco elegante */}
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
                   <img 
-                    key={`nueva-${index}`}
-                    src={previewUrl}
-                    alt={`preview-${index}`} 
-                    className="w-16 h-16 object-cover border rounded cursor-pointer hover:opacity-80 transition"
-                    onClick={() => setImagenSeleccionada(previewUrl)}
+                    src={
+                      imagenSeleccionada ||
+                      (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
+                      "https://placehold.co/600x600/f8fafc/64748b?text=Imagen+Principal"
+                    }
+                    alt="Imagen del producto" 
+                    className="w-[500px] h-[500px] relative w-full aspect-square object-cover rounded-2xl shadow-xl border-4 border-white" 
                   />
-                );
-              })}
+                </div>
+
+                {/* Carrusel de miniaturas mejorado */}
+                <div className="relative">
+                  {(() => {
+                    const allImages = getAllImages();
+                    const showCarousel = allImages.length > 4;
+                    const visibleImages = showCarousel 
+                      ? allImages.slice(currentThumbnailIndex, currentThumbnailIndex + 4)
+                      : allImages;
+
+                    return (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="flex items-center justify-center gap-2">
+                          {/* Botón anterior */}
+                          {showCarousel && (
+                            <button
+                              type="button"
+                              onClick={prevThumbnails}
+                              disabled={currentThumbnailIndex === 0}
+                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
+                            >
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              </svg>
+                            </button>
+                          )}
+
+                          {/* Miniaturas visibles */}
+                          <div className="flex gap-3 px-2">
+                            {visibleImages.map((image, index) => {
+                              const globalIndex = showCarousel ? currentThumbnailIndex + index : index;
+                              return (
+                                <div key={`${image.type}-${globalIndex}`} className="relative group">
+                                  <img 
+                                    src={image.url} 
+                                    alt={`img-${globalIndex}`} 
+                                    className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
+                                      imagenSeleccionada === image.url 
+                                        ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
+                                        : "border-gray-200 hover:border-indigo-300"
+                                    }`}
+                                    onClick={() => setImagenSeleccionada(image.url)}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Botón siguiente */}
+                          {showCarousel && (
+                            <button
+                              type="button"
+                              onClick={nextThumbnails}
+                              disabled={currentThumbnailIndex >= allImages.length - 4}
+                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
+                            >
+                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
+
             {/* Columna derecha */}
             <div className="md:w-1/2 md:pl-6 space-y-6">
               {/* Nombre producto */}
@@ -222,35 +281,48 @@ function FormProductoModern() {
                 <label></label>
               </div>
 
-              {/* Carga de imagenes */}
-              <div className="infield bg-gray-100 p-4 rounded-lg">
-                <p className="text-sm text-gray-700 mb-3">
-                  {`Fotos · ${producto.imagenes.length + imagenes.length}/10 — Máximo de 10 fotos.`}
-                </p>
+              {/* Carga de imagenes*/}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    Galería de Imágenes
+                  </h3>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    producto.imagenes.length + imagenes.length >= 10 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {producto.imagenes.length + imagenes.length}/10
+                  </span>
+                </div>
             
-                <div className="flex flex-wrap gap-2 items-start">
+                <div className="grid grid-cols-5 gap-3 items-start">
                   {/* Miniaturas de imágenes ya cargadas */}
                   {producto.imagenes.map((url, index) => (
-                    <div key={`cargada-${index}`} className="relative w-24 h-24">
-                      <img 
-                        key={`existente-${index}`}
-                        src={url} 
-                        alt={`img-${index}`} 
-                        className="w-full h-full object-cover rounded"
-                        onClick={() => setImagenSeleccionada(url)}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setProducto(prev => ({
-                            ...prev,
-                            imagenes: prev.imagenes.filter((_, i) => i !== index)
-                          }));
-                        }}
-                        className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-red-700"
-                      >
-                        ✕
-                      </button>
+                    <div key={`cargada-${index}`} className="relative group">
+                      <div className="aspect-square relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                        <img 
+                          src={url} 
+                          alt={`img-${index}`} 
+                          className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                          onClick={() => setImagenSeleccionada(url)}
+                        />
+                        {/* Overlay al hacer hover */}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProducto(prev => ({
+                              ...prev,
+                              imagenes: prev.imagenes.filter((_, i) => i !== index)
+                            }));
+                          }}
+                          className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-red-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   ))}
                     
@@ -258,36 +330,53 @@ function FormProductoModern() {
                   {imagenes.map((img, index) => {
                     const previewUrl = URL.createObjectURL(img);
                     return (
-                      <div key={`nueva-${index}`} className="relative w-24 h-24">
-                        <img 
-                          key={`nueva-${index}`}
-                          src={previewUrl}
-                          alt={`preview-${index}`} 
-                          className="w-full h-full object-cover rounded"
-                          onClick={() => setImagenSeleccionada(previewUrl)}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setImagenes(prev => prev.filter((_, i) => i !== index));
-                          }}
-                          className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded-full shadow hover:bg-red-700"
-                        >
-                          ✕
-                        </button>
+                      <div key={`nueva-${index}`} className="relative group">
+                        <div className="aspect-square relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border-2 border-green-200">
+                          <img 
+                            src={previewUrl}
+                            alt={`preview-${index}`} 
+                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+                            onClick={() => setImagenSeleccionada(previewUrl)}
+                          />
+                          {/* Badge de "Nueva" */}
+                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow z-10">
+                            Nueva
+                          </div>
+                          {/* Overlay al hacer hover */}
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                          
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setImagenes(prev => prev.filter((_, i) => i !== index));
+                            }}
+                            className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded-full shadow hover:bg-red-700"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
 
-                  {/* Botón añadir imagenes */}
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById('input-fotos').click()}
-                    className="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"
-                  >
-                    <span className="text-3xl">+</span>
-                    <span className="text-xs mt-1">Subir</span>
-                  </button>
+                  {/* Botón añadir imagenes - Solo si no se llegó al límite */}
+                  {(producto.imagenes.length + imagenes.length) < 10 && (
+                    <div className="aspect-square">
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('input-fotos').click()}
+                        className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-400 hover:text-indigo-600 hover:bg-white/50 hover:border-indigo-400 transition-all duration-300 group hover:scale-105 bg-white/20"
+                      >
+                        <div className="flex flex-col items-center gap-2">
+                          <svg className="w-8 h-8 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          <span className="text-xs font-medium text-center">Agregar<br/>Fotos</span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+
                   <input
                     id="input-fotos"
                     type="file"
@@ -298,14 +387,13 @@ function FormProductoModern() {
                       const files = Array.from(e.target.files);
                       const total = files.length + producto.imagenes.length + imagenes.length;
                       if (total > 10) {
-                        alert("Máximo 10 imágenes por producto.");
+                        toast.error("Máximo 10 imágenes por producto.");
                         return;
                       }
                       setImagenes(prev => [...prev, ...files]);
                     }}
                   />     
                 </div>
-
               </div>
 
               {/* Precio */}
@@ -457,8 +545,10 @@ function FormProductoModern() {
                           // Actualizar lista de categorías
                           const res = await axios.get("http://localhost:5000/Categoria/showCategorias");
                           setCategorias(res.data);
+                          toast.success("Categoría creada exitosamente");
                         } catch (err) {
                           console.error("Error al crear categoría:", err);
+                          toast.error("Error al crear la categoría");
                         }
                       }}
                     >
@@ -466,6 +556,7 @@ function FormProductoModern() {
                     </button>
                     
                     <button 
+                      type="button"
                       className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
                       onClick={() => setMostrarFormularioCategoria(false)}
                     >
@@ -491,10 +582,9 @@ function FormProductoModern() {
           {/* Botón de carga de producto */}
           <button 
             type="submit" 
-              // className="button-pretty w-full"
-              className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-              disabled={loading}
-            >
+            className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+            disabled={loading}
+          >
             {loading ? 'Cargando...' : id ? 'Actualizar producto' : 'Cargar producto'}
           </button>
         </div>
