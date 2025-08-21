@@ -112,7 +112,7 @@ function Productos() {
                     </span>
                     {/* Precio con descuento */}
                     <span className="text-red-600 font-bold text-lg">
-                      ${product.precio_final}
+                      <Precio valor={Number(product.precio_final)} className={"text-2xl text-blue-700 my-2 font-semibold"} />
                     </span>
                     {/* Nombre del descuento */}
                     <span className="text-green-600 text-xs italic">

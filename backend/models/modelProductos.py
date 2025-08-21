@@ -52,12 +52,20 @@ class ProductosModel:
         response=json_util.dumps(Productos)
         return Response(response, mimetype="application/json")
 
-    def specific_product(self,id):
-        producto=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
+    # def specific_product(self,id):
+    #     producto=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
+    #     if not producto:
+    #         return Response(json_util.dumps({"error": "Producto no encontrado"}), mimetype="application/json", status=404)
+    #     producto['_id'] = str(producto['_id'])
+    #     return Response(json_util.dumps(producto), mimetype="application/json")
+
+    def specific_product(self, id):
+        producto = self.mongo.db.Productos.find_one({'_id': ObjectId(id)})
         if not producto:
-            return Response(json_util.dumps({"error": "Producto no encontrado"}), mimetype="application/json", status=404)
+            return None  # Devuelve None si no existe
         producto['_id'] = str(producto['_id'])
-        return Response(json_util.dumps(producto), mimetype="application/json")
+        return producto  # Diccionario limpio
+
     
     def find_Productos(self, palabra):
         regex = re.compile(f".*{re.escape(palabra)}.*", re.IGNORECASE)
