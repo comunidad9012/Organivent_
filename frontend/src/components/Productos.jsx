@@ -11,7 +11,7 @@ import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
-import { Eye, Edit, ShoppingCart } from 'lucide-react';
+import { Heart, Edit, ShoppingCart } from 'lucide-react';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -46,7 +46,7 @@ function Productos() {
     };
 
     fetchProductos();
-  }, [filters.id_categoria]); // 🔹 Se ejecuta cuando `categoria` cambia
+  }, [filters.id_categoria]); // Se ejecuta cuando `categoria` cambia
 
 
 
@@ -57,50 +57,68 @@ function Productos() {
       </Helmet>
 
       {/* Products Grid */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+
+      <div className="max-w-3xl mx-auto px-2 py-6">
         {Productos.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {currentProducts.map((product) => (
               <div
                 key={product._id}
-                className="group bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden block cursor-pointer transform hover:-translate-y-1"
+                className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
               >
-                {/* Image + Info (linkeables) */}
-                <Link 
-                  to={`/Productos/viewproduct/${product._id}`}
-                  className="block"
+              <div className="relative aspect-square bg-white overflow-hidden group">
+                
+                {/* Botón de favorito en la esquina superior derecha */}
+                <button
+                  className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-gray-500 hover:text-red-500 transition-colors"
+                  aria-label="Agregar a favoritos"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Favorito!");
+                  }}
                 >
-                  <div className="relative aspect-square bg-white overflow-hidden">
-                    <img
-                      src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
-                      alt={product.nombre_producto}
-                      className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
+                  <Heart size={22} />
+                </button>
 
-                  <div className="p-4 space-y-3 text-center bg-gray-50">
-                    <div className="order-1">
-                      <Precio valor={Number(product.precio_venta)} className="text-black font-bold text-2xl"/>
-                    </div>
-                    <h3 className="order-2 font-semibold text-gray-900 text-lg line-clamp-2 leading-tight group-hover:text-black transition-colors">
-                      {product.nombre_producto}
-                    </h3>
-                  </div>
+                {/* Colores disponibles en la esquina superior izquierda */}
+                {product.colores?.length > 0 && (
+                  <p className="absolute top-2 left-2 z-10 text-xs bg-white/70 backdrop-blur-sm px-2 py-1 rounded-full text-gray-600">
+                    {product.colores.length} colores!
+                  </p>
+                )}
+
+                {/* Imagen clickeable */}
+                <Link to={`/Productos/viewproduct/${product._id}`} className="block relative z-0">
+                  <img
+                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+                    alt={product.nombre_producto}
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                  />
                 </Link>
+              </div>
+
+              <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
+                {/* Info */}
+                <div className="p-3 space-y-2 text-center bg-gray-50">
+                  <Precio valor={Number(product.precio_venta)} className="text-black font-bold text-lg"/>
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
+                    {product.nombre_producto}
+                  </h3>
+                </div>
+              </Link>
 
                 {/* Admin Actions */}
                 {userState.rol === Roles.ADMIN && (
-                  <div className="pt-2 flex space-x-2">
+                  <div className="flex justify-center gap-1 p-2 border-t bg-gray-50">
                     <Link
                       to={`/private/admin/Productos/update/${product._id}`}
-                      className="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center space-x-1"
+                      className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-xs transition-colors"
                     >
-                      <Edit size={14} />
-                      <span>Editar</span>
+                      <Edit size={12} />
+                      Editar
                     </Link>
-                    <div className="flex-1">
-                      <DeleteProduct product={product} setProductos={setProductos}/>
-                    </div>
+                    <DeleteProduct product={product} setProductos={setProductos}/>
                   </div>
                 )}
               </div>
@@ -108,9 +126,7 @@ function Productos() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
-              <ShoppingCart size={96} className="mx-auto" />
-            </div>
+            <ShoppingCart size={96} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No hay productos disponibles</h3>
             <p className="text-gray-600">Intenta ajustar tus filtros o vuelve más tarde.</p>
           </div>
@@ -119,19 +135,17 @@ function Productos() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="max-w-4xl mx-auto px-4 pb-8">
+        <div className="max-w-3xl mx-auto px-4 pb-8">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex justify-center items-center space-x-2">
-              {/* Previous button */}
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
                 Anterior
               </button>
 
-              {/* Page numbers */}
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum;
                 if (totalPages <= 5) {
@@ -159,19 +173,13 @@ function Productos() {
                 );
               })}
 
-              {/* Next button */}
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
               >
                 Siguiente
               </button>
-            </div>
-            
-            {/* Page info */}
-            <div className="text-center mt-2 text-xs text-gray-500">
-              Página {currentPage} de {totalPages} • Mostrando {currentProducts.length} de {Productos.length} productos
             </div>
           </div>
         </div>
