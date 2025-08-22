@@ -11,6 +11,7 @@ import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
+import { Eye, Edit, ShoppingCart } from 'lucide-react';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -20,7 +21,7 @@ function Productos() {
 
   //paginacion
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 12;
 
   const startIndex = (currentPage - 1) * itemsPerPage; //para definir el comienzo dice donde esta el anterior, lo multiplica por la cantidad de items por pagina para determinar desde que producto empezar a mostrar
   const endIndex = startIndex + itemsPerPage;
@@ -50,82 +51,143 @@ function Productos() {
 
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Helmet>
         <title>Productos</title>
       </Helmet>
 
-      <div className="text-center">
-      <h1>Productos</h1>
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold text-gray-900">Productos</h1>
+          <p className="text-gray-600 mt-2">
+            {Productos.length > 0 ? `${Productos.length} productos disponibles` : 'Cargando productos...'}
+          </p>
+        </div>
+      </div>
 
+      {/* Products Grid */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {Productos.length > 0 ? (
-          // aca puedo poner justify-content-around para que los productos se distribuyan mejor y no en el centro
-          <div className="row justify-content-center mt-4">
-            
-            {currentProducts.map((product, index) => (
-              <Fragment key={product._id}>
-                <div className="col-md-3 mt-4">
-                  <div className="card h-100">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {currentProducts.map((product) => (
+              <Link
+                key={product._id}
+                to={userState.rol === null ? `/Productos/viewproduct/${product._id}` : `Productos/viewproduct/${product._id}`}
+                className="group bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden block cursor-pointer transform hover:-translate-y-1"
+              >
+                
+                {/* Image Container */}
+                <div className="relative aspect-square bg-gray-50 overflow-hidden">
                   <img
                     src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
                     alt={product.nombre_producto}
-                    className="card-img-top w-full h-60 object-contain mt-4"
-                    // style={{ backgroundColor: '#f9f9f9' }}
+                    className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
                   />
-                    <div className="card-body d-flex flex-column">
-                      <h5 className="card-title">{product.nombre_producto}</h5>
-                      {/* <div dangerouslySetInnerHTML={{ __html: product.descripcion }} /> */}
-                      <p>{limitText(product.descripcion, 100)}</p>
-                      <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
-                      {userState.rol === null ?
-                      <Link to={`/Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link>
-                      : 
-                      <Link to={`Productos/viewproduct/${product._id}`} className="mt-auto">Ver más</Link> 
-                      }
-                      <br />
-
-
-                      {userState.rol === Roles.ADMIN ?
-                        <>
-                          {/* <Link to={`/Productos/update/${product._id}`} className="btn btn-warning mt-2"> */}
-                          <Link to={`/private/admin/Productos/update/${product._id}`} className="btn btn-warning mt-2">
-                          Editar
-                          </Link>
-                          <DeleteProduct product={product} setProductos={setProductos}/>
-                        </>
-                        :
-                        <>
-                          <CartProduct product={product}/>
-                        </>
-                    }
-
-
-
-                    </div>
-                  </div>
                 </div>
-                {index % 3 === 2 && <div className="w-100"></div>}
-              </Fragment>
+
+                {/* Product Info */}
+                <div className="p-4 space-y-3 text-center">
+                  {/* Precio - lo más grande */}
+                  <div className="order-1">
+                    <Precio valor={Number(product.precio_venta)} className="text-blue-600 font-bold text-2xl"/>
+                  </div>
+                  
+                  {/* Nombre del producto */}
+                  <h3 className="order-2 font-semibold text-gray-900 text-lg line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
+                    {product.nombre_producto}
+                  </h3>
+
+                  {/* Admin Actions - solo para admin */}
+                  {userState.rol === Roles.ADMIN && (
+                    <div className="pt-2 flex space-x-2" onClick={(e) => e.preventDefault()}>
+                      <Link
+                        to={`/private/admin/Productos/update/${product._id}`}
+                        className="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center space-x-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Edit size={14} />
+                        <span>Editar</span>
+                      </Link>
+                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+                        <DeleteProduct product={product} setProductos={setProductos}/>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Link>
             ))}
           </div>
-           ) : (
-            <p>No hay productos disponibles.</p>
+        ) : (
+          <div className="text-center py-12">
+            <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
+              <ShoppingCart size={96} className="mx-auto" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No hay productos disponibles</h3>
+            <p className="text-gray-600">Intenta ajustar tus filtros o vuelve más tarde.</p>
+          </div>
         )}
       </div>
 
-      {/* Paginación */}
-      <div className="mt-4">
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            className={`btn mx-1 ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => setCurrentPage(i + 1)}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="max-w-4xl mx-auto px-4 pb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex justify-center items-center space-x-2">
+              {/* Previous button */}
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
 
+              {/* Page numbers */}
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      currentPage === pageNum
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              {/* Next button */}
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Siguiente
+              </button>
+            </div>
+            
+            {/* Page info */}
+            <div className="text-center mt-2 text-xs text-gray-500">
+              Página {currentPage} de {totalPages} • Mostrando {currentProducts.length} de {Productos.length} productos
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
