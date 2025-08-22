@@ -41,7 +41,7 @@ function Logout() {
           type="button"
           className="block w-full px-4 py-2 text-sm text-red-500 hover:bg-red-50"
         >
-          Sign out
+          Cerrar sesión
         </button>
       </AlertDialogTrigger>
 
