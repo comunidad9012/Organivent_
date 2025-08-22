@@ -51,71 +51,59 @@ function Productos() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Helmet>
         <title>Productos</title>
       </Helmet>
-
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Productos</h1>
-          <p className="text-gray-600 mt-2">
-            {Productos.length > 0 ? `${Productos.length} productos disponibles` : 'Cargando productos...'}
-          </p>
-        </div>
-      </div>
 
       {/* Products Grid */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         {Productos.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {currentProducts.map((product) => (
-              <Link
+              <div
                 key={product._id}
-                to={userState.rol === null ? `/Productos/viewproduct/${product._id}` : `Productos/viewproduct/${product._id}`}
                 className="group bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden block cursor-pointer transform hover:-translate-y-1"
               >
-                
-                {/* Image Container */}
-                <div className="relative aspect-square bg-gray-50 overflow-hidden">
-                  <img
-                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
-                    alt={product.nombre_producto}
-                    className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                {/* Product Info */}
-                <div className="p-4 space-y-3 text-center">
-                  {/* Precio - lo más grande */}
-                  <div className="order-1">
-                    <Precio valor={Number(product.precio_venta)} className="text-blue-600 font-bold text-2xl"/>
+                {/* Image + Info (linkeables) */}
+                <Link 
+                  to={`/Productos/viewproduct/${product._id}`}
+                  className="block"
+                >
+                  <div className="relative aspect-square bg-white overflow-hidden">
+                    <img
+                      src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+                      alt={product.nombre_producto}
+                      className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  
-                  {/* Nombre del producto */}
-                  <h3 className="order-2 font-semibold text-gray-900 text-lg line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">
-                    {product.nombre_producto}
-                  </h3>
 
-                  {/* Admin Actions - solo para admin */}
-                  {userState.rol === Roles.ADMIN && (
-                    <div className="pt-2 flex space-x-2" onClick={(e) => e.preventDefault()}>
-                      <Link
-                        to={`/private/admin/Productos/update/${product._id}`}
-                        className="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center space-x-1"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Edit size={14} />
-                        <span>Editar</span>
-                      </Link>
-                      <div className="flex-1" onClick={(e) => e.stopPropagation()}>
-                        <DeleteProduct product={product} setProductos={setProductos}/>
-                      </div>
+                  <div className="p-4 space-y-3 text-center bg-gray-50">
+                    <div className="order-1">
+                      <Precio valor={Number(product.precio_venta)} className="text-black font-bold text-2xl"/>
                     </div>
-                  )}
-                </div>
-              </Link>
+                    <h3 className="order-2 font-semibold text-gray-900 text-lg line-clamp-2 leading-tight group-hover:text-black transition-colors">
+                      {product.nombre_producto}
+                    </h3>
+                  </div>
+                </Link>
+
+                {/* Admin Actions */}
+                {userState.rol === Roles.ADMIN && (
+                  <div className="pt-2 flex space-x-2">
+                    <Link
+                      to={`/private/admin/Productos/update/${product._id}`}
+                      className="flex-1 bg-amber-500 hover:bg-amber-600 text-white text-xs font-medium py-2 px-3 rounded-md transition-colors flex items-center justify-center space-x-1"
+                    >
+                      <Edit size={14} />
+                      <span>Editar</span>
+                    </Link>
+                    <div className="flex-1">
+                      <DeleteProduct product={product} setProductos={setProductos}/>
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         ) : (
