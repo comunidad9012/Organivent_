@@ -22,6 +22,7 @@ export const PrivateRoutes: RouteMap ={
     USER : 'User',
     CART : 'cart',
     VIEW_PRODUCT_PRIVATE : 'Productos/viewproduct/:id',
+    FAVORITES: 'favoritos',
     
     // DASHBOARD : 'dashboard',
     // PROFILE : 'profile',

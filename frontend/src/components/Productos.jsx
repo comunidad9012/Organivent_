@@ -11,7 +11,8 @@ import { Roles } from '../models/roles.js';
 import { PrivateRoutes } from '../models/routes.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
-import { Heart, Edit, ShoppingCart } from 'lucide-react';
+import FavButton from "./FavButton";
+import { Edit, ShoppingCart } from 'lucide-react';
 
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
@@ -69,17 +70,7 @@ function Productos() {
               <div className="relative aspect-square bg-white overflow-hidden group">
                 
                 {/* Botón de favorito en la esquina superior derecha */}
-                <button
-                  className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 rounded-full text-gray-500 hover:text-red-500 transition-colors"
-                  aria-label="Agregar a favoritos"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log("Favorito!");
-                  }}
-                >
-                  <Heart size={22} />
-                </button>
+                 <FavButton productId={product._id} />
 
                 {/* Colores disponibles en la esquina superior izquierda */}
                 {product.colores?.length > 0 && (

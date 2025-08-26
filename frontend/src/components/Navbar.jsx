@@ -11,6 +11,7 @@ import { Roles } from "../models/roles";
 import { PrivateRoutes, PublicRoutes } from "../models/routes";
 import '../styles/navbar.css';
 import { Sparkles } from "lucide-react"; // iconito de brillito
+import FavoritesButton from "./FavoritesButton";
 
 // Componente para el logo
 const Logo = () => (
@@ -83,13 +84,10 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
     <div className="flex items-center gap-2">
       {/* Favoritos para usuarios normales */}
       {userRole === Roles.USER && (
-        <NavLink to="#" icon={Heart}>
-          Favoritos
-        </NavLink>
+        <FavoritesButton />
       )}
-      
+    
       {/* Enlaces específicos por rol - sacar y meter al dropbox*/}
-
       {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}` && (
         <NavLink to={`/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}`}>
           Pedidos
