@@ -82,10 +82,6 @@ const CartButton = ({ totalItems, animate }) => (
 const UserActions = ({ userRole, location, totalItems, animate, userState }) => {
   return (
     <div className="flex items-center gap-2">
-      {/* Favoritos para usuarios normales */}
-      {userRole === Roles.USER && (
-        <FavoritesButton />
-      )}
     
       {/* Enlaces específicos por rol - sacar y meter al dropbox*/}
       {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}` && (
@@ -104,6 +100,11 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
       <div className="flex items-center gap-2">
         <ProfileDropdown />
       </div>
+      
+      {/* Favoritos para usuarios normales */}
+      {userRole === Roles.USER && (
+        <FavoritesButton />
+      )}
 
       {/* Carrito solo para usuarios normales */}
         {userRole === Roles.USER && location.pathname !== `/private/${PrivateRoutes.CART}` && (
