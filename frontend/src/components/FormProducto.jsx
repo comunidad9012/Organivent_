@@ -7,6 +7,8 @@ import Loading from '../utilities/Loading';
 import '../styles/loading.css';
 import { PrivateRoutes } from '../models/routes';
 import { toast } from 'sonner';
+import GaleriaProducto from "./FormProducto/GaleriaProducto";
+
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -182,90 +184,17 @@ function FormProductoModern() {
           <div className="flex flex-col md:flex-row gap-6">
             {/* Columna izquierda */}
             <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100">
-              <div className="space-y-6">
-                
-                {/* Imagen principal con marco elegante */}
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                  <img 
-                    src={
-                      imagenSeleccionada ||
-                      (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
-                      "https://placehold.co/600x600/f8fafc/64748b?text=Imagen+Principal"
-                    }
-                    alt="Imagen del producto" 
-                    className="w-[500px] h-[500px] relative w-full aspect-square object-cover rounded-2xl shadow-xl border-4 border-white" 
-                  />
-                </div>
-
-                {/* Carrusel de miniaturas mejorado */}
-                <div className="relative">
-                  {(() => {
-                    const allImages = getAllImages();
-                    const showCarousel = allImages.length > 4;
-                    const visibleImages = showCarousel 
-                      ? allImages.slice(currentThumbnailIndex, currentThumbnailIndex + 4)
-                      : allImages;
-
-                    return (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="flex items-center justify-center gap-2">
-                          {/* Botón anterior */}
-                          {showCarousel && (
-                            <button
-                              type="button"
-                              onClick={prevThumbnails}
-                              disabled={currentThumbnailIndex === 0}
-                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
-                            >
-                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                              </svg>
-                            </button>
-                          )}
-
-                          {/* Miniaturas visibles */}
-                          <div className="flex gap-3 px-2">
-                            {visibleImages.map((image, index) => {
-                              const globalIndex = showCarousel ? currentThumbnailIndex + index : index;
-                              return (
-                                <div key={`${image.type}-${globalIndex}`} className="relative group">
-                                  <img 
-                                    src={image.url} 
-                                    alt={`img-${globalIndex}`} 
-                                    className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-3 transition-all duration-300 hover:scale-110 hover:shadow-lg ${
-                                      imagenSeleccionada === image.url 
-                                        ? "border-indigo-500 shadow-lg shadow-indigo-200 scale-105" 
-                                        : "border-gray-200 hover:border-indigo-300"
-                                    }`}
-                                    onClick={() => setImagenSeleccionada(image.url)}
-                                  />
-                                </div>
-                              );
-                            })}
-                          </div>
-
-                          {/* Botón siguiente */}
-                          {showCarousel && (
-                            <button
-                              type="button"
-                              onClick={nextThumbnails}
-                              disabled={currentThumbnailIndex >= allImages.length - 4}
-                              className="p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 border border-gray-200"
-                            >
-                              <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </div>
+              <GaleriaProducto
+                imagenSeleccionada={imagenSeleccionada}
+                setImagenSeleccionada={setImagenSeleccionada}
+                imagenes={imagenes}
+                producto={producto}
+                getAllImages={getAllImages}
+                currentThumbnailIndex={currentThumbnailIndex}
+                prevThumbnails={prevThumbnails}
+                nextThumbnails={nextThumbnails}
+              />
             </div>
-
             {/* Columna derecha */}
             <div className="md:w-1/2 md:pl-6 space-y-6">
               {/* Nombre producto */}
