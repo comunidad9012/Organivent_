@@ -8,7 +8,12 @@ import '../styles/loading.css';
 import { PrivateRoutes } from '../models/routes';
 import { toast } from 'sonner';
 import GaleriaProducto from "./FormProducto/GaleriaProducto";
-
+import NombreProducto from "./FormProducto/NombreProducto";
+import GaleriaImagenesForm from "./FormProducto/GaleriaImagenesForm";
+import ColoresDisponibles from "./FormProducto/ColoresDisponibles";
+import CategoriaForm from "./FormProducto/CategoriaForm";
+import DescripcionProducto from "./FormProducto/DescripcionProducto";
+import BotonSubmit from "./FormProducto/BotonSubmit";
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -197,133 +202,15 @@ function FormProductoModern() {
             </div>
             {/* Columna derecha */}
             <div className="md:w-1/2 md:pl-6 space-y-6">
-              {/* Nombre producto */}
-              <div className="infield mb-6">
-                <input 
-                  required
-                  type="text" 
-                  name="nombre_producto" 
-                  value={producto.nombre_producto}
-                  onChange={handleChange}
-                  placeholder="Nombre del producto"
-                />
-                <label></label>
-              </div>
+              <NombreProducto producto={producto} handleChange={handleChange} />
 
-              {/* Carga de imagenes*/}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    Galería de Imágenes
-                  </h3>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    producto.imagenes.length + imagenes.length >= 10 
-                      ? 'bg-red-100 text-red-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {producto.imagenes.length + imagenes.length}/10
-                  </span>
-                </div>
-            
-                <div className="grid grid-cols-5 gap-3 items-start">
-                  {/* Miniaturas de imágenes ya cargadas */}
-                  {producto.imagenes.map((url, index) => (
-                    <div key={`cargada-${index}`} className="relative group">
-                      <div className="aspect-square relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                        <img 
-                          src={url} 
-                          alt={`img-${index}`} 
-                          className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                          onClick={() => setImagenSeleccionada(url)}
-                        />
-                        {/* Overlay al hacer hover */}
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-                        
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setProducto(prev => ({
-                              ...prev,
-                              imagenes: prev.imagenes.filter((_, i) => i !== index)
-                            }));
-                          }}
-                          className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-red-700"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                    
-                  {/* Miniaturas de imágenes recién seleccionadas */}
-                  {imagenes.map((img, index) => {
-                    const previewUrl = URL.createObjectURL(img);
-                    return (
-                      <div key={`nueva-${index}`} className="relative group">
-                        <div className="aspect-square relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow border-2 border-green-200">
-                          <img 
-                            src={previewUrl}
-                            alt={`preview-${index}`} 
-                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                            onClick={() => setImagenSeleccionada(previewUrl)}
-                          />
-                          {/* Badge de "Nueva" */}
-                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow z-10">
-                            Nueva
-                          </div>
-                          {/* Overlay al hacer hover */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-                          
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setImagenes(prev => prev.filter((_, i) => i !== index));
-                            }}
-                            className="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded-full shadow hover:bg-red-700"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {/* Botón añadir imagenes - Solo si no se llegó al límite */}
-                  {(producto.imagenes.length + imagenes.length) < 10 && (
-                    <div className="aspect-square">
-                      <button
-                        type="button"
-                        onClick={() => document.getElementById('input-fotos').click()}
-                        className="w-full h-full flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 rounded-lg text-indigo-400 hover:text-indigo-600 hover:bg-white/50 hover:border-indigo-400 transition-all duration-300 group hover:scale-105 bg-white/20"
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <svg className="w-8 h-8 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
-                          <span className="text-xs font-medium text-center">Agregar<br/>Fotos</span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-
-                  <input
-                    id="input-fotos"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    hidden
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      const total = files.length + producto.imagenes.length + imagenes.length;
-                      if (total > 10) {
-                        toast.error("Máximo 10 imágenes por producto.");
-                        return;
-                      }
-                      setImagenes(prev => [...prev, ...files]);
-                    }}
-                  />     
-                </div>
-              </div>
+              <GaleriaImagenesForm
+                producto={producto}
+                imagenes={imagenes}
+                setImagenes={setImagenes}
+                setProducto={setProducto}
+                setImagenSeleccionada={setImagenSeleccionada}
+              />
 
               {/* Precio */}
               <div className="infield mb-6">
@@ -338,184 +225,35 @@ function FormProductoModern() {
                 <label></label>
               </div>
 
-              {/* Añadir colores disponibles */}
-              <div className=" bg-gray-100 p-4 rounded-lg">
-                <span className="block mb-2 ">Colores disponibles:</span>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    placeholder="Nombre del color"
-                    value={nuevoColor.name || ''}
-                    onChange={(e) => setNuevoColor(prev => ({ ...prev, name: e.target.value }))}
-                    className="border p-1 rounded"
-                  />
-                  <input
-                    type="color"
-                    value={nuevoColor.hex || '#000000'}
-                    onChange={(e) => setNuevoColor(prev => ({ ...prev, hex: e.target.value }))}
-                    className="w-10 h-10 p-0 border rounded"
-                  />
-                  <button
-                    type="button"
-                    className="button-pretty"
-                    onClick={() => {
-                      if (nuevoColor.name && nuevoColor.hex) {
-                        setProducto(prev => ({
-                          ...prev,
-                          colores: [...prev.colores, nuevoColor]
-                        }));
-                        setNuevoColor({ name: '', hex: '#000000' });
-                      }
-                    }}
-                  >
-                    Añadir
-                  </button>
-                </div>
-
-                {/* Mostrar colores añadidos */}
-                <div className="flex gap-2 mt-2 flex-wrap">
-                  {producto.colores.map((color, index) => (
-                    <div key={index} className="flex items-center gap-1">
-                      <div
-                        className="w-6 h-6 rounded-full border"
-                        style={{ backgroundColor: color.hex }}
-                        title={color.name}
-                      />
-                      <span className="text-sm">{color.name}</span>
-                      <button
-                        type="button"
-                        className="text-red-500 ml-1"
-                        onClick={() => {
-                          setProducto(prev => ({
-                            ...prev,
-                            colores: prev.colores.filter((_, i) => i !== index)
-                          }));
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
+              <ColoresDisponibles
+                producto={producto}
+                setProducto={setProducto}
+                nuevoColor={nuevoColor}
+                setNuevoColor={setNuevoColor}
+              />
             </div>
           </div>
 
-          {/* Sección Categoria */}
-          <div className="infield mb-6 bg-gray-100 p-4 rounded-lg">
-            <div className="flex gap-2">
-              <select 
-                className="w-full p-2 border rounded"
-                value={producto.categoria || ''}
-                onChange={(e) => setProducto(prev => ({ ...prev, categoria: e.target.value }))}
-              >
-                <option value="">Seleccionar categoría</option>
-                {categorias.map((cat) => (
-                  <option key={cat._id} value={cat.nombre_categoria}>
-                    {cat.nombre_categoria}
-                  </option>
-                ))}
-              </select>
-              {/* Agregar categoria */}
-              <button 
-                type="button" 
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                onClick={() => setMostrarFormularioCategoria(true)}
-              >
-                +
-              </button>
-            </div>
+          {/* Sección Baja */}
+          <CategoriaForm
+            producto={producto}
+            setProducto={setProducto}
+            categorias={categorias}
+            setCategorias={setCategorias}
+            mostrarFormularioCategoria={mostrarFormularioCategoria}
+            setMostrarFormularioCategoria={setMostrarFormularioCategoria}
+            nuevaCategoria={nuevaCategoria}
+            setNuevaCategoria={setNuevaCategoria}
+          />
 
-            {/* Crear categoria */}
-            {mostrarFormularioCategoria && (
-              <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-                <h4 className="font-bold mb-3">Nueva Categoría</h4>
-                
-                <div className="grid gap-3">
-                  <input
-                    type="text"
-                    placeholder="Nombre"
-                    className="p-2 border rounded"
-                    value={nuevaCategoria.nombre_categoria}
-                    onChange={(e) => setNuevaCategoria(prev => ({ ...prev, nombre_categoria: e.target.value }))}
-                  />
-                  
-                  <input
-                    type="text"
-                    placeholder="Descripción"
-                    className="p-2 border rounded"
-                    value={nuevaCategoria.descripcion}
-                    onChange={(e) => setNuevaCategoria(prev => ({ ...prev, descripcion: e.target.value }))}
-                  />
-                  
-                  <input
-                    type="text"
-                    placeholder="Subcategorías (separadas por coma)"
-                    className="p-2 border rounded"
-                    onChange={(e) =>
-                      setNuevaCategoria(prev => ({ 
-                        ...prev, 
-                        subcategorias: e.target.value.split(",").map(s => s.trim()) 
-                      }))
-                    }
-                  />
-                  
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                      onClick={async () => {
-                        try {
-                          await axios.post("http://localhost:5000/Categoria/createCategoria", nuevaCategoria);
-                          setMostrarFormularioCategoria(false);
-                          setNuevaCategoria({ nombre_categoria: '', descripcion: '', subcategorias: [] });
-                          
-                          // Actualizar lista de categorías
-                          const res = await axios.get("http://localhost:5000/Categoria/showCategorias");
-                          setCategorias(res.data);
-                          toast.success("Categoría creada exitosamente");
-                        } catch (err) {
-                          console.error("Error al crear categoría:", err);
-                          toast.error("Error al crear la categoría");
-                        }
-                      }}
-                    >
-                      Guardar categoría
-                    </button>
-                    
-                    <button 
-                      type="button"
-                      className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
-                      onClick={() => setMostrarFormularioCategoria(false)}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <DescripcionProducto
+            editorRef={editorRef}
+            handleEditorChange={handleEditorChange}
+            producto={producto}
+          />
 
-          {/* Descripción */}
-          <div className="mb-2">
-            <p className="block m-2 font-bold">Descripción:</p>
-            <Editor
-              apiKey='1hyldt9u4byda8tjkhrxwy3zqocdzt2fujo24fy4spgi9wmc'
-              onInit={(evt, editor) => editorRef.current = editor}
-              init={{ height: 300, menubar: true, language: 'es' }}
-              onEditorChange={handleEditorChange}
-              value={producto.descripcion}
-            />
-          </div>
-          {/* Botón de carga de producto */}
-          <button 
-            type="submit" 
-            className="mt-4 w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
-            disabled={loading}
-          >
-            {loading ? 'Cargando...' : id ? 'Actualizar producto' : 'Cargar producto'}
-          </button>
+          <BotonSubmit loading={loading} id={id} />
+
         </div>
       </form>
     </div>
