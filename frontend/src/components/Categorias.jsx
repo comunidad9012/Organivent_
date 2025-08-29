@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useContext } from 'react'
 import { FiltersContext } from './context/filters.jsx' 
 
