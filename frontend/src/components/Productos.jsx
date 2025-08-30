@@ -19,7 +19,7 @@ function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
   
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 3;
 
   const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
@@ -78,34 +78,50 @@ function Productos() {
 
   {/* Zona principal */}
   <div className="basis-5/6">
-    <div className="text-center">
-      
+     {/* Products Grid */}
 
-    {currentProducts.length > 0 ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-        {currentProducts.map(product => (
-          <div 
-            key={product._id} 
-            onClick={() => navigate(
-              userState.rol === null 
-                ? `/Productos/viewproduct/${product._id}` 
-                : `Productos/viewproduct/${product._id}`
-            )}
-            className="border cursor-pointer hover:shadow-xl rounded-lg p-4 flex flex-col"
-          >
-            <img
-              src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
-              alt={product.nombre_producto}
-              className="w-full h-60 object-contain mt-4"
-            />
-            
-            <div className="card-body flex flex-col flex-1 gap-4">
-              <h5 className="card-title">{product.nombre_producto}</h5>
-              <p>{limitText(product.descripcion, 100)}</p>
-              
-              <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
+      <div className="max-w-3xl mx-auto px-2 py-6">
+        {Productos.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {currentProducts.map((product) => (
+              <div
+                key={product._id}
+                className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
+              >
+              <div className="relative aspect-square bg-white overflow-hidden group">
+                
+                {/* Botón de favorito en la esquina superior derecha */}
+                 <FavButton productId={product._id} />
 
-              {userState.rol === Roles.ADMIN && (
+                {/* Colores disponibles en la esquina superior izquierda */}
+                {product.colores?.length > 0 && (
+                  <p className="absolute top-2 left-2 z-10 text-xs bg-white/70 backdrop-blur-sm px-2 py-1 rounded-full text-gray-600">
+                    {product.colores.length} colores!
+                  </p>
+                )}
+
+                {/* Imagen clickeable */}
+                <Link to={`/Productos/viewproduct/${product._id}`} className="block relative z-0">
+                  <img
+                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+                    alt={product.nombre_producto}
+                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                  />
+                </Link>
+              </div>
+
+              <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
+                {/* Info */}
+                <div className="p-3 space-y-2 text-center bg-gray-50">
+                  <Precio valor={Number(product.precio_venta)} className="text-black font-bold text-lg"/>
+                  <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
+                    {product.nombre_producto}
+                  </h3>
+                </div>
+              </Link>
+
+                {/* Admin Actions */}
+                {userState.rol === Roles.ADMIN && (
                 <div className="mt-auto flex justify-end gap-2">
                   {/* Botón editar */}
                   <Link 
@@ -120,16 +136,18 @@ function Productos() {
                   <DeleteProduct product={product} setProductos={setProductos}/>
                 </div>
               )}
-            </div>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="text-center py-12">
+            <ShoppingCart size={96} className="mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No hay productos disponibles</h3>
+            <p className="text-gray-600">Intenta ajustar tus filtros o vuelve más tarde.</p>
+          </div>
+        )}
       </div>
-    ) : (
-      <p>No hay productos disponibles.</p>
-    )}
-
-    </div>
-
+      
      {/* Paginar */}
           <Paginacion
             totalItems={Productos.length}
