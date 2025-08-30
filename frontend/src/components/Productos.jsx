@@ -101,7 +101,28 @@ function Productos() {
               <h5 className="card-title">{product.nombre_producto}</h5>
               <p>{limitText(product.descripcion, 100)}</p>
               
-              <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/>
+              {/* <Precio valor={Number(product.precio_venta)} className="mx-auto mb-4 text-blue-700"/> */}
+
+              <div className="mx-auto mb-4">
+                {product.precio_final && product.precio_final < product.precio_venta ? (
+                  <div className="flex flex-col items-center">
+                    {/* Precio original tachado */}
+                    <span className="text-gray-500 line-through text-sm">
+                      ${product.precio_venta}
+                    </span>
+                    {/* Precio con descuento */}
+                    <span className="text-red-600 font-bold text-lg">
+                      <Precio valor={Number(product.precio_final)} className={"text-2xl text-blue-700 my-2 font-semibold"} />
+                    </span>
+                    {/* Nombre del descuento */}
+                    <span className="text-green-600 text-xs italic">
+                      {product.descuento_aplicado?.nombre}
+                    </span>
+                  </div>
+                ) : (
+                  <Precio valor={Number(product.precio_venta)} className="text-blue-700"/>
+                )}
+              </div>
 
               {userState.rol === Roles.ADMIN && (
                 <div className="mt-auto flex justify-end gap-2">

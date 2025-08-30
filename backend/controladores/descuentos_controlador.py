@@ -1,0 +1,62 @@
+from flask import Blueprint, request, current_app, jsonify
+from models.modelDescuentos import Descuento
+
+Descuentos_bp = Blueprint("Descuentos", __name__, url_prefix="/Descuentos")
+
+# Crear un descuento
+@Descuentos_bp.post("/createDescuento")
+def create_descuento():
+    data = request.json
+    if not data:
+        return jsonify({"error": "Se requieren datos para crear el descuento"}), 400
+    
+    descuento_model = Descuento(current_app)
+    result = descuento_model.mongo.db.descuentos.insert_one(data)
+    return jsonify({"message": "Descuento creado con éxito", "id": str(result.inserted_id)}), 201
+
+
+# Obtener todos los descuentos
+@Descuentos_bp.get("/showDescuentos")
+def show_descuentos():
+    descuento_model = Descuento(current_app)
+    descuentos = list(descuento_model.mongo.db.descuentos.find())
+    for d in descuentos:
+        d["_id"] = str(d["_id"])
+    return jsonify(descuentos)
+
+
+# Obtener solo descuentos activos
+@Descuentos_bp.get("/activos")
+def descuentos_activos():
+    descuento_model = Descuento(current_app)
+    activos = descuento_model.obtener_descuentos_activos()
+    for d in activos:
+        d["_id"] = str(d["_id"])
+    return jsonify(activos)
+
+
+# Eliminar un descuento por id
+@Descuentos_bp.delete("/delete/<id>")
+def delete_descuento(id):
+    from bson.objectid import ObjectId
+    descuento_model = Descuento(current_app)
+    result = descuento_model.mongo.db.descuentos.delete_one({"_id": ObjectId(id)})
+    if result.deleted_count == 1:
+        return jsonify({"message": "Descuento eliminado con éxito"}), 200
+    else:
+        return jsonify({"error": "Descuento no encontrado"}), 404
+
+
+# Actualizar un descuento por id
+@Descuentos_bp.put("/update/<id>")
+def update_descuento(id):
+    from bson.objectid import ObjectId
+    data = request.json
+    descuento_model = Descuento(current_app)
+    result = descuento_model.mongo.db.descuentos.update_one(
+        {"_id": ObjectId(id)}, {"$set": data}
+    )
+    if result.matched_count == 1:
+        return jsonify({"message": "Descuento actualizado con éxito"}), 200
+    else:
+        return jsonify({"error": "No se encontró el descuento"}), 404
