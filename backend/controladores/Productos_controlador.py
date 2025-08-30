@@ -196,7 +196,6 @@ def update_product(id):
         dict: A dictionary containing the response from the ProductosModel's update_product method.
     """
     data = request.json  # Obtiene los datos enviados en la solicitud como JSON.
-    print("DATOS RECIBIDOS DEL FRONT:", data)
     Productos_model = ProductosModel(current_app)  # Instancia el modelo de productos.
     response = Productos_model.update_product(id, data)  # Llama al método del modelo.
     return response  # Devuelve la respuesta.

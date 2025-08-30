@@ -103,6 +103,8 @@ class ProductosModel:
                 update_fields['colores'] = data['colores']
             if 'imagenes' in data:
                 update_fields['imagenes'] = data['imagenes'] # listado nuevo o modificado
+            if 'categoria' in data:
+                update_fields['categoria'] = data['categoria']
             # if 'miniatura' in data:
             #     update_fields['miniatura'] = data['miniatura']
 
