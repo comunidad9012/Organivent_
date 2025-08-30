@@ -111,3 +111,46 @@ class ProductosModel:
         except Exception as e:
             print(f"Error al actualizar el producto: {e}")
             return {"error": "Error interno del servidor"}, 500
+
+    def get_favoritos(self, user_id):
+        favoritos_col = self.mongo.db.Favoritos
+        productos_col = self.mongo.db.Productos
+
+        # Buscar los IDs de productos favoritos del usuario
+        favoritos = list(favoritos_col.find({"user_id": user_id}))
+        product_ids = [ObjectId(f["product_id"]) for f in favoritos]
+
+        if not product_ids:
+            return []
+
+        # Buscar los productos en la colección Productos
+        productos = list(productos_col.find({"_id": {"$in": product_ids}}))
+
+        for p in productos:
+            p["_id"] = str(p["_id"])
+        return productos
+
+    def toggle_favorito(self, user_id, product_id):
+        favoritos_col = self.mongo.db.Favoritos
+
+        # ¿Ya existe el favorito?
+        existente = favoritos_col.find_one({"user_id": user_id, "product_id": product_id})
+
+        if existente:
+            # Si existe → eliminar
+            favoritos_col.delete_one({"_id": existente["_id"]})
+            return {"message": "Producto eliminado de favoritos", "isFavorito": False}
+        else:
+            # Si no existe → agregar
+            favoritos_col.insert_one({
+                "user_id": user_id,
+                "product_id": product_id
+            })
+            return {"message": "Producto agregado a favoritos", "isFavorito": True}
+
+
+
+    def is_favorito(self, user_id, product_id):
+        favoritos_col = self.mongo.db.Favoritos
+        favorito = favoritos_col.find_one({"user_id": user_id, "product_id": product_id})
+        return {"isFavorito": favorito is not None}

@@ -7,6 +7,8 @@ import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
 import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
+import FavButton from "./FavButton";
+import { Edit, ShoppingCart } from 'lucide-react';
 import { FiltersContext } from './context/filters.jsx'
 import Paginacion from './Paginacion.jsx';
 
@@ -41,7 +43,7 @@ function Productos() {
     };
 
     fetchProductos();
-  }, [filters.id_categoria]); // 🔹 Se ejecuta cuando `categoria` cambia
+  }, [filters.id_categoria]); // Se ejecuta cuando `categoria` cambia
 
   // paginacion
   const startIndex = (currentPage - 1) * itemsPerPage;

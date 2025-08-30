@@ -83,3 +83,43 @@ def update_product(id):
     Productos_model = ProductosModel(current_app)  # Instancia el modelo de productos.
     response = Productos_model.update_product(id, data)  # Llama al método del modelo.
     return response  # Devuelve la respuesta.
+
+@Productos_bp.get("/es_favorito/<product_id>")
+def es_favorito(product_id):
+    try:
+        user_id = request.args.get("user_id")
+        if not user_id:
+            return jsonify({"error": "user_id es requerido"}), 400
+
+        Productos_model = ProductosModel(current_app)
+        result = Productos_model.is_favorito(user_id, product_id)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@Productos_bp.post("/toggle_favorito/<product_id>")
+def toggle_favorito(product_id):
+    try:
+        data = request.json
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "user_id es requerido"}), 400
+
+        Productos_model = ProductosModel(current_app)
+        result = Productos_model.toggle_favorito(user_id, product_id)
+
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@Productos_bp.route('/favoritos/<user_id>', methods=['GET'])
+def get_favoritos(user_id):
+    try:
+        Productos_model = ProductosModel(current_app)  #ahora instanciado
+        response = Productos_model.get_favoritos(user_id)
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
