@@ -6,6 +6,8 @@ import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
 import Precio from '../utilities/Precio';
+import FavButton from "./FavButton";
+
 
 function ProductoDetail() {
   const [Producto, setProducto] = useState({});
@@ -38,7 +40,10 @@ function ProductoDetail() {
       {/* <h1>{Producto.nombre_producto}</h1>
       <div dangerouslySetInnerHTML={{ __html: Producto.nombre_producto }} /> */}
 
-      <div className="w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 bg-white rounded-2xl shadow-2xl p-6 lg:p-10 transition-all duration-300">
+      <div className="relative w-full max-w-4xl mx-auto flex flex-col lg:flex-row gap-8 bg-white rounded-2xl shadow-2xl p-6 lg:p-10 transition-all duration-300">
+        {/* Botón de favoritos arriba a la derecha */}
+        <FavButton productId={Producto._id} />
+
         { /* Sección de imágenes */}
         <div className="w-full lg:w-1/2 flex flex-col">
           <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[550px] flex items-center justify-center overflow-hidden bg-white rounded-lg">
