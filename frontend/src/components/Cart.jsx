@@ -62,7 +62,16 @@ export default function Cart() {
             <ul className="space-y-4">
               {cart.map((product, index) => (
                 <li key={index} className="flex flex-col md:flex-row items-start gap-4 border border-zinc-300 rounded-lg p-4">
-                  <img src="https://placehold.co/200x200" alt="Producto" className="w-48 h-48 object-cover" />
+                 <img
+                    src={
+                      product.imagenes && product.imagenes.length > 0
+                        ? product.imagenes[0]
+                        : "https://placehold.co/200x200"
+                    }
+                    alt={product.nombre_producto}
+                    className="w-48 h-48 object-cover rounded-lg border"
+                  />
+
                   <div className="flex flex-col justify-between">
                     <h2 className="text-lg font-semibold mt-2">{product.nombre_producto}</h2>
                     {product.selectedColor && (
