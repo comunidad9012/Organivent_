@@ -51,7 +51,14 @@ class PedidosModel:
 
         for prod in pedido.get("productos", []):
             producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
-            prod["productoNombre"] = producto["nombre_producto"] if producto else "Producto no encontrado"
+            if producto:
+                prod["productoNombre"] = producto.get("nombre_producto", "Producto sin nombre")
+                prod["imagenes"] = producto.get("imagenes", [])   # 👈 importante
+                prod["precio_final"] = producto.get("precio_final", 0)  # opcional, si te interesa mostrarlo
+            else:
+                prod["productoNombre"] = "Producto no encontrado"
+                prod["imagenes"] = []
+                prod["precio_final"] = 0
             prod["productoId"] = str(prod["productoId"])
 
         return pedido

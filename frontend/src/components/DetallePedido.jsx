@@ -141,11 +141,11 @@ const DetallePedido = () => {
             {pedido.productos.map((prod, idx) => (
               <div key={idx} className="flex gap-4 border rounded-lg shadow-sm bg-gray-50 p-4 items-center">
                 <div className="w-24 h-24 bg-white rounded border flex items-center justify-center overflow-hidden">
-                  {prod.imagen ? (
-                    <img src={prod.imagen} alt={prod.productoNombre || "Producto"} className="w-full h-full object-cover" />
-                  ) : (
-                    <ImageIcon className="text-gray-400 w-8 h-8" />
-                  )}
+                {prod.imagenes?.length > 0 ? (
+                  <img src={prod.imagenes[0]} alt={prod.productoNombre} className="w-full h-full object-cover" />
+                ) : (
+                  <ImageIcon className="text-gray-400 w-8 h-8" />
+                )}
                 </div>
                 <div className="flex-1 space-y-1 text-left pl-2">
                   <p className="font-semibold text-blue-800">{prod.productoNombre || "Producto sin nombre"}</p>
