@@ -38,6 +38,8 @@ class ClientModel:
         from bson.objectid import ObjectId
         return self.mongo.db.Clientes.find_one({"_id": ObjectId(user_id)})
 
+    def get_usuario_by_email(self, email):
+        return self.mongo.db.Clientes.find_one({"email": email})
 
     # def show_clients(self):
     #     clients = list(self.mongo.db.Clientes.find().sort('_id', -1))

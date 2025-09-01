@@ -8,20 +8,16 @@ from functools import wraps #para el decorador
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-@auth_bp.route('/login', methods=['POST']) #con esto se logea si el usuario y contraseña son correctos
+@auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
+    user_data = data.get('user', {})  
 
-    user_data = data.get('user', {})  # Extrae el objeto 'user'
-    username = user_data.get('username')
+    email = user_data.get('email')
     password = user_data.get('password')
 
-    #aca toma el username y password del frontend
-    
     client_model = ClientModel(current_app)
-    usuario = client_model.get_usuario_by_username(username)
-    #aca encuentra el usuario por username
-    
+    usuario = client_model.get_usuario_by_email(email)
 
     if usuario and check_password_hash(usuario['Contraseña'], password):
         payload = {
@@ -30,21 +26,20 @@ def login():
             'rol': usuario.get('rol', 'user'),
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }
-        token = jwt.encode(payload, current_app.secret_key, algorithm='HS256') #codifica el token.  ver si esto no me da error por el secret_key que yo lo tengo difernte
+        token = jwt.encode(payload, current_app.secret_key, algorithm='HS256')
 
-        #acá pongo los datos que quiero que el frontend vea
         user = {
-        'id': str(usuario['_id']),
-        'nombre_usuario': usuario['nombre_usuario'],
-        'rol': usuario['rol']
+            'id': str(usuario['_id']),
+            'nombre_usuario': usuario['nombre_usuario'],
+            'rol': usuario['rol']
         }
 
-        response = make_response(user) #make_response crea una respuesta HTTP personalizada, permite modificar cabeceras o agregar cookies
+        response = make_response(user)
         response.set_cookie('jwt', token, httponly=True, samesite='Strict')
-
         return response
     else:
         return jsonify({'message': 'Datos incorrectos'}), 401
+
 
 
 def token_required(f):  #Middleware de autenticación, decorador | con esto vemos si el token es valido

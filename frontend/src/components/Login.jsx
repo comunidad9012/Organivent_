@@ -92,10 +92,10 @@ function Login() {
                         <div className="infield">
                             <input 
                                 required
-                                type="text" 
-                                placeholder="Nombre de usuario" 
-                                value={user.username}
-                                onChange={(e) => setUser({...user, username: e.target.value})}
+                                type="email" 
+                                placeholder="Email" 
+                                value={user.email}
+                                onChange={(e) => setUser({...user, email: e.target.value})}
                             />
                             <label></label>
                         </div>
