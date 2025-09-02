@@ -44,7 +44,6 @@ def view_pedido(data, id):
     return Response(json_util.dumps(pedido_serializado), mimetype="application/json")
 
 
-
 @Pedidos_bp.delete("/deletePedido/<id>")
 def delete_pedido(id):
     pedidos_model = PedidosModel(current_app)
@@ -91,5 +90,3 @@ def update_state(token_data, id):
         return jsonify({"mensaje": "Estado actualizado correctamente"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
-
-

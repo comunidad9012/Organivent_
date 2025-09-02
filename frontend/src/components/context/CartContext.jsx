@@ -1,93 +1,75 @@
 import { createContext, useReducer, useContext, useEffect } from "react";
-import { clearLocalStorage, persistLocalStorage } from "../../utilities/localStorage.utility";
+import { persistLocalStorage } from "../../utilities/localStorage.utility";
 import isSameProduct from "../../utilities/isSameProduct";
+import { useSelector } from "react-redux";
 
-export const CartKey = "cart";
+const CartContext = createContext();
 
-// Intentar recuperar el carrito del localStorage
-const getInitialCart = () => {
-  try {
-    const stored = JSON.parse(localStorage.getItem(CartKey));
-    return Array.isArray(stored) ? stored : [];
-  } catch (err) {
-    console.error("Error leyendo el carrito desde localStorage:", err);
-    return [];
-  }
-};
-
-// Reducer para manejar las acciones del carrito
 const cartReducer = (state, action) => {
   switch (action.type) {
-
     case "ADD_TO_CART": {
-      const existing = state.find(item => isSameProduct(item, action.payload)); //esto se fija si hay uno igual en el carrito
-
+      const existing = state.find(item => isSameProduct(item, action.payload));
       if (existing) {
-        return state.map(item => //ahora se fija CUAL es el que ya existe y a ese le suma 1
+        return state.map(item =>
           isSameProduct(item, action.payload)
             ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
         );
       }
-
       return [...state, { ...action.payload, quantity: 1 }];
     }
-
-
-    case "INCREMENT_QUANTITY": { //esto lo utilizan los botones de + y - del carrito
-      return state.map((item) =>
+    case "INCREMENT_QUANTITY":
+      return state.map(item =>
+        item._id === action.payload ? { ...item, quantity: item.quantity + 1 } : item
+      );
+    case "DECREMENT_QUANTITY":
+      return state.map(item =>
         item._id === action.payload
-          ? { ...item, quantity: item.quantity + 1 }
+          ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 }
           : item
       );
-    }
-    
-    case "DECREMENT_QUANTITY": {
-      return state.map((item) =>
-        item._id === action.payload
-          ? {
-              ...item,
-              quantity: item.quantity > 1 ? item.quantity - 1 : 1,
-            }
-          : item
-      );
-    }
-      
-
     case "REMOVE_FROM_CART": {
-      const idToRemove = typeof action.payload === 'object' ? action.payload._id : action.payload;
+      const idToRemove = typeof action.payload === "object" ? action.payload._id : action.payload;
       return state.filter(product => product._id !== idToRemove);
     }
-    
-      
-
     case "CLEAR_CART":
-      clearLocalStorage(CartKey);
       return [];
-
+    case "REPLACE_CART":
+      return Array.isArray(action.payload) ? action.payload : [];
     default:
       return state;
   }
 };
 
-// Crear el contexto del carrito
-const CartContext = createContext();
-
-// Proveedor del carrito para envolver la app
 export const CartProvider = ({ children }) => {
-  const [cart, dispatch] = useReducer(cartReducer, getInitialCart());
+  const user = useSelector((state) => state.user);
+  const storageKey = user?.email || user?.nombre_usuario
+  ? `cart_${user.email || user.nombre_usuario}`
+  : "cart_guest";
 
-  // Guardar en localStorage cuando el carrito cambie
+  const [cart, dispatch] = useReducer(cartReducer, []);
+
+  // 1) cuando cambia la clave (login/logout), cargar el carrito almacenado
   useEffect(() => {
-    persistLocalStorage(CartKey, cart);
-  }, [cart]);
+    try {
+      const stored = JSON.parse(localStorage.getItem(storageKey));
+      dispatch({ type: "REPLACE_CART", payload: Array.isArray(stored) ? stored : [] });
+    } catch (e) {
+      console.error("No se pudo cargar el carrito del usuario", e);
+      dispatch({ type: "REPLACE_CART", payload: [] });
+    }
+  }, [storageKey]);
 
-  return (
-    <CartContext.Provider value={{ cart, dispatch }}>
-      {children}
-    </CartContext.Provider>
-  );
+  // 2) persistir SOLO cuando cambia el carrito
+  useEffect(() => {
+    try {
+      persistLocalStorage(storageKey, cart);
+    } catch (e) {
+      console.error("Error al persistir carrito:", e);
+    }
+  }, [cart]); // << importante: no include storageKey aquí
+
+  return <CartContext.Provider value={{ cart, dispatch }}>{children}</CartContext.Provider>;
 };
 
-// Hook para usar el carrito en cualquier componente
 export const useCart = () => useContext(CartContext);

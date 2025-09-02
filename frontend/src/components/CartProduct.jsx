@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "./context/CartContext";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // para redirigir
@@ -8,16 +8,22 @@ import '../styles/CartProduct.css';
 
 function CartProduct({ product , selectedColor}) {
   const navigate = useNavigate();
-  const { dispatch } = useCart();
+  const {cart, dispatch } = useCart();
   const [added, setAdded] = useState(false);
   const user = useSelector((state) => state.user);
-  const hasColorOptions = Array.isArray(product.colores) && product.colores.length > 0;
 
+  const hasColorOptions = Array.isArray(product.colores) && product.colores.length > 0;
   const isFormValid = (!hasColorOptions || selectedColor) 
   // && (!hasSizeOptions || selectedSize) 
   // && (!hasPaperOptions || selectedPaper);
 
-  
+  useEffect(() => {
+    const isInCart = cart.some(item =>
+      item._id === product._id &&
+      JSON.stringify(item.selectedColor) === JSON.stringify(selectedColor)
+    );
+    setAdded(isInCart);
+  }, [cart, product._id, selectedColor]);
 //--------------------------------
   // Verificar si el producto ya está en el carrito | lo saqué para que el usuario pueda agregar otro del mismo producto
   // useEffect(() => {
