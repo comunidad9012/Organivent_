@@ -110,15 +110,41 @@ function Productos() {
                 </Link>
               </div>
 
-              <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
+             <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
                 {/* Info */}
                 <div className="p-3 space-y-2 text-center bg-gray-50">
-                  <Precio valor={Number(product.precio_venta)} className="text-black font-bold text-lg"/>
+                  {product.descuento_aplicado ? (
+                    <div className="flex flex-col items-center space-y-1">
+                      {/* Precio con descuento */}
+                      <Precio 
+                        valor={Number(product.precio_final)} 
+                        className="text-red-600 font-bold text-lg"
+                      />
+                      {/* Precio original tachado */}
+                      <p className="text-gray-500 text-sm line-through">
+                        ${Number(product.precio_original).toLocaleString("es-AR")}
+                      </p>
+                      {/* Badge del descuento */}
+                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                        {product.descuento_aplicado.tipo === "porcentaje" 
+                          ? `-${product.descuento_aplicado.valor * 100}%`
+                          : `-$${product.descuento_aplicado.valor}`}
+                      </span>
+                    </div>
+                  ) : (
+                    // Si no tiene descuento, muestro solo el precio normal
+                    <Precio 
+                      valor={Number(product.precio_venta)} 
+                      className="text-black font-bold text-lg"
+                    />
+                  )}
+
                   <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
                     {product.nombre_producto}
                   </h3>
                 </div>
               </Link>
+
 
                 {/* Admin Actions */}
                 {userState.rol === Roles.ADMIN && (
