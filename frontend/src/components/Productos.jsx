@@ -13,6 +13,7 @@ import { FiltersContext } from './context/filters.jsx'
 import Paginacion from './Paginacion.jsx';
 
 import { SquarePen } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 
 
 function Productos() {
@@ -112,24 +113,34 @@ function Productos() {
 
              <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
                 {/* Info */}
-                <div className="p-3 space-y-2 text-center bg-gray-50">
+                <div className="p-3 space-y-2 bg-gray-50">
                   {product.descuento_aplicado ? (
-                    <div className="flex flex-col items-center space-y-1">
-                      {/* Precio con descuento */}
-                      <Precio 
-                        valor={Number(product.precio_final)} 
-                        className="text-red-600 font-bold text-lg"
-                      />
-                      {/* Precio original tachado */}
-                      <p className="text-gray-500 text-sm line-through">
+                    <div className="flex flex-col space-y-1">
+                       {/* Precio original tachado */}
+                      <p className="text-left text-gray-500 text-sm line-through mb-1">
                         ${Number(product.precio_original).toLocaleString("es-AR")}
                       </p>
-                      {/* Badge del descuento */}
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                        {product.descuento_aplicado.tipo === "porcentaje" 
-                          ? `-${product.descuento_aplicado.valor * 100}%`
-                          : `-$${product.descuento_aplicado.valor}`}
-                      </span>
+                      <div className='grid grid-cols-2 gap-2 items-center'>
+                        {/* Precio con descuento */}
+                        <Precio 
+                          valor={Number(product.precio_final)} 
+                          className="text-black font-bold text-lg"
+                        />
+                        {/* Badge del descuento */}
+                        <span className="w-15 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                          {product.descuento_aplicado.tipo === "porcentaje" 
+                            ? `-${product.descuento_aplicado.valor * 100}%`
+                            : `-$${product.descuento_aplicado.valor}`}
+                        </span>
+                      </div>
+
+
+                        <div className='grid grid-cols-4 gap-2 items-center text-xs text-green-800 bg-green-100 p-1 m-1 rounded text-center'>
+                          <Ticket className='ml-3 w-5'/>
+                          <p className='col-span-3 m-1 text-left '>
+                            {product.descuento_aplicado.nombre}
+                          </p>
+                        </div>
                     </div>
                   ) : (
                     // Si no tiene descuento, muestro solo el precio normal
