@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { TicketPlus, Percent, CircleDollarSign } from "lucide-react";
+import { TicketPlus, Percent, CircleDollarSign, SquarePen } from "lucide-react";
 import { PrivateRoutes } from "../models/routes";
 import { useEffect, useState } from "react";
+import DeleteItem from './DeleteItem.tsx';
 
 function ListDiscount() {
   const [descuentos, setDescuentos] = useState([]);
@@ -78,6 +79,29 @@ function ListDiscount() {
                 <p>Inicio: {new Date(d.fecha_inicio).toLocaleDateString()}</p>
                 <p>Fin: {new Date(d.fecha_fin).toLocaleDateString()}</p>
               </div>
+
+              
+                <div className="mt-auto flex justify-end gap-2">
+                {/* Botón editar */}
+                <Link 
+                    to={`/private/admin/descuentos/update/${d._id}`} 
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
+                >
+                    <SquarePen size={18}/>
+                </Link>
+
+                {/* Botón borrar */}
+                <DeleteItem
+                    item={d}
+                    itemName={d.nombre}
+                    resource="Descuentos"
+                    setItems={setDescuentos}
+                    getId={(d) => d._id}
+                />
+
+                </div>
+                
             </div>
           );
         })}

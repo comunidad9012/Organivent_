@@ -72,7 +72,7 @@ def descuentos_activos():
 
 
 # Eliminar un descuento por id
-@Descuentos_bp.delete("/delete/<id>")
+@Descuentos_bp.delete("/deleteDescuentos/<id>")
 def delete_descuento(id):
     from bson.objectid import ObjectId
     descuento_model = Descuento(current_app)

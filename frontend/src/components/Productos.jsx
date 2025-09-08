@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react'
-import DeleteProduct from './DeleteProduct.jsx';
+// import DeleteProduct from './DeleteProduct.jsx';
+import DeleteItem from './DeleteItem.tsx';
+
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
@@ -153,20 +155,28 @@ function Productos() {
 
                 {/* Admin Actions */}
                 {userState.rol === Roles.ADMIN && (
-                <div className="mt-auto flex justify-end gap-2">
-                  {/* Botón editar */}
-                  <Link 
-                    to={`/private/admin/Productos/update/${product._id}`} 
-                    onClick={(e) => e.stopPropagation()}
-                    className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
-                  >
-                    <SquarePen size={18}/>
-                  </Link>
+                  <div className="mt-auto flex justify-end gap-2">
+                    {/* Botón editar */}
+                    <Link 
+                      to={`/private/admin/Productos/update/${product._id}`} 
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
+                    >
+                      <SquarePen size={18}/>
+                    </Link>
 
-                  {/* Botón borrar */}
-                  <DeleteProduct product={product} setProductos={setProductos}/>
-                </div>
-              )}
+                    {/* Botón borrar */}
+                    {/* <DeleteProduct product={product} setProductos={setProductos}/> */}
+                    <DeleteItem
+                      item={product}
+                      itemName={product.nombre_producto}
+                      resource="Productos"
+                      setItems={setProductos}
+                      getId={(p) => p._id}
+                    />
+
+                  </div>
+                )}
               </div>
             ))}
           </div>
