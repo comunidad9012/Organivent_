@@ -5,7 +5,7 @@
 from flask import Blueprint, request, current_app, jsonify
 from models.modelProductos import ProductosModel
 from models.modelDescuentos import Descuento
-from utils.descuentos import aplicar_descuentos_a_productos
+from utils.descuentos import aplicar_descuentos_a_productos, validar_descuento
 
 Productos_bp = Blueprint('Productos', __name__, url_prefix='/Productos')
 
@@ -47,10 +47,13 @@ def show_Productos():
 
     productos = Productos_model.show_Productos().get_json()
     descuentos = Descuento_model.obtener_descuentos_activos()
+    # Normalizar todos los descuentos antes de aplicar
+    descuentos_normalizados = [validar_descuento(d) for d in descuentos]
 
-    productos = aplicar_descuentos_a_productos(productos, descuentos)
+    productos = aplicar_descuentos_a_productos(productos, descuentos_normalizados)
 
     return jsonify(productos)
+
 
 
 

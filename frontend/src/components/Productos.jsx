@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react'
 // import DeleteProduct from './DeleteProduct.jsx';
-import DeleteItem from './DeleteItem.tsx';
+import DeleteItem from '../utilities/DeleteItem';
 
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
@@ -127,7 +127,7 @@ function Productos() {
                         {/* Badge del descuento */}
                         <span className="w-15 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
                           {product.descuento_aplicado.tipo === "porcentaje" 
-                            ? `-${product.descuento_aplicado.valor * 100}%`
+                            ? `-${product.descuento_aplicado.valor}%`
                             : `-$${product.descuento_aplicado.valor}`}
                         </span>
                       </div>

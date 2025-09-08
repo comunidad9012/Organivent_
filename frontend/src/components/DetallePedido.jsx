@@ -1,3 +1,14 @@
+// agregar por ahi
+
+{/* <DeleteItem
+  item={pedido}
+  itemName={`Pedido #${pedido.numero}`}
+  resource="Pedidos"
+  setItems={setPedidos}
+  getId={(p) => p._id}
+/> */}
+
+
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'

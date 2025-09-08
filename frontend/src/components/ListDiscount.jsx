@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { TicketPlus, Percent, CircleDollarSign, SquarePen } from "lucide-react";
 import { PrivateRoutes } from "../models/routes";
 import { useEffect, useState } from "react";
-import DeleteItem from './DeleteItem.tsx';
+import DeleteItem from '../utilities/DeleteItem';
 
 function ListDiscount() {
   const [descuentos, setDescuentos] = useState([]);
@@ -59,7 +59,7 @@ function ListDiscount() {
                 )}
                 <span className="font-semibold">
                   {d.tipo === "porcentaje"
-                    ? `${d.valor * 100}%`
+                    ? `${d.valor}%`
                     : `$${d.valor}`}
                 </span>
               </div>
