@@ -1,5 +1,6 @@
 from flask import Blueprint, request, current_app, jsonify
 from models.modelDescuentos import Descuento
+from datetime import datetime
 
 Descuentos_bp = Blueprint("Descuentos", __name__, url_prefix="/Descuentos")
 
@@ -9,10 +10,39 @@ def create_descuento():
     data = request.json
     if not data:
         return jsonify({"error": "Se requieren datos para crear el descuento"}), 400
-    
-    descuento_model = Descuento(current_app)
-    result = descuento_model.mongo.db.descuentos.insert_one(data)
-    return jsonify({"message": "Descuento creado con éxito", "id": str(result.inserted_id)}), 201
+
+    try:
+        # productos y categorias se guardan como strings (no ObjectId)
+        productos = [str(p) for p in data.get("productos", [])]
+        categorias = [str(c) for c in data.get("categorias", [])]
+
+        # convertir fechas ISO a datetime (Mongo luego las guarda como $date)
+        fecha_inicio = datetime.fromisoformat(data["fecha_inicio"].replace("Z", "+00:00")) if "fecha_inicio" in data else None
+        fecha_fin = datetime.fromisoformat(data["fecha_fin"].replace("Z", "+00:00")) if "fecha_fin" in data else None
+
+        # documento final como el de tu DB
+        descuento_doc = {
+            "nombre": data.get("nombre"),
+            "tipo": data.get("tipo"),
+            "valor": float(data.get("valor", 0)),
+            "productos": productos,
+            "categorias": categorias,
+            "activo": data.get("activo", True),
+            "fecha_inicio": fecha_inicio,
+            "fecha_fin": fecha_fin,
+        }
+
+        descuento_model = Descuento(current_app)
+        result = descuento_model.mongo.db.descuentos.insert_one(descuento_doc)
+
+        return jsonify({
+            "message": "Descuento creado con éxito",
+            "id": str(result.inserted_id)
+        }), 201
+
+    except Exception as e:
+        return jsonify({"error": f"Error al crear el descuento: {str(e)}"}), 500
+
 
 
 # Obtener todos los descuentos

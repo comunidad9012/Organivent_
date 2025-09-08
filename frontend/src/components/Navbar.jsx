@@ -96,6 +96,12 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
         </NavLink>
       )}
 
+      {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.DESCUENTOS}` && (
+        <NavLink to={`/private/admin/${PrivateRoutes.DESCUENTOS}`}>
+          Añadir descuento
+        </NavLink>
+      )}
+
       {/* Dropdown del perfil */}
       <div className="flex items-center gap-2">
         <ProfileDropdown />

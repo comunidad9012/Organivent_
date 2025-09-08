@@ -150,7 +150,7 @@ h1 {
     width: 100%;
   }
 
-  /* input {
+  input {
     width: 100%;
     padding: 12px 15px;
     background-color: #f3f3f3;
@@ -171,7 +171,7 @@ h1 {
 
   input:focus ~ label {
     width: 100%;
-  } */
+  }
 
   /* button {
     border-radius: 20px;

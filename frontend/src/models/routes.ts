@@ -23,6 +23,15 @@ export const PrivateRoutes: RouteMap ={
     CART : 'cart',
     VIEW_PRODUCT_PRIVATE : 'Productos/viewproduct/:id',
     FAVORITES: 'favoritos',
+    DESCUENTOS: 'descuentos',
+
+    //ver que onda con estos
+    CREATE_DESCUENTO: 'descuentos/create',
+    UPDATE_DESCUENTO: 'descuentos/update/:id',
+
+
+    // Add more private routes as needed
+    // Example:
     
     // DASHBOARD : 'dashboard',
     // PROFILE : 'profile',

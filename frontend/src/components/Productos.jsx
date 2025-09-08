@@ -133,9 +133,7 @@ function Productos() {
                             : `-$${product.descuento_aplicado.valor}`}
                         </span>
                       </div>
-
-
-                        <div className='grid grid-cols-4 gap-2 items-center text-xs text-green-800 bg-green-100 p-1 m-1 rounded text-center'>
+                        <div className='grid grid-cols-4 gap-2 items-center text-xs text-green-800 bg-green-100 rounded text-center'>
                           <Ticket className='ml-3 w-5'/>
                           <p className='col-span-3 m-1 text-left '>
                             {product.descuento_aplicado.nombre}
