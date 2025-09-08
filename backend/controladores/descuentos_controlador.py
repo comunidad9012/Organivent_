@@ -49,10 +49,16 @@ def create_descuento():
 @Descuentos_bp.get("/showDescuentos")
 def show_descuentos():
     descuento_model = Descuento(current_app)
-    descuentos = list(descuento_model.mongo.db.descuentos.find())
+    descuentos = list(descuento_model.mongo.db.descuentos.find({}))
+    
+    # Convertir ObjectId y fechas a string para enviar al frontend
     for d in descuentos:
         d["_id"] = str(d["_id"])
-    return jsonify(descuentos)
+        if "fecha_inicio" in d:
+            d["fecha_inicio"] = d["fecha_inicio"].isoformat()
+        if "fecha_fin" in d:
+            d["fecha_fin"] = d["fecha_fin"].isoformat()
+    return jsonify(descuentos), 200
 
 
 # Obtener solo descuentos activos

@@ -17,7 +17,7 @@ def aplicar_descuentos_a_productos(productos, descuentos):
 
         precio_final = precio_original
         descuento_aplicado = None
-
+# ---------------
         if p["_id"] in descuentos_por_producto:
             d = descuentos_por_producto[p["_id"]]
             if d["tipo"] == "porcentaje":
@@ -32,7 +32,7 @@ def aplicar_descuentos_a_productos(productos, descuentos):
             elif d["tipo"] == "fijo":
                 precio_final = max(precio_original - d["valor"], 0)
             descuento_aplicado = d
-
+# ------------------    
         p["precio_original"] = round(precio_original, 2)
         p["precio_final"] = round(precio_final, 2)
         if descuento_aplicado:

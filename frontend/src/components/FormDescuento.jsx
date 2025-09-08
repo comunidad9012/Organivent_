@@ -155,7 +155,7 @@ const FormDescuento = ({ onSubmit }) => {
           value={formData.valor}
           onChange={handleChange}
           className="w-full p-2 border rounded"
-          placeholder={tipo === "porcentaje" ? "Ej. 20 (20%)" : "Ej. 500 (500 pesos)"}
+          placeholder={tipo === "porcentaje" ? "Ej. 0.2 (20%)" : "Ej. 500 (500 pesos)"}
           required
         />
       </div>

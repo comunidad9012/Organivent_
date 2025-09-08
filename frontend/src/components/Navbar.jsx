@@ -82,6 +82,12 @@ const CartButton = ({ totalItems, animate }) => (
 const UserActions = ({ userRole, location, totalItems, animate, userState }) => {
   return (
     <div className="flex items-center gap-2">
+
+      {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.DESCUENTOS}` && (
+        <NavLink to={`/private/admin/${PrivateRoutes.DESCUENTOS}`}>
+          Descuentos
+        </NavLink>
+      )}
     
       {/* Enlaces específicos por rol - sacar y meter al dropbox*/}
       {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.ADMIN_PEDIDOS}` && (
@@ -93,12 +99,6 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
       {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.CREATE_PRODUCT}` && (
         <NavLink to={`/private/admin/${PrivateRoutes.CREATE_PRODUCT}`}>
           Añadir producto
-        </NavLink>
-      )}
-
-      {userRole === Roles.ADMIN && location.pathname !== `/private/admin/${PrivateRoutes.DESCUENTOS}` && (
-        <NavLink to={`/private/admin/${PrivateRoutes.DESCUENTOS}`}>
-          Añadir descuento
         </NavLink>
       )}
 

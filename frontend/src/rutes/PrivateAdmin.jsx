@@ -8,6 +8,7 @@ import ProductoDetail from "../components/ProductosDetail";
 import FormProductoModern from "../components/FormProducto";
 import DetallePedido from "../components/DetallePedido";
 import FormDescuento from "../components/FormDescuento";
+import ListDiscount from "../components/ListDiscount";
 
 const Admin = lazy(() => import('../pages/Admin'));
 
@@ -20,10 +21,10 @@ function PrivateAdmin() {
 
           <Route path={PrivateRoutes.UPDATE_PRODUCT} element={<FormProductoModern />} />
 
-
-
           <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<ListaPedidos />} />
-          <Route path={PrivateRoutes.DESCUENTOS} element={<FormDescuento />} />
+          <Route path={PrivateRoutes.DESCUENTOS} element={<ListDiscount />} />
+          <Route path={PrivateRoutes.CREATE_DESCUENTO} element={<FormDescuento />} />
+
 
           <Route path={PrivateRoutes.ADMIN_VIEW_PEDIDO} element={<DetallePedido />} />
 

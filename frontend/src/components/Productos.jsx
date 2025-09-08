@@ -1,19 +1,15 @@
-import { useState, useEffect , Fragment } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react'
 import DeleteProduct from './DeleteProduct.jsx';
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
-import limitText from '../utilities/limitText.jsx';
 import Precio from '../utilities/Precio.jsx';
 import FavButton from "./FavButton";
-import { Edit, ShoppingCart } from 'lucide-react';
+import { ShoppingCart, SquarePen, Ticket} from 'lucide-react';
 import { FiltersContext } from './context/filters.jsx'
 import Paginacion from './Paginacion.jsx';
-
-import { SquarePen } from 'lucide-react';
-import { Ticket } from 'lucide-react';
 
 
 function Productos() {
