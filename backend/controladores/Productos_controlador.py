@@ -47,99 +47,10 @@ def show_Productos():
 
     productos = Productos_model.show_Productos().get_json()
     descuentos = Descuento_model.obtener_descuentos_activos()
-    # Normalizar todos los descuentos antes de aplicar
-    descuentos_normalizados = [validar_descuento(d) for d in descuentos]
-
-    productos = aplicar_descuentos_a_productos(productos, descuentos_normalizados)
+    productos = aplicar_descuentos_a_productos(productos, descuentos)
 
     return jsonify(productos)
-
-
-
-
-# @Productos_bp.get("/showProductos")
-# def show_Productos():
-#     Productos_model = ProductosModel(current_app)
-#     Descuento_model = Descuento(current_app)
-
-#     # Traemos productos y descuentos activos
-#     response = Productos_model.show_Productos()  # esto es un Response
-#     productos = response.get_json()
-#     descuentos = Descuento_model.obtener_descuentos_activos()
-
-#     # Convertimos lista de descuentos a algo más fácil de buscar
-#     descuentos_por_producto = {}
-#     descuentos_por_categoria = {}
-
-#     for d in descuentos:
-#         for pid in d.get("productos", []):
-#             descuentos_por_producto[str(pid)] = d  # aseguramos string
-#         for cat in d.get("categorias", []):
-#             descuentos_por_categoria[str(cat)] = d  # aseguramos string
-
-#     # Aplicar descuentos al precio de cada producto
-#     for p in productos:
-#         # ✅ precio_venta puede venir como string → lo casteamos
-#         precio_original = float(p.get("precio_venta", 0))
-
-#         # ✅ convertimos _id y categoria a string
-#         p["_id"] = str(p["_id"])
-#         p["categoria"] = str(p.get("categoria", ""))
-
-#         precio_final = precio_original
-#         descuento_aplicado = None
-
-#         # 1️⃣ Descuento por producto
-#         if p["_id"] in descuentos_por_producto:
-#             d = descuentos_por_producto[p["_id"]]
-#             if d["tipo"] == "porcentaje":
-#                 precio_final = precio_original * (1 - d["valor"])
-#             elif d["tipo"] == "fijo":
-#                 precio_final = max(precio_original - d["valor"], 0)
-#             descuento_aplicado = d
-
-#         # 2️⃣ Descuento por categoría
-#         elif p["categoria"] in descuentos_por_categoria:
-#             d = descuentos_por_categoria[p["categoria"]]
-#             if d["tipo"] == "porcentaje":
-#                 precio_final = precio_original * (1 - d["valor"])
-#             elif d["tipo"] == "fijo":
-#                 precio_final = max(precio_original - d["valor"], 0)
-#             descuento_aplicado = d
-
-#         # Guardamos en la respuesta
-#         p["precio_original"] = round(precio_original, 2)
-#         p["precio_final"] = round(precio_final, 2)
-#         if descuento_aplicado:
-#             p["descuento_aplicado"] = {
-#                 "nombre": descuento_aplicado["nombre"],
-#                 "tipo": descuento_aplicado["tipo"],
-#                 "valor": descuento_aplicado["valor"]
-#             }
-
-#     return jsonify(productos)
-
-
-
-
-
-
-
-
-#     Bonus
-
-# Esto mismo lo podés replicar en:
-
-# viewProductos/<id> → mostrar un producto con su descuento aplicado.
-
-# showProductosPorCategoria/<id_categoria> → ya traer con descuentos.
-
-
-# @Productos_bp.get("/viewProductos/<id>")
-# def specific_product(id):
-#     Productos_model=ProductosModel(current_app)
-#     response=(Productos_model.specific_product(id)).json
-#     return response
+    
 
 @Productos_bp.get("/viewProductos/<id>")
 def specific_product_endpoint(id):

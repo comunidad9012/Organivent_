@@ -80,7 +80,7 @@ function ProductoDetail() {
               {Producto.descuento_aplicado && (
                 <div className="text-sm text-green-600">
                   {Producto.descuento_aplicado.tipo === "porcentaje"
-                    ? `Descuento: ${Producto.descuento_aplicado.valor * 100}% - ${Producto.descuento_aplicado.nombre}`
+                    ? `Descuento: ${Producto.descuento_aplicado.valor}% - ${Producto.descuento_aplicado.nombre}`
                     : `Descuento: $${Producto.descuento_aplicado.valor} - ${Producto.descuento_aplicado.nombre}`}
                 </div>
               )}
