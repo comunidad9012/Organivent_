@@ -6,29 +6,21 @@ from flask import Blueprint, request, current_app, jsonify
 from models.modelProductos import ProductosModel
 from models.modelDescuentos import Descuento
 from utils.descuentos import aplicar_descuentos_a_productos, validar_descuento
+from utils.validators import validar_producto
 
 Productos_bp = Blueprint('Productos', __name__, url_prefix='/Productos')
 
 @Productos_bp.post("/createProductos")
 def create_Productos():
-    """
-    Create a new product in the database.
+    data = request.json or {}
 
-    This function handles POST requests to create a new product. It receives the product data
-    as JSON in the request body, creates a new product using the ProductosModel, and returns
-    the response from the model.
+    errores = validar_producto(data, is_update=False)
+    if errores:
+        return jsonify({"errors": errores}), 400
 
-    Returns:
-        dict: A dictionary containing the response from the ProductosModel's create_Productos method.
-              This typically includes information about the success or failure of the operation
-              and potentially the details of the created product.
-    """
-    data = request.json  #Obtiene los datos enviados en la solicitud como un diccionario JSON.
-    Productos_model = ProductosModel(current_app)  #Instancia el modelo de productos, conectándolo con la aplicación Flask activa.
-    response = Productos_model.create_Productos(data) #Llama al método del modelo para crear el producto con los datos proporcionados.
-    return response #Devuelve la respuesta al cliente (front en react).
-
-# arreglar que si o si tiene que tener contenido el producto para crearlo.
+    Productos_model = ProductosModel(current_app)
+    response = Productos_model.create_Productos(data)
+    return response
 
 @Productos_bp.delete("/deleteProductos/<id>")
 def delete_product(id):
@@ -50,7 +42,7 @@ def show_Productos():
     productos = aplicar_descuentos_a_productos(productos, descuentos)
 
     return jsonify(productos)
-    
+
 
 @Productos_bp.get("/viewProductos/<id>")
 def specific_product_endpoint(id):
@@ -99,22 +91,17 @@ def get_productos_por_categoria(id_categoria):
 
 @Productos_bp.put("/update/<id>")
 def update_product(id):
-    """
-    Update an existing product in the database.
-
-    This function handles PUT requests to update a product. It receives the updated product data
-    as JSON in the request body, updates the corresponding product in the database, and returns
-    a response indicating success or failure.
-
-    Returns:
-        dict: A dictionary containing the response from the ProductosModel's update_product method.
-    """
     data = request.json  # Obtiene los datos enviados en la solicitud como JSON.
+
+    errores = validar_producto(data, is_update=True)
+    if errores:
+        return jsonify({"errors": errores}), 400
+
     Productos_model = ProductosModel(current_app)  # Instancia el modelo de productos.
     response = Productos_model.update_product(id, data)  # Llama al método del modelo.
     return response  # Devuelve la respuesta.
 
-#IMPLEMENTAR DESPUES CUANDO TENGA LA VISTA EN EL FORMULARIO
+#ESTO CREO QUE ES PARA APLICAR DESCUENTOS AL PRODUCTO ACTUALIZADO
 
 # @Productos_bp.put("/update/<id>")
 # def update_product(id):

@@ -136,22 +136,49 @@ function FormProductoModern() {
   
     const method = id ? 'PUT' : 'POST';
   
+    // fetch(url, {
+    //   method,
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(finalProducto)
+    // })
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     setLoading(false);
+    //     toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
+    //     setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
+    //   })
+    //   .catch(error => {
+    //     console.error('Error:', error);
+    //     setLoading(false);
+    //     toast.error(id ? 'Error al actualizar el producto.' : 'Error al crear el producto.');
+    //   });
     fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(finalProducto)
-    })
-      .then(response => response.json())
-      .then(data => {
-        setLoading(false);
-        toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
-        setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setLoading(false);
-        toast.error(id ? 'Error al actualizar el producto.' : 'Error al crear el producto.');
-      });
+  method,
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(finalProducto)
+})
+  .then(async response => {
+    const data = await response.json();
+    if (!response.ok) {
+      if (data.errors) {
+        Object.values(data.errors).forEach(msg => toast.error(msg));
+      } else {
+        toast.error('Error en el servidor');
+      }
+      throw new Error("Error en validación");
+    }
+    return data;
+  })
+  .then(data => {
+    setLoading(false);
+    toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
+    setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    setLoading(false);
+  });
+
   };
 
   // Función para obtener todas las imágenes (existentes + nuevas)
@@ -217,6 +244,7 @@ function FormProductoModern() {
                 <input 
                   required
                   type="number" 
+                  min="1"
                   name="precio_venta" 
                   value={producto.precio_venta}
                   onChange={handleChange}
