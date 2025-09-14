@@ -7,11 +7,11 @@ import DeleteItem from '../utilities/DeleteItem';
 import store from '../redux/store.js';
 import { useSelector } from 'react-redux';
 import { Roles } from '../models/roles.js';
-import Precio from '../utilities/Precio.jsx';
 import FavButton from "./FavButton";
-import { ShoppingCart, SquarePen, Ticket} from 'lucide-react';
+import { ShoppingCart, SquarePen} from 'lucide-react';
 import { FiltersContext } from './context/filters.jsx'
 import Paginacion from './Paginacion.jsx';
+import PriceWhitDiscountOrNot from '../utilities/PriceWhitDiscountOrNot.jsx';
 
 
 function Productos() {
@@ -112,39 +112,8 @@ function Productos() {
              <Link to={`/Productos/viewproduct/${product._id}`} className="block">              
                 {/* Info */}
                 <div className="p-3 space-y-2 bg-gray-50">
-                  {product.descuento_aplicado ? (
-                    <div className="flex flex-col space-y-1">
-                       {/* Precio original tachado */}
-                      <p className="text-left text-gray-500 text-sm line-through mb-1">
-                        ${Number(product.precio_original).toLocaleString("es-AR")}
-                      </p>
-                      <div className='grid grid-cols-2 gap-2 items-center'>
-                        {/* Precio con descuento */}
-                        <Precio 
-                          valor={Number(product.precio_final)} 
-                          className="text-black font-bold text-lg"
-                        />
-                        {/* Badge del descuento */}
-                        <span className="w-15 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                          {product.descuento_aplicado.tipo === "porcentaje" 
-                            ? `-${product.descuento_aplicado.valor}%`
-                            : `-$${product.descuento_aplicado.valor}`}
-                        </span>
-                      </div>
-                        <div className='grid grid-cols-4 gap-2 items-center text-xs text-green-800 bg-green-100 rounded text-center'>
-                          <Ticket className='ml-3 w-5'/>
-                          <p className='col-span-3 m-1 text-left '>
-                            {product.descuento_aplicado.nombre}
-                          </p>
-                        </div>
-                    </div>
-                  ) : (
-                    // Si no tiene descuento, muestro solo el precio normal
-                    <Precio 
-                      valor={Number(product.precio_venta)} 
-                      className="text-black font-bold text-lg"
-                    />
-                  )}
+                  {/* muestra el precio con descuento si tiene sino el precio normal */}
+                  <PriceWhitDiscountOrNot product={product}/>
 
                   <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
                     {product.nombre_producto}

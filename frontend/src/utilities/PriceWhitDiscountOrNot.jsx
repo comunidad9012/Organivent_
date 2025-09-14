@@ -1,7 +1,7 @@
-import {  Ticket} from 'lucide-react';
-import Precio from "../utilities/Precio";
+import { Ticket} from 'lucide-react';
+import FormatoPrecio from "./FormatoPrecio";
 
-function ViewDiscount(product) {
+function PriceWhitDiscountOrNot( { product} ) {
   return (
     <div>
       {product.descuento_aplicado ? (
@@ -12,7 +12,7 @@ function ViewDiscount(product) {
           </p>
           <div className="grid grid-cols-2 gap-2 items-center">
             {/* Precio con descuento */}
-            <Precio
+            <FormatoPrecio
               valor={Number(product.precio_final)}
               className="text-black font-bold text-lg"
             />
@@ -32,7 +32,7 @@ function ViewDiscount(product) {
         </div>
       ) : (
         // Si no tiene descuento, muestro solo el precio normal
-        <Precio
+        <FormatoPrecio
           valor={Number(product.precio_venta)}
           className="text-black font-bold text-lg"
         />
@@ -40,4 +40,4 @@ function ViewDiscount(product) {
     </div>
   );
 }
-export default ViewDiscount;
+export default PriceWhitDiscountOrNot;

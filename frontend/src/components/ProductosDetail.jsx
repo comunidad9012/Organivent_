@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import CartProduct from './CartProduct';
 import store from "../redux/store";
 import { useSelector } from "react-redux";
 import { Roles } from "../models/roles";
-import Precio from '../utilities/Precio';
 import FavButton from "./FavButton";
+import PriceWhitDiscountOrNot from '../utilities/PriceWhitDiscountOrNot';
 
 
 function ProductoDetail() {
@@ -74,27 +74,8 @@ function ProductoDetail() {
         {/* Sección de detalle */}
         <div className="w-full lg:w-1/2 flex flex-col gap-4 items-center">
           <h2 className="text-4xl font-bold text-gray-800 leading-tight">{Producto.nombre_producto}</h2>
-          {/* <Precio valor={Number(Producto.precio_venta)} className={"text-2xl text-blue-700 my-2 font-semibold"}/> */}
-          {Producto?.precio_original !== undefined && Producto?.precio_final !== undefined && (
-            <div className="flex flex-col gap-1 items-center">
-              {Producto.descuento_aplicado && (
-                <div className="text-sm text-green-600">
-                  {Producto.descuento_aplicado.tipo === "porcentaje"
-                    ? `Descuento: ${Producto.descuento_aplicado.valor}% - ${Producto.descuento_aplicado.nombre}`
-                    : `Descuento: $${Producto.descuento_aplicado.valor} - ${Producto.descuento_aplicado.nombre}`}
-                </div>
-              )}
-
-              {Producto.precio_final !== Producto.precio_original && (
-                <div className="text-gray-500 line-through">
-                  ${Producto.precio_original.toLocaleString()}
-                </div>
-              )}
-
-              <Precio valor={Number(Producto.precio_final)} className={"text-2xl text-blue-700 my-2 font-semibold"} />
-            </div>
-          )}
-
+            {/* muestra el precio con descuento si tiene sino el precio normal */}
+            <PriceWhitDiscountOrNot product={Producto}/>
           <div className="flex items-center mt-2">
               <span className="flex items-center text-yellow-500">★★★★☆</span>
               {/* VER ESTO DE LAS ESTRELLAS MAS ADELANTE */}

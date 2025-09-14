@@ -146,12 +146,14 @@ def toggle_favorito(product_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @Productos_bp.route('/favoritos/<user_id>', methods=['GET'])
 def get_favoritos(user_id):
     try:
         Productos_model = ProductosModel(current_app)  #ahora instanciado
-        response = Productos_model.get_favoritos(user_id)
+        Descuento_model = Descuento(current_app) #para aplicar descuentos
+        favoritos = Productos_model.get_favoritos(user_id)
+        descuentos = Descuento_model.obtener_descuentos_activos()
+        response = aplicar_descuentos_a_productos(favoritos, descuentos)
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

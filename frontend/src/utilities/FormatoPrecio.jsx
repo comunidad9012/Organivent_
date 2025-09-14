@@ -1,6 +1,4 @@
-import React from "react";
-
-const Precio = ({ valor , className}) => {
+const FormatoPrecio = ({ valor , className}) => {
   const { entero, decimales } = formatearPrecio(valor);
 
   return (
@@ -25,4 +23,4 @@ function formatearPrecio(precio) {
   };
 }
 
-export default Precio;
+export default FormatoPrecio;

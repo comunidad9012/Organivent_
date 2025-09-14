@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { useSelector } from "react-redux";
-import Precio from "../utilities/Precio";
 import FavButton from "./FavButton";
+import PriceWhitDiscountOrNot from "../utilities/PriceWhitDiscountOrNot";
 
 function Favoritos() {
   const [favoritos, setFavoritos] = useState([]);
@@ -17,6 +17,7 @@ function Favoritos() {
           `http://localhost:5000/Productos/favoritos/${userState.id}`
         );
         const data = await response.json();
+        console.log("Favoritos:", data); // 👀
         setFavoritos(data);
       } catch (error) {
         console.error("Error al cargar favoritos:", error);
@@ -65,10 +66,8 @@ function Favoritos() {
 
               <Link to={`/Productos/viewproduct/${product._id}`} className="block">
                 <div className="p-3 space-y-2 text-center bg-gray-50">
-                  <Precio
-                    valor={Number(product.precio_venta)}
-                    className="text-black font-bold text-lg"
-                  />
+                    {/* muestra el precio con descuento si tiene sino el precio normal */}
+                    <PriceWhitDiscountOrNot product={product}/>
                   <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
                     {product.nombre_producto}
                   </h3>
