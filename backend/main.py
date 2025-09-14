@@ -11,11 +11,13 @@ from controladores.Categoria_controlador import Categoria_bp
 from controladores.autenticacion import auth_bp
 from controladores.Pedidos_controlador import Pedidos_bp 
 from controladores.descuentos_controlador import Descuentos_bp
+from controladores.Variantes_controlador import Variantes_bp
+from controladores.Stock_controlador import Stock_bp
 
 load_dotenv()
 
 app = Flask(__name__, static_folder='../images', static_url_path='/images')
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"]) # Esto hace que soporte las credenciales (que vienen en header de las peticiones http) y el origen de la app frontend puerto 5173 de vite para poder ver las cookies
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}}) # Esto hace que soporte las credenciales (que vienen en header de las peticiones http) y el origen de la app frontend puerto 5173 de vite para poder ver las cookies
 
 app.config['MONGO_URI'] = os.getenv('MONGOURL')
 app.secret_key = os.getenv("SECRET_KEY")
@@ -28,8 +30,7 @@ except Exception as e:
 
 
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), '../images')
-app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['Access-Control-Allow-Credentials'] = "true" #Y ESTO?    
+app.config['CORS_HEADERS'] = 'Content-Type'   
 
 app.register_blueprint(Client_bp)
 app.register_blueprint(Productos_bp)
@@ -38,6 +39,8 @@ app.register_blueprint(Categoria_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(Pedidos_bp)
 app.register_blueprint(Descuentos_bp)
+app.register_blueprint(Variantes_bp)
+app.register_blueprint(Stock_bp)
 
 @app.route('/images/<path:filename>')
 def serve_image(filename):

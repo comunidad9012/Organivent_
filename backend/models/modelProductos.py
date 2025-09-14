@@ -29,7 +29,11 @@ class ProductosModel:
             }
 
             self.mongo.db.Productos.insert_one(Productos_data)
-            return {"contenido": "exitoso"}
+           
+            result = self.mongo.db.productos.insert_one(data)
+            return {"contenido": "exitoso",
+            "_id": str(result.inserted_id)
+            }
         else:
             return {"contenido": "no funciona"}
 
