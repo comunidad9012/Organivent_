@@ -1,5 +1,6 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from utils.serializers import serialize_doc
 
 class VariantesModel:
     def __init__(self, app):
@@ -7,21 +8,13 @@ class VariantesModel:
 
     def create_variante(self, data):
         variante_data = {
-            "producto_id": data["producto_id"],   # id del producto
-            "atributos": data.get("atributos", {})  # ej: { "color": "rojo", "tamaño": "M" }
+            "producto_id": ObjectId(data["producto_id"]),
+            "atributos": data.get("atributos", {})
         }
         result = self.mongo.db.Variantes.insert_one(variante_data)
-        return {"_id": str(result.inserted_id), **variante_data}
 
-    def get_variante(self, variante_id):
-        variante = self.mongo.db.Variantes.find_one({"_id": ObjectId(variante_id)})
-        if not variante:
-            return None
-        variante["_id"] = str(variante["_id"])
-        return variante
+        variante_data["_id"] = result.inserted_id
+        return serialize_doc(variante_data)
 
     def get_variantes_by_producto(self, producto_id):
-        variantes = list(self.mongo.db.Variantes.find({"producto_id": producto_id}))
-        for v in variantes:
-            v["_id"] = str(v["_id"])
-        return variantes
+        return list(self.mongo.db.Variantes.find({"producto_id": ObjectId(producto_id)}))

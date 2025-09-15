@@ -15,6 +15,7 @@ import CategoriaForm from "./FormProducto/CategoriaForm";
 import DescripcionProducto from "./FormProducto/DescripcionProducto";
 import BotonSubmit from "./FormProducto/BotonSubmit";
 import VariantesStockForm from "./FormProducto/VariantesStockForm";
+import PrecioForm from "./FormProducto/PrecioForm";
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -58,10 +59,26 @@ function FormProductoModern() {
     if (id) {
       fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
         .then(response => response.json())
-        .then(data => setProducto(data))
+        .then(data => {
+          // Transformar variantes para el formulario
+          const variantesTransformadas = data.variantes?.map(v => ({
+            atributos: {
+              color: v.atributos.color?.name || "",
+              tamaño: v.atributos.tamaño || ""
+            },
+            cantidad: v.stock || 0
+          })) || [];
+  
+          setProducto({
+            ...data,
+            es_stock: variantesTransformadas.length > 0,
+            variantes: variantesTransformadas
+          });
+        })
         .catch(error => console.error('Error al cargar el producto:', error));
     }
   }, [id]);
+  
 
   // limpia los objetos URL generados con URL.createObjectURL
   useEffect(() => {
@@ -260,17 +277,7 @@ function FormProductoModern() {
               />
 
               {/* Precio */}
-              <div className="infield mb-6">
-                <input 
-                  required
-                  type="number" 
-                  name="precio_venta" 
-                  value={producto.precio_venta}
-                  onChange={handleChange}
-                  placeholder="Precio de venta"
-                />
-                <label></label>
-              </div>
+              <PrecioForm producto={producto} setProducto={setProducto} />
 
               <ColoresDisponibles
                 producto={producto}

@@ -1,106 +1,72 @@
-import React from "react";
+import React, { useState } from "react";
+import ModalVariantes from "./ModalVariantes";
 
 function VariantesStockForm({ producto, setProducto }) {
-  // Toggle es_stock
-  const handleToggleStock = (e) => {
-    setProducto(prev => ({
-      ...prev,
-      es_stock: e.target.checked,
-      variantes: e.target.checked ? prev.variantes || [] : []
-    }));
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = (e) => {
+    e?.preventDefault?.();
+    console.log("Abrir modal variantes");
+    // activamos es_stock si no lo estaba (opcional)
+    setProducto(prev => ({ ...prev, es_stock: true, variantes: prev.variantes || [] }));
+    setIsOpen(true);
   };
 
-  // Agregar variante vacía
-  const addVariante = () => {
-    setProducto(prev => ({
-      ...prev,
-      variantes: [...(prev.variantes || []), { atributos: { color: "" }, cantidad: 0 }]
-    }));
-  };
-
-  // Cambiar atributo o cantidad
-  const handleVarianteChange = (index, field, value) => {
-    const nuevas = [...producto.variantes];
-    if (field === "cantidad") {
-      nuevas[index].cantidad = Number(value);
-    } else {
-      nuevas[index].atributos[field] = value;
-    }
-    setProducto(prev => ({ ...prev, variantes: nuevas }));
-  };
-
-  // Eliminar variante
-  const removeVariante = (index) => {
-    const nuevas = producto.variantes.filter((_, i) => i !== index);
-    setProducto(prev => ({ ...prev, variantes: nuevas }));
-  };
+  const variantesCount = (producto.variantes || []).length;
 
   return (
-    <div className="infield mb-6 p-4 border rounded-lg bg-gray-50">
-      <label className="flex items-center gap-2 mb-4">
-        <input
-          type="checkbox"
-          checked={producto.es_stock || false}
-          onChange={handleToggleStock}
-        />
-        Manejar stock
-      </label>
+    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-xl border border-purple-200">
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+          Variantes de Stock
+        </h4>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+          variantesCount > 0
+            ? 'bg-purple-100 text-purple-800' 
+            : 'bg-gray-100 text-gray-600'
+        }`}>
+          {variantesCount} variante{variantesCount !== 1 ? 's' : ''}
+        </span>
+      </div>
 
-      {producto.es_stock && (
-        <div>
-          <h3 className="font-bold mb-2">Variantes con stock</h3>
-          {producto.variantes?.map((v, i) => (
-            <div key={i} className="flex gap-2 mb-2">
-            {/* Color desde ColoresDisponibles */}
-            <select
-              value={v.atributos.color || ""}
-              onChange={(e) => handleVarianteChange(i, "color", e.target.value)}
-              className="border p-1 rounded"
-            >
-              <option value="">-- Selecciona un color --</option>
-              {producto.colores.map((c, idx) => (
-                <option key={idx} value={c.name}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          
-            {/* Tamaño libre */}
-            <input
-              type="text"
-              placeholder="Tamaño (opcional)"
-              value={v.atributos.tamaño || ""}
-              onChange={(e) => handleVarianteChange(i, "tamaño", e.target.value)}
-              className="border p-1 rounded"
-            />
-          
-            {/* Stock */}
-            <input
-              type="number"
-              placeholder="Cantidad"
-              value={v.cantidad || ""}
-              onChange={(e) => handleVarianteChange(i, "cantidad", e.target.value)}
-              className="border p-1 rounded w-24"
-            />
-          
-            <button
-              type="button"
-              onClick={() => removeVariante(i)}
-              className="px-2 bg-red-500 text-white rounded"
-            >
-              X
-            </button>
+      <div className="flex gap-3 items-center">
+        <button
+          type="button"
+          onClick={handleOpen}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Gestionar variantes
+        </button>
+
+        {variantesCount > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {producto.variantes.slice(0, 3).map((variante, index) => (
+              <div key={index} className="inline-flex items-center gap-1 px-2 py-1 bg-white/60 backdrop-blur-sm rounded-lg border border-purple-200 text-xs">
+                <span className="font-medium text-gray-700">{variante.atributos.color || 'Sin color'}</span>
+                <span className="text-gray-500">({variante.cantidad || 0})</span>
+              </div>
+            ))}
+            {variantesCount > 3 && (
+              <div className="inline-flex items-center px-2 py-1 bg-white/40 backdrop-blur-sm rounded-lg border border-purple-200 text-xs text-gray-600">
+                +{variantesCount - 3} más
+              </div>
+            )}
           </div>
-          
-          ))}
-          <button
-            type="button"
-            onClick={addVariante}
-            className="mt-2 px-3 py-1 bg-green-500 text-white rounded"
-          >
-            + Añadir variante
-          </button>
-        </div>
+        )}
+      </div>
+
+      {isOpen && (
+        <ModalVariantes
+          producto={producto}
+          setProducto={setProducto}
+          onClose={() => {
+            console.log("Cerrar modal variantes");
+            setIsOpen(false);
+          }}
+        />
       )}
     </div>
   );

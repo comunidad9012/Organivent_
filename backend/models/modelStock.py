@@ -6,16 +6,20 @@ class StockModel:
         self.mongo = PyMongo(app)
 
     def create_stock(self, data):
-        stock_data = {
-            "variante_id": data["variante_id"],
-            "cantidad": int(data["cantidad"])
-        }
-        result = self.mongo.db.Stock.insert_one(stock_data)
-        return {"_id": str(result.inserted_id), **stock_data}
+        try:
+            stock_data = {
+                "variante_id": ObjectId(data["variante_id"]),
+                "cantidad": int(data["cantidad"])
+            }
+            result = self.mongo.db.Stock.insert_one(stock_data)
+
+            return {
+                "_id": str(result.inserted_id),
+                "variante_id": str(stock_data["variante_id"]),
+                "cantidad": stock_data["cantidad"]
+            }
+        except Exception as e:
+            return {"error": str(e)}
 
     def get_stock_by_variante(self, variante_id):
-        stock = self.mongo.db.Stock.find_one({"variante_id": variante_id})
-        if not stock:
-            return None
-        stock["_id"] = str(stock["_id"])
-        return stock
+        return self.mongo.db.Stock.find_one({"variante_id": ObjectId(variante_id)})
