@@ -2,6 +2,7 @@ from flask_pymongo import PyMongo
 from flask import Response
 from bson import json_util
 from bson.objectid import ObjectId
+from bson.errors import InvalidId
 import re
     
 class ProductosModel:
@@ -12,28 +13,28 @@ class ProductosModel:
         print("Datos recibidos en backend:", data)
 
         if 'nombre_producto' in data:
-            # Obtener imágenes del JSON recibido
-            imagenes = data.get('imagenes')
-            if not imagenes:
-                imagenes = ["imgs/imagenes/default.jpg"]  # Imagen por defecto si no se recibe ninguna
+            imagenes = data.get('imagenes') or ["imgs/imagenes/default.jpg"]
+
+            categoria_id = data.get('categoria_id')
+            if not categoria_id:
+                return {"error": "categoria_id es requerido"}, 400
+
+            try:
+                categoria_id = ObjectId(categoria_id)
+            except InvalidId:
+                return {"error": "categoria_id inválido"}, 400
 
             Productos_data = {
                 'nombre_producto': data['nombre_producto'],
                 'descripcion': data['descripcion'],
                 'precio_venta': data['precio_venta'],
-                'colores': data['colores'],
+                'categoria_id': categoria_id,
                 'imagenes': imagenes,
-                'categoria': data['categoria']
-                # 'stock': data['stock'],  # Descomentá si vas a usarlo
-                # 'miniatura': data['miniatura']  # Igual que esto
+                'colores': data['colores']
             }
 
-            self.mongo.db.Productos.insert_one(Productos_data)
-           
-            result = self.mongo.db.productos.insert_one(data)
-            return {"contenido": "exitoso",
-            "_id": str(result.inserted_id)
-            }
+            result = self.mongo.db.Productos.insert_one(Productos_data)
+            return {"contenido": "exitoso", "_id": str(result.inserted_id)}
         else:
             return {"contenido": "no funciona"}
 
@@ -87,9 +88,10 @@ class ProductosModel:
         return Response(response, mimetype="application/json")
 
     def get_productos_by_categoria(self, id_categoria):
-        productos = list(self.mongo.db.Productos.find({"categoria": id_categoria}))
+        productos = list(self.mongo.db.Productos.find({"categoria_id": ObjectId(id_categoria)}))
         for producto in productos:
             producto['_id'] = str(producto['_id'])
+            producto['categoria_id'] = str(producto['categoria_id'])  # serializar para enviar al frontend
         response=json_util.dumps(productos)
         return Response(response, mimetype="application/json")
 

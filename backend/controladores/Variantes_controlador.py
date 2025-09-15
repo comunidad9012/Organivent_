@@ -1,6 +1,7 @@
 from flask import Blueprint, request, current_app, jsonify
 from bson import ObjectId
 from models.modelVariantes import VariantesModel
+from utils.serializers import serialize_doc
 
 Variantes_bp = Blueprint('Variantes', __name__, url_prefix='/Variantes')
 
@@ -20,5 +21,6 @@ def create_variante():
 def get_variantes_by_producto(producto_id):
     model = VariantesModel(current_app)
     variantes = model.get_variantes_by_producto(producto_id)
+    variantes = [serialize_doc(v) for v in variantes]
     return jsonify(variantes), 200
 

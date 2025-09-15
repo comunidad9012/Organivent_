@@ -9,7 +9,7 @@ class Descuento:
         hoy = datetime.now()
 
         # Asegúrate de que fecha_inicio y fecha_fin están guardadas como ISODate en Mongo
-        return list(self.mongo.db.descuentos.find({
+        return list(self.mongo.db.Descuentos.find({
             "activo": True,
             "fecha_inicio": {"$lte": hoy},
             "fecha_fin": {"$gte": hoy}

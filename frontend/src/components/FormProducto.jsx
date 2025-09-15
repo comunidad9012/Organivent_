@@ -29,7 +29,7 @@ function FormProductoModern() {
     precio_venta: '',
     imagenes: [], 
     colores: [],
-    categoria: '',
+    categoria_id: '',
   });
   const [categorias, setCategorias] = useState([]);
   const [nuevaCategoria, setNuevaCategoria] = useState({ 
@@ -145,24 +145,27 @@ function FormProductoModern() {
       // 1️⃣ Subir imágenes
       const nuevasUrls = await subirImagenes();
   
-      // 2️⃣ Construir objeto final del producto
+      // 2️⃣ Construir objeto final del producto (sin variantes/es_stock)
+      const { variantes, es_stock, ...productoSinVariantes } = producto;
+
       const finalProducto = {
-        ...producto,
+        ...productoSinVariantes,
         imagenes: [...(producto.imagenes || []), ...nuevasUrls],
       };
-  
+
       // 3️⃣ Crear o actualizar producto
       const url = id
         ? `http://localhost:5000/Productos/update/${id}`
         : "http://localhost:5000/Productos/createProductos";
-  
+
       const method = id ? "PUT" : "POST";
-  
+
       const productoRes = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalProducto),
       });
+
   
       if (!productoRes.ok) throw new Error("Error al guardar producto");
   
@@ -170,28 +173,27 @@ function FormProductoModern() {
       console.log("Producto guardado:", productoCreado);
   
       // 4️⃣ Si el producto maneja stock, registrar variantes y stock
-      if (finalProducto.es_stock && finalProducto.variantes?.length > 0) {
-        for (const variante of finalProducto.variantes) {
-          console.log("Payload variante:", {
-            producto_id: id || productoCreado._id,
-            atributos: variante.atributos,
-          });
+      if (producto.es_stock && producto.variantes?.length > 0) {
+        for (const variante of producto.variantes) {
           // Crear variante
           const varianteRes = await fetch("http://localhost:5000/Variantes/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              producto_id: id || productoCreado._id, // usar id si es update, si no, el del nuevo producto
-              atributos: variante.atributos,
+              producto_id: id || productoCreado._id,
+              atributos: {
+                color: {
+                  name: variante.atributos.color,
+                  hex: (producto.colores.find(c => c.name === variante.atributos.color)?.hex) || "#ffffff"
+                }
+              }
             }),
           });
-  
+
           if (!varianteRes.ok) throw new Error("Error al guardar variante");
-  
           const varianteCreada = await varianteRes.json();
-          console.log("Variante creada:", varianteCreada);
-  
-          // Crear stock asociado a esa variante
+
+          // Crear stock
           await fetch("http://localhost:5000/Stock/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -202,6 +204,7 @@ function FormProductoModern() {
           });
         }
       }
+
   
       // 5️⃣ Mensaje de éxito y redirección
       setLoading(false);

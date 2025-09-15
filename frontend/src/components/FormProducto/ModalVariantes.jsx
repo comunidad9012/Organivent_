@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import axios from "axios";
 
 function ModalVariantes({ producto, setProducto, onClose }) {
   // Cerrar con Esc
@@ -34,14 +35,31 @@ function ModalVariantes({ producto, setProducto, onClose }) {
     setProducto((prev) => ({ ...prev, variantes: nuevas }));
   };
 
-  const handleGuardarYCerrar = () => {
-    // Si querés obligar a que haya es_stock cuando haya variantes:
-    if ((producto.variantes || []).length > 0) {
+  const handleGuardarYCerrar = async () => {
+    try {
+      for (const variante of producto.variantes || []) {
+        // 1. Crear variante
+        const resVar = await axios.post("/Variantes/create", {
+          producto_id: producto._id,
+          atributos: { color: { name: variante.atributos.color, hex: "#ffffff" } } // acá podés mapear hex también
+        });
+  
+        const varianteCreada = resVar.data;
+  
+        // 2. Crear stock
+        await axios.post("/Stock/create", {
+          variante_id: varianteCreada._id,
+          cantidad: variante.cantidad
+        });
+      }
+  
+      // opcional: actualizar el producto en frontend como "guardado"
       setProducto((prev) => ({ ...prev, es_stock: true }));
-    } else {
-      setProducto((prev) => ({ ...prev, es_stock: false }));
+  
+      onClose();
+    } catch (err) {
+      console.error("Error guardando variantes:", err);
     }
-    onClose();
   };
 
   return (

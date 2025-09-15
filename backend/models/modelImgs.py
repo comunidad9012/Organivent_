@@ -11,12 +11,12 @@ class ImagesModel:
     def save_image_db(self,filename,file_url):
         try:
             print(filename,file_url)
-            self.mongo.db.images.insert_one({'filename': filename, 'url': file_url}) #esto es para arrancar con la galeria de imagenes
+            self.mongo.db.Imagenes.insert_one({'filename': filename, 'url': file_url}) #esto es para arrancar con la galeria de imagenes
         except Exception as e:
             return jsonify({'error': str(e)}), 500
         
     def show_gallery(self):
-        images=list(self.mongo.db.images.find().sort('_id', -1))
+        images=list(self.mongo.db.Imagenes.find().sort('_id', -1))
         for item in images:
             item['_id'] = str(item['_id'])
         response=json_util.dumps(images)

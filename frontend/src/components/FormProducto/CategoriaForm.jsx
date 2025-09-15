@@ -17,12 +17,12 @@ export default function CategoriaForm({
       <div className="flex gap-2">
         <select 
           className="w-full p-2 border rounded"
-          value={producto.categoria || ''}
-          onChange={(e) => setProducto(prev => ({ ...prev, categoria: e.target.value }))}
+          value={producto.categoria_id || ''}
+          onChange={(e) => setProducto(prev => ({ ...prev, categoria_id: e.target.value }))}
         >
           <option value="">Seleccionar categoría</option>
           {categorias.map((cat) => (
-            <option key={cat._id} value={cat.nombre_categoria}>
+            <option key={cat._id} value={cat._id}>
               {cat.nombre_categoria}
             </option>
           ))}

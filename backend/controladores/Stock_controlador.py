@@ -1,6 +1,7 @@
 from flask import Blueprint, request, current_app, jsonify
 from models.modelStock import StockModel
 from bson import ObjectId
+from utils.serializers import serialize_doc
 
 Stock_bp = Blueprint('Stock', __name__, url_prefix='/Stock')
 
@@ -20,5 +21,5 @@ def get_stock_by_variante(variante_id):
     model = StockModel(current_app)
     stock = model.get_stock_by_variante(variante_id)
     if stock:
-        return jsonify(stock), 200
+        return jsonify(serialize_doc(stock)), 200
     return jsonify({"error": "Stock no encontrado"}), 404

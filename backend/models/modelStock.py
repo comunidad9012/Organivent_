@@ -1,5 +1,6 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from utils.serializers import serialize_doc
 
 class StockModel:
     def __init__(self, app):
@@ -12,12 +13,8 @@ class StockModel:
                 "cantidad": int(data["cantidad"])
             }
             result = self.mongo.db.Stock.insert_one(stock_data)
-
-            return {
-                "_id": str(result.inserted_id),
-                "variante_id": str(stock_data["variante_id"]),
-                "cantidad": stock_data["cantidad"]
-            }
+            stock_data["_id"] = result.inserted_id
+            return serialize_doc(stock_data)
         except Exception as e:
             return {"error": str(e)}
 
