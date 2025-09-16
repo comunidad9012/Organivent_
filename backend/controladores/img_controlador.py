@@ -12,11 +12,12 @@ imgs_bp = Blueprint('imgs', __name__, url_prefix='/imgs')
 @imgs_bp.post('/upload')
 def upload_file():
     if 'file' not in request.files:
-     return jsonify({'error': 'No se recibió archivo'}), 400
+        return jsonify({'error': 'No se recibió archivo'}), 400
 
-    # Puede ser una lista de archivos
     files = request.files.getlist('file')
     imagenes_urls = []
+
+    img_model = ImagesModel(current_app)
 
     for file in files:
         if file.filename == '':
@@ -29,18 +30,20 @@ def upload_file():
             upload_to_minio(file_stream, filename, file.mimetype)
             file_url = f"http://localhost:5000/imgs/imagenes/{filename}"
 
-            # Guardar en MongoDB (opcional si lo haces por producto después)
-            img_model = ImagesModel(current_app)
-            img_model.save_image_db(filename, file_url)
+            # Guardar en MongoDB y obtener el id insertado
+            inserted_id = img_model.save_image_db(filename, file_url)
 
-            imagenes_urls.append(file_url)
+            imagenes_urls.append({
+                "_id": inserted_id,
+                "filename": filename,
+                "url": file_url
+            })
 
         except Exception as e:
-            print(f"Error al subir a MinIO: {e}")
+            current_app.logger.exception(f"Error al subir {filename}: {e}")
             return jsonify({'error': f'Falló la subida de {filename}'}), 500
 
     return jsonify({'locations': imagenes_urls}), 200
-
 
 @imgs_bp.get('/gallery')
 def gallery():

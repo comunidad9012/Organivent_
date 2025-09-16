@@ -9,11 +9,29 @@ class ProductosModel:
     def __init__(self, app):
         self.mongo = PyMongo(app)
 
+    def _normalize_image_ids(self, imagenes):
+        if not imagenes:
+            return []
+
+        normalized = []
+        for img in imagenes:
+            if isinstance(img, dict):
+                # si ya viene {_id, url}, lo guardamos así
+                normalized.append(img)
+            elif isinstance(img, str):
+                try:
+                    normalized.append({"_id": ObjectId(img)})
+                except:
+                    normalized.append({"_id": img})
+        return normalized
+
+
     def create_Productos(self, data):
         print("Datos recibidos en backend:", data)
 
         if 'nombre_producto' in data:
-            imagenes = data.get('imagenes') or ["imgs/imagenes/default.jpg"]
+            raw_images = data.get('imagenes') or []
+            imagenes_objids = self._normalize_image_ids(raw_images)
 
             categoria_id = data.get('categoria_id')
             if not categoria_id:
@@ -26,18 +44,17 @@ class ProductosModel:
 
             Productos_data = {
                 'nombre_producto': data['nombre_producto'],
-                'descripcion': data['descripcion'],
-                'precio_venta': data['precio_venta'],
+                'descripcion': data.get('descripcion', ''),
+                'precio_venta': data.get('precio_venta', 0),
                 'categoria_id': categoria_id,
-                'imagenes': imagenes,
-                'colores': data['colores']
+                'imagenes': imagenes_objids,
+                'colores': data.get('colores', [])
             }
 
             result = self.mongo.db.Productos.insert_one(Productos_data)
             return {"contenido": "exitoso", "_id": str(result.inserted_id)}
         else:
             return {"contenido": "no funciona"}
-
 
 
     def delete_product_by_id(self, product_id):
@@ -49,11 +66,23 @@ class ProductosModel:
             return False
 
 
-        
     def show_Productos(self):
-        Productos=list(self.mongo.db.Productos.find().sort('_id', -1)) #este _id es el de mongo
+        Productos=list(self.mongo.db.Productos.find().sort('_id', -1))
         for item in Productos:
+            # serializar ids
             item['_id'] = str(item['_id'])
+            item['categoria_id'] = str(item.get('categoria_id')) if item.get('categoria_id') else None
+
+            # resolver imágenes (si hay)
+            image_ids = item.get('imagenes', [])
+            if image_ids:
+                imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
+                for img in imgs:
+                    img['_id'] = str(img['_id'])
+                item['imagenes'] = imgs
+            else:
+                item['imagenes'] = []
+
         response=json_util.dumps(Productos)
         return Response(response, mimetype="application/json")
 
@@ -67,9 +96,20 @@ class ProductosModel:
     def specific_product(self, id):
         producto = self.mongo.db.Productos.find_one({'_id': ObjectId(id)})
         if not producto:
-            return None  # Devuelve None si no existe
+            return None
         producto['_id'] = str(producto['_id'])
-        return producto  # Diccionario limpio
+        producto['categoria_id'] = str(producto.get('categoria_id')) if producto.get('categoria_id') else None
+
+        image_ids = producto.get('imagenes', [])
+        if image_ids:
+            imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
+            for img in imgs:
+                img['_id'] = str(img['_id'])
+            producto['imagenes'] = imgs
+        else:
+            producto['imagenes'] = []
+
+        return producto
 
     
     def find_Productos(self, palabra):
@@ -91,7 +131,16 @@ class ProductosModel:
         productos = list(self.mongo.db.Productos.find({"categoria_id": ObjectId(id_categoria)}))
         for producto in productos:
             producto['_id'] = str(producto['_id'])
-            producto['categoria_id'] = str(producto['categoria_id'])  # serializar para enviar al frontend
+            producto['categoria_id'] = str(producto['categoria_id'])  # serializar
+            # resolver imágenes
+            image_ids = producto.get('imagenes', [])
+            if image_ids:
+                imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
+                for img in imgs:
+                    img['_id'] = str(img['_id'])
+                producto['imagenes'] = imgs
+            else:
+                producto['imagenes'] = []
         response=json_util.dumps(productos)
         return Response(response, mimetype="application/json")
 
@@ -108,11 +157,11 @@ class ProductosModel:
             if 'colores' in data:
                 update_fields['colores'] = data['colores']
             if 'imagenes' in data:
-                update_fields['imagenes'] = data['imagenes'] # listado nuevo o modificado
+                # convertir a ObjectId list
+                imagenes_objids = self._normalize_image_ids(data['imagenes'])
+                update_fields['imagenes'] = imagenes_objids
             if 'categoria' in data:
                 update_fields['categoria'] = data['categoria']
-            # if 'miniatura' in data:
-            #     update_fields['miniatura'] = data['miniatura']
 
             result = self.mongo.db.Productos.update_one(
                 {"_id": ObjectId(product_id)},

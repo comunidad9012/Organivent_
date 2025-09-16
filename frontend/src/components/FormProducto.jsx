@@ -113,66 +113,72 @@ function FormProductoModern() {
       console.warn("No hay imágenes para subir");
       return [];
     }
-
+  
     const formData = new FormData();
-    imagenes.forEach((img) => formData.append('file', img));
-
+    imagenes.forEach((img) => formData.append("file", img)); // 👈 singular
+  
     try {
-      const response = await fetch('http://localhost:5000/imgs/upload', {
-        method: 'POST',
-        body: formData
+      const response = await fetch("http://localhost:5000/imgs/upload", {
+        method: "POST",
+        body: formData,
       });
-
+  
       if (!response.ok) {
         throw new Error("Error al subir imágenes");
       }
-
+  
       const data = await response.json();
-      console.log("Respuesta del back:", data);
-      return data.locations || [];
-
+      console.log("Respuesta backend imágenes:", data);
+      return data.locations; // backend devuelve [{ _id, filename, url }]
     } catch (error) {
       console.error("Error al subir imágenes:", error);
       return [];
     }
   };
   
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
   
     try {
-      // 1️⃣ Subir imágenes
-      const nuevasUrls = await subirImagenes();
+      // 1️⃣ Subir imágenes nuevas
+      const nuevas = await subirImagenes();
+      const nuevasImgs = nuevas.map(img => ({
+        _id: img._id,
+        url: img.url,
+      }));
   
       // 2️⃣ Construir objeto final del producto (sin variantes/es_stock)
       const { variantes, es_stock, ...productoSinVariantes } = producto;
-
+  
       const finalProducto = {
         ...productoSinVariantes,
-        imagenes: [...(producto.imagenes || []), ...nuevasUrls],
+        imagenes: [
+          ...(producto.imagenes || []),
+          ...nuevasImgs
+        ],
       };
-
+  
       // 3️⃣ Crear o actualizar producto
       const url = id
         ? `http://localhost:5000/Productos/update/${id}`
         : "http://localhost:5000/Productos/createProductos";
-
+  
       const method = id ? "PUT" : "POST";
-
+  
       const productoRes = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalProducto),
       });
-
   
       if (!productoRes.ok) throw new Error("Error al guardar producto");
   
       const productoCreado = await productoRes.json();
       console.log("Producto guardado:", productoCreado);
   
-      // 4️⃣ Si el producto maneja stock, registrar variantes y stock
+      // 4️⃣ Si hay variantes -> procesarlas
       if (producto.es_stock && producto.variantes?.length > 0) {
         for (const variante of producto.variantes) {
           // Crear variante
@@ -189,10 +195,10 @@ function FormProductoModern() {
               }
             }),
           });
-
+  
           if (!varianteRes.ok) throw new Error("Error al guardar variante");
           const varianteCreada = await varianteRes.json();
-
+  
           // Crear stock
           await fetch("http://localhost:5000/Stock/create", {
             method: "POST",
@@ -204,9 +210,7 @@ function FormProductoModern() {
           });
         }
       }
-
   
-      // 5️⃣ Mensaje de éxito y redirección
       setLoading(false);
       toast.success(id ? "Producto actualizado con éxito!" : "Producto creado con éxito!");
       setTimeout(
@@ -220,11 +224,21 @@ function FormProductoModern() {
       toast.error("Error al guardar el producto.");
     }
   };
-
+  
   // Función para obtener todas las imágenes (existentes + nuevas)
   const getAllImages = () => {
-    const existingImages = producto.imagenes.map(url => ({ type: 'existing', url, original: url }));
-    const newImages = imagenes.map(img => ({ type: 'new', url: URL.createObjectURL(img), original: img }));
+    const existingImages = (producto.imagenes || []).map(img => ({
+      type: 'existing',
+      url: img.url,
+      original: img,
+    }));
+  
+    const newImages = imagenes.map(img => ({
+      type: 'new',
+      url: URL.createObjectURL(img),
+      original: img,
+    }));
+  
     return [...existingImages, ...newImages];
   };
 
