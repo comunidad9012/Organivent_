@@ -5,9 +5,9 @@ export default function GaleriaImagenesForm({ producto, imagenes, setImagenes, s
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
           Galería de Imágenes
-        </h3>
+        </h4>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
           producto.imagenes.length + imagenes.length >= 10 
             ? 'bg-red-100 text-red-800' 

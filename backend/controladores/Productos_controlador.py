@@ -6,6 +6,10 @@ from flask import Blueprint, request, current_app, jsonify
 from models.modelProductos import ProductosModel
 from models.modelDescuentos import Descuento
 from utils.descuentos import aplicar_descuentos_a_productos, validar_descuento
+from bson import ObjectId
+from models.modelVariantes import VariantesModel
+from models.modelStock import StockModel
+from utils.serializers import serialize_doc
 from utils.validators import validar_producto
 
 Productos_bp = Blueprint('Productos', __name__, url_prefix='/Productos')
@@ -43,20 +47,40 @@ def show_Productos():
 
     return jsonify(productos)
 
-
 @Productos_bp.get("/viewProductos/<id>")
 def specific_product_endpoint(id):
     Productos_model = ProductosModel(current_app)
+    Variantes_model = VariantesModel(current_app)
+    Stock_model = StockModel(current_app)
     Descuento_model = Descuento(current_app)
 
     producto = Productos_model.specific_product(id)
     if not producto:
         return jsonify({"error": "Producto no encontrado"}), 404
 
+    # Validar ObjectId
+    try:
+        producto_oid = ObjectId(id)
+    except:
+        return jsonify({"error": "ID inválido"}), 400
+
+    # Buscar variantes del producto
+    variantes = list(Variantes_model.mongo.db.Variantes.find({"producto_id": producto_oid}))
+
+    # Para cada variante, agregar stock
+    for v in variantes:
+        stock_doc = Stock_model.get_stock_by_variante(v["_id"])
+        v["stock"] = stock_doc["cantidad"] if stock_doc else 0
+
+    producto["variantes"] = variantes
+
+    # Aplicar descuentos
     descuentos = Descuento_model.obtener_descuentos_activos()
     producto_con_descuento = aplicar_descuentos_a_productos([producto], descuentos)[0]
 
-    return jsonify(producto_con_descuento)
+    # Serializar todo antes de devolverlo
+    #esto lo tenemos distinto, cualquier cosa usar en su lugar esto:  return jsonify(producto_con_descuento)
+    return jsonify(serialize_doc(producto_con_descuento)), 200
 
 
 @Productos_bp.post("/find_product") #cambie por post para poder usar el formulario, si lo puedo arreglar la vuelvo a get
@@ -145,6 +169,7 @@ def toggle_favorito(product_id):
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+        
 
 @Productos_bp.route('/favoritos/<user_id>', methods=['GET'])
 def get_favoritos(user_id):

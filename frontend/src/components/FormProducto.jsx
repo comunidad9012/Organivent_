@@ -14,6 +14,8 @@ import ColoresDisponibles from "./FormProducto/ColoresDisponibles";
 import CategoriaForm from "./FormProducto/CategoriaForm";
 import DescripcionProducto from "./FormProducto/DescripcionProducto";
 import BotonSubmit from "./FormProducto/BotonSubmit";
+import VariantesStockForm from "./FormProducto/VariantesStockForm";
+import PrecioForm from "./FormProducto/PrecioForm";
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -57,10 +59,26 @@ function FormProductoModern() {
     if (id) {
       fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
         .then(response => response.json())
-        .then(data => setProducto(data))
+        .then(data => {
+          // Transformar variantes para el formulario
+          const variantesTransformadas = data.variantes?.map(v => ({
+            atributos: {
+              color: v.atributos.color?.name || "",
+              tamaño: v.atributos.tamaño || ""
+            },
+            cantidad: v.stock || 0
+          })) || [];
+  
+          setProducto({
+            ...data,
+            es_stock: variantesTransformadas.length > 0,
+            variantes: variantesTransformadas
+          });
+        })
         .catch(error => console.error('Error al cargar el producto:', error));
     }
   }, [id]);
+  
 
   // limpia los objetos URL generados con URL.createObjectURL
   useEffect(() => {
@@ -123,62 +141,81 @@ function FormProductoModern() {
     event.preventDefault();
     setLoading(true);
   
-    const nuevasUrls = await subirImagenes();
+    try {
+      // 1️⃣ Subir imágenes
+      const nuevasUrls = await subirImagenes();
   
-    const finalProducto = {
-      ...producto,
-      imagenes: [...(producto.imagenes || []), ...nuevasUrls]
-    };
+      // 2️⃣ Construir objeto final del producto
+      const finalProducto = {
+        ...producto,
+        imagenes: [...(producto.imagenes || []), ...nuevasUrls],
+      };
   
-    const url = id
-      ? `http://localhost:5000/Productos/update/${id}`
-      : 'http://localhost:5000/Productos/createProductos';
+      // 3️⃣ Crear o actualizar producto
+      const url = id
+        ? `http://localhost:5000/Productos/update/${id}`
+        : "http://localhost:5000/Productos/createProductos";
   
-    const method = id ? 'PUT' : 'POST';
+      const method = id ? "PUT" : "POST";
   
-    // fetch(url, {
-    //   method,
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(finalProducto)
-    // })
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     setLoading(false);
-    //     toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
-    //     setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
-    //   })
-    //   .catch(error => {
-    //     console.error('Error:', error);
-    //     setLoading(false);
-    //     toast.error(id ? 'Error al actualizar el producto.' : 'Error al crear el producto.');
-    //   });
-    fetch(url, {
-  method,
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(finalProducto)
-})
-  .then(async response => {
-    const data = await response.json();
-    if (!response.ok) {
-      if (data.errors) {
-        Object.values(data.errors).forEach(msg => toast.error(msg));
-      } else {
-        toast.error('Error en el servidor');
+      const productoRes = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalProducto),
+      });
+  
+      if (!productoRes.ok) throw new Error("Error al guardar producto");
+  
+      const productoCreado = await productoRes.json();
+      console.log("Producto guardado:", productoCreado);
+  
+      // 4️⃣ Si el producto maneja stock, registrar variantes y stock
+      if (finalProducto.es_stock && finalProducto.variantes?.length > 0) {
+        for (const variante of finalProducto.variantes) {
+          console.log("Payload variante:", {
+            producto_id: id || productoCreado._id,
+            atributos: variante.atributos,
+          });
+          // Crear variante
+          const varianteRes = await fetch("http://localhost:5000/Variantes/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              producto_id: id || productoCreado._id, // usar id si es update, si no, el del nuevo producto
+              atributos: variante.atributos,
+            }),
+          });
+  
+          if (!varianteRes.ok) throw new Error("Error al guardar variante");
+  
+          const varianteCreada = await varianteRes.json();
+          console.log("Variante creada:", varianteCreada);
+  
+          // Crear stock asociado a esa variante
+          await fetch("http://localhost:5000/Stock/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              variante_id: varianteCreada._id,
+              cantidad: variante.cantidad,
+            }),
+          });
+        }
       }
-      throw new Error("Error en validación");
+  
+      // 5️⃣ Mensaje de éxito y redirección
+      setLoading(false);
+      toast.success(id ? "Producto actualizado con éxito!" : "Producto creado con éxito!");
+      setTimeout(
+        () => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }),
+        2000
+      );
+  
+    } catch (error) {
+      console.error("Error en el proceso:", error);
+      setLoading(false);
+      toast.error("Error al guardar el producto.");
     }
-    return data;
-  })
-  .then(data => {
-    setLoading(false);
-    toast.success(id ? 'Producto actualizado con éxito!' : 'Producto creado con éxito!');
-    setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000);
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    setLoading(false);
-  });
-
   };
 
   // Función para obtener todas las imágenes (existentes + nuevas)
@@ -240,18 +277,7 @@ function FormProductoModern() {
               />
 
               {/* Precio */}
-              <div className="infield mb-6">
-                <input 
-                  required
-                  type="number" 
-                  min="1"
-                  name="precio_venta" 
-                  value={producto.precio_venta}
-                  onChange={handleChange}
-                  placeholder="Precio de venta"
-                />
-                <label></label>
-              </div>
+              <PrecioForm producto={producto} setProducto={setProducto} />
 
               <ColoresDisponibles
                 producto={producto}
@@ -259,6 +285,10 @@ function FormProductoModern() {
                 nuevoColor={nuevoColor}
                 setNuevoColor={setNuevoColor}
               />
+
+              {/* Variantes */}
+              <VariantesStockForm producto={producto} setProducto={setProducto} />
+            
             </div>
           </div>
 
