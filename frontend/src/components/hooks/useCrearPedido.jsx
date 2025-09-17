@@ -22,13 +22,28 @@ function useCrearPedido() {
 
     const data = {
       usuarioId: userState.id,
-      productos: cart.map(p => ({
+      productos: cart.map(p => ({    
         productoId: p._id,
+        nombre: p.nombre_producto,
         cantidad: p.quantity || 1,
         color: p.selectedColor || null,
+
+        // Foto histórica de precios y descuento
+        precio_original: p.precio_original || p.precio_venta,
+        precio_final: p.precio_final || p.precio_venta,
+        descuento_aplicado: p.descuento_aplicado || null,
+
+        // También dejamos precio_unitario/subtotal por compatibilidad
+        precio_unitario: p.precio_final || p.precio_venta,
+        subtotal: (p.precio_final || p.precio_venta) * (p.quantity || 1),
+        imagenes: p.imagenes || []
       })),
-      total: cart.reduce((acc, item) => acc + item.precio_venta * (item.quantity || 1), 0),
+      total: cart.reduce((acc, item) => {
+        const precio = item.precio_final || item.precio_venta;
+        return acc + precio * (item.quantity || 1);
+      }, 0),
     };
+
 
     try {
       const response = await fetch("http://localhost:5000/Pedidos/createPedido", {

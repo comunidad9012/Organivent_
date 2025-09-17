@@ -88,7 +88,7 @@ const ListaPedidos = () => {
                     <ShoppingCart className="w-4 h-4" />
                     <span>{p.productos.length} productos</span>
                   </div>
-                  <ul className="mt-2 pl-5 list-disc text-sm text-gray-600">
+                  <ul className="mt-2 pl-5 list-disc text-sm text-gray-600 text-left">
                     {p.productos.map((prod, i) => (
                       <li key={i}>
                         {prod.productoNombre || "Producto"} x{prod.cantidad}

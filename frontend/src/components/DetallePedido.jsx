@@ -27,6 +27,7 @@ import {
 import EstadoPedido from '../models/Estado_Pedido/EstadoPedido'
 import { EstadosPedido } from '../models/Estado_Pedido/enums'
 import { toast } from "sonner"
+import PriceWhitDiscountOrNot from '../utilities/PriceWhitDiscountOrNot'
 
 const DetallePedido = () => {
   const { id } = useParams()
@@ -168,6 +169,7 @@ const DetallePedido = () => {
                       <span>{prod.color.name}</span>
                     </div>
                   )}
+                  <PriceWhitDiscountOrNot product={prod} />
                 </div>
               </div>
             ))}
