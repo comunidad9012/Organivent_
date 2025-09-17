@@ -8,7 +8,7 @@ import PriceWhitDiscountOrNot from "../utilities/PriceWhitDiscountOrNot";
 export default function Cart() {
   const { cart, dispatch } = useCart();
   const [subtotal, setSubtotal] = useState(0);
-  const { handleComprar, loading, messagePedido } = useCrearPedido();
+  const { handleComprar, loading } = useCrearPedido();
 
   const [ahorro, setAhorro] = useState(0);
 
@@ -33,6 +33,7 @@ export default function Cart() {
 
 
   const isEmpty = cart.length === 0;
+  const hasDiscounts = ahorro > 0;
 
   return (
     <div className="flex flex-col md:flex-row gap-4 p-6 min-h-[60vh]">
@@ -151,18 +152,18 @@ export default function Cart() {
           <h3 className="text-lg font-bold mb-4">Resumen de compra</h3>
           <div className="flex justify-between mb-2">
             <span>Productos ({cart.reduce((acc, item) => acc + (item.quantity || 1), 0)})</span>
-            <FormatoPrecio valor={Number(subtotal + ahorro)} className="text-gray-500 line-through" />
+            <FormatoPrecio valor={Number(subtotal + ahorro)} className={hasDiscounts ? "text-gray-500 line-through" : "text-gray-500" }/>
           </div>
-          {ahorro > 0 && (
+          {hasDiscounts && (
             <div className="flex justify-between mb-2 text-green-600">
               <span>Descuentos</span>
               <FormatoPrecio valor={-Number(ahorro)} />
             </div>
           )}
-          <div className="flex justify-between mb-2">
+          {/* <div className="flex justify-between mb-2">
             <span>Envío</span>
             <span className="text-green-500">Gratis</span>
-          </div>
+          </div> */}
           <div className="flex justify-between font-bold mb-4">
             <span>Total</span>
             <FormatoPrecio valor={Number(subtotal)} className="text-xl font-bold text-blue-700" />
@@ -176,7 +177,6 @@ export default function Cart() {
           </button>
 
           {/* TODO: Reemplazar por toast */}
-          {messagePedido && <p className="mt-4 text-green-600">{messagePedido}</p>}
         </div>
       )}
     </div>

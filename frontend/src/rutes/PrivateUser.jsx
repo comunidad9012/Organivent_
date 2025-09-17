@@ -9,6 +9,7 @@ import PrivateAdmin from "./PrivateAdmin";
 import ListaPedidos from "../components/ListaPedidos";
 import DetallePedido from "../components/DetallePedido";
 import Favoritos from "../components/Favoritos";
+import CompraFinalizada from "../components/CompraFinalizada";
 
 const User = lazy(() => import('../pages/User'));
 
@@ -23,6 +24,7 @@ function PrivateUser() {
         <Route path={PrivateRoutes.CART} element={<Cart />}/>
         <Route path={PrivateRoutes.USER} element={<User />} />
         <Route path={`user/${PrivateRoutes.FAVORITES}`} element={<Favoritos />} />
+        <Route path={PrivateRoutes.COMPRA_FINALIZADA} element={<CompraFinalizada />}/>
         
           {/* aca puedo poner el roleGuard para el admin y arriba para el del usuario y los path a los que deriva si los saca corriendo */}
         <Route element={<RoleGuard />}>

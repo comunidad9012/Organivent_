@@ -5,11 +5,10 @@ import { useCart } from "../context/CartContext";
 import store from "../../redux/store";
 import { useSelector } from "react-redux";
 import { PrivateRoutes } from "../../models/routes";
+import { toast } from "sonner"
 
 function useCrearPedido() {
   const [loading, setLoading] = useState(false);
-  const [messagePedido, setMessagePedido] = useState("");
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const { cart, dispatch } = useCart();
@@ -18,7 +17,6 @@ function useCrearPedido() {
   const handleComprar = async (event) => {
     if (event) event.preventDefault(); // si se llama desde un formulario
     setLoading(true);
-    setError(null);
 
     const data = {
       usuarioId: userState.id,
@@ -59,23 +57,23 @@ function useCrearPedido() {
       const result = await response.json();
 
       if (result.mensaje === "Pedido creado exitosamente") {
-        setMessagePedido("¡Pedido creado con éxito!");
+        toast.success("¡Pedido creado con éxito!");
         dispatch({ type: "CLEAR_CART" });
-        setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, { replace: true }), 2000); // o a una página de confirmación
+        setTimeout(() => navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.COMPRA_FINALIZADA}`, { replace: true }));
       } else {
-        setMessagePedido("Error al crear el pedido: " + (result.error || "Respuesta inesperada"));
+        toast.error("Error al crear el pedido");
+        console.error("Error al crear el pedido: " + (result.error || "Respuesta inesperada"));
       }
 
     } catch (err) {
       console.error("Error al crear el pedido:", err);
-      setError(err.message);
-      setMessagePedido("Error en la solicitud: " + err.message);
+      toast.error("Error al crear el pedido: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return { handleComprar, loading, messagePedido, error };
+  return { handleComprar, loading };
 }
 
 export default useCrearPedido;
