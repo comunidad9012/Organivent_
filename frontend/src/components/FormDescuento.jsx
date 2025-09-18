@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner"
+import { useNavigate } from "react-router-dom";
+import { PrivateRoutes } from "../models/routes";
 
 const FormDescuento = ({ onSubmit }) => {
   const [tipo, setTipo] = useState("porcentaje");
@@ -11,6 +14,7 @@ const FormDescuento = ({ onSubmit }) => {
 
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const navigate = useNavigate();
 
   // 🚀 Cargar productos y categorías al montar
   useEffect(() => {
@@ -83,15 +87,17 @@ const FormDescuento = ({ onSubmit }) => {
 
     const result = await response.json();
     if (response.ok) {
-      console.log("✅ Descuento creado:", result);
-      alert("Descuento creado con éxito");
+      toast.success("¡Descuento creado con éxito!");
+      navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}/${PrivateRoutes.DESCUENTOS}`, { replace: true });
+
+      
     } else {
-      console.error("❌ Error al crear descuento:", result);
-      alert(result.error || "Error al crear el descuento");
+      toast.error("Error al crear el descuento");
+      console.error("⚠️ Error en creación:", result);
     }
   } catch (error) {
     console.error("⚠️ Error en fetch:", error);
-    alert("No se pudo conectar con el servidor");
+    toast.error("No se pudo conectar con el servidor");
   }
 
   if (onSubmit) {

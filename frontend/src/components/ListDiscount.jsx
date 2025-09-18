@@ -13,6 +13,7 @@ function ListDiscount() {
       .then((res) => res.json())
       .then((data) => {
         setDescuentos(data);
+        console.log("✅ Descuentos cargados:", data);
       })
       .catch((err) => console.error("⚠️ Error cargando descuentos:", err));
   }, []);
@@ -67,11 +68,15 @@ function ListDiscount() {
               <div className="text-sm text-gray-500">
                 <p>
                   <span className="font-medium">Categorías:</span>{" "}
-                  {d.categorias?.length ? d.categorias.join(", ") : "Ninguna"}
+                  {d.categorias_detalle?.length
+                  ? d.categorias_detalle.map(c => c.nombre).join(", ")
+                  : "Ninguna"}
                 </p>
                 <p>
                   <span className="font-medium">Productos:</span>{" "}
-                  {d.productos?.length ? d.productos.join(", ") : "Ninguno"}
+                  {d.productos_detalle?.length
+                  ? d.productos_detalle.map(p => p.nombre).join(", ")
+                  : "Ninguno"}
                 </p>
               </div>
 

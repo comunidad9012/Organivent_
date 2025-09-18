@@ -28,6 +28,7 @@ import EstadoPedido from '../models/Estado_Pedido/EstadoPedido'
 import { EstadosPedido } from '../models/Estado_Pedido/enums'
 import { toast } from "sonner"
 import PriceWhitDiscountOrNot from '../utilities/PriceWhitDiscountOrNot'
+import FormatoPrecio from '../utilities/FormatoPrecio'
 
 const DetallePedido = () => {
   const { id } = useParams()
@@ -173,10 +174,14 @@ const DetallePedido = () => {
                 </div>
               </div>
             ))}
-            <div className="flex justify-end">
+            <div className="flex justify-end space-x-4 mt-4 ">
               <p className="text-xl font-bold text-blue-700">
-                Total: ${parseFloat(pedido.total).toFixed(2)}
+                Total: 
               </p>
+              <FormatoPrecio
+                valor={Number(pedido.total)}
+                className="text-xl font-bold text-blue-700"
+              />
             </div>
           </div>
         </div>

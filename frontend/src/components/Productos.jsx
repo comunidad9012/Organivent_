@@ -18,7 +18,7 @@ function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
   
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
 
   const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no

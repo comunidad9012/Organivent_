@@ -15,7 +15,7 @@ class Categoria:
         """
         client = MongoClient(mongo_uri)
         self.db = client.get_database()  # Accede a la base de datos predeterminada
-        self.categorias = self.db['Categoria']
+        self.categorias = self.db['Categoria'] #la coleccion se llama Categoria
 
     def create_categoria(self, nombre_categoria, descripcion, subcategorias):
         """
@@ -34,7 +34,7 @@ class Categoria:
             "descripcion": descripcion,
             "subcategorias": subcategorias
         }
-        result = self.categorias.insert_one(categoria)
+        result = self.categorias.insert_one(categoria) #no entiendo como funciona esto si no inserta en Categoria
         return {'id': str(result.inserted_id)}, 201
 
     def update_categoria(self, nombre_categoria, update_fields):
@@ -64,7 +64,7 @@ class Categoria:
         Returns:
             tuple: A dictionary containing the number of deleted documents and the HTTP status code 200.
         """
-        result = self.categorias.delete_one({"nombre_categoria": nombre_categoria})
+        result = self.categorias.delete_one({"nombre_categoria": nombre_categoria}) #no entiendo como funciona esto si no inserta en Categoria
         return {'deleted_count': result.deleted_count}, 200
 
     def get_all_categorias(self):
