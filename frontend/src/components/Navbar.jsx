@@ -106,6 +106,13 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
       <div className="flex items-center gap-2">
         <ProfileDropdown />
       </div>
+
+      {/* Mis pedidos */}
+        {userRole === Roles.USER && location.pathname !== `/private/${PrivateRoutes.USER_PEDIDOS}` && (
+        <NavLink to={`/private/${PrivateRoutes.USER_PEDIDOS}`}>
+          Mis Pedidos
+        </NavLink>
+      )}
       
       {/* Favoritos para usuarios normales */}
       {userRole === Roles.USER && (
