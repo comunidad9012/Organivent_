@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import Loading from "../utilities/Loading"
 import EstadoPedido from "../models/Estado_Pedido/EstadoPedido";
 import FilterState from "./FilterState";
+import FormatoPrecio from "../utilities/FormatoPrecio";
 
 const ListaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -99,9 +100,10 @@ const ListaPedidos = () => {
 
                 {/* Total + Estado */}
                 <div className="flex flex-col items-end justify-between text-right">
-                  <p className="text-xl font-bold text-blue-600">
-                    ${parseFloat(p.total).toFixed(2)}
-                  </p>
+                    <FormatoPrecio
+                      valor={Number(p.total)}
+                      className="text-xl font-bold text-blue-700"
+                    />
                   <EstadoPedido estado={p.estado} />
                 </div>
               </div>

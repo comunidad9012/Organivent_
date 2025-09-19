@@ -147,6 +147,7 @@ const DetallePedido = () => {
 
         {/* Columna Derecha - Productos */}
         <div className={`bg-white rounded-xl shadow-md p-4 border border-gray-100 ${rol === "admin" ? "md:w-2/3" : "w-full"}`}>
+        {/* w-110 mx-auto */}
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" /> Productos
           </h3>

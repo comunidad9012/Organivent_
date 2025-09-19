@@ -20,7 +20,7 @@ function PriceWhitDiscountOrNot({ product }) {
   return (
     <div>
       {descuento ? (
-        <div className="flex flex-col space-y-1">
+        <div className="flex flex-col space-y-1 items-start">
           {/* Precio original tachado */}
           <p className="text-left text-gray-500 text-sm line-through mb-1">
             ${Number(precioOriginal).toLocaleString("es-AR")}
