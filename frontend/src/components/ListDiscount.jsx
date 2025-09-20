@@ -3,9 +3,17 @@ import { TicketPlus, Percent, CircleDollarSign, SquarePen } from "lucide-react";
 import { PrivateRoutes } from "../models/routes";
 import { useEffect, useState } from "react";
 import DeleteItem from '../utilities/DeleteItem';
+import Paginacion from './Paginacion.jsx';
 
 function ListDiscount() {
   const [descuentos, setDescuentos] = useState([]);
+    // paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = descuentos.slice(startIndex, endIndex);
+
 
   // Traer descuentos al cargar
   useEffect(() => {
@@ -13,7 +21,7 @@ function ListDiscount() {
       .then((res) => res.json())
       .then((data) => {
         setDescuentos(data);
-        console.log("✅ Descuentos cargados:", data);
+        // console.log("✅ Descuentos cargados:", data);
       })
       .catch((err) => console.error("⚠️ Error cargando descuentos:", err));
   }, []);
@@ -29,15 +37,15 @@ function ListDiscount() {
       </Link>
 
       {/* Lista de tarjetas */}
-      <div className="space-y-4">
-        {descuentos.map((d) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {currentItems.map((d) => {
           const bordeColor =
             d.tipo === "porcentaje" ? "border-blue-400" : "border-green-400";
 
           return (
             <div
               key={d._id}
-              className={`p-5 bg-white rounded-lg shadow-md border-l-4 ${bordeColor} flex flex-col gap-3`}
+              className={`p-5 bg-white rounded-lg shadow-lg border-l-4 ${bordeColor} flex flex-col`}
             >
               <div className="flex justify-between items-center">
                 <p className="font-bold text-lg">{d.nombre}</p>
@@ -52,7 +60,7 @@ function ListDiscount() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-4 text-gray-600">
+              <div className="flex items-center gap-3 text-gray-600 mb-2">
                 {d.tipo === "porcentaje" ? (
                   <Percent className="text-blue-500" />
                 ) : (
@@ -73,14 +81,14 @@ function ListDiscount() {
                   : "Ninguna"}
                 </p>
                 <p>
-                  <span className="font-medium">Productos:</span>{" "}
-                  {d.productos_detalle?.length
-                  ? d.productos_detalle.map(p => p.nombre).join(", ")
+                  <span className="font-medium">descuentos:</span>{" "}
+                  {d.descuentos_detalle?.length
+                  ? d.descuentos_detalle.map(p => p.nombre).join(", ")
                   : "Ninguno"}
                 </p>
               </div>
 
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between text-xs text-gray-400 border-t pt-2">
                 <p>Inicio: {new Date(d.fecha_inicio).toLocaleDateString()}</p>
                 <p>Fin: {new Date(d.fecha_fin).toLocaleDateString()}</p>
               </div>
@@ -110,7 +118,15 @@ function ListDiscount() {
             </div>
           );
         })}
+          
       </div>
+      {/* Paginar */}
+      <Paginacion
+        totalItems={descuentos.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage} 
+      />
     </div>
   );
 }

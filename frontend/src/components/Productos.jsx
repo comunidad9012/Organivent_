@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useContext } from 'react'
 // import DeleteProduct from './DeleteProduct.jsx';
 import DeleteItem from '../utilities/DeleteItem';
@@ -17,12 +17,12 @@ import PriceWhitDiscountOrNot from '../utilities/PriceWhitDiscountOrNot.jsx';
 function Productos() {
   const [Productos, setProductos] = useState([]); // Lista de productos
   
+  // paginacion
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
   const { filters, setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
-  const navigate = useNavigate();
 
 
   // Fetch para obtener los productos y tambien por categoría
