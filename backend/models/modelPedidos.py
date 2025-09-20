@@ -10,51 +10,6 @@ class PedidosModel:
     def __init__(self, app):
         self.mongo = PyMongo(app)
 
-    # def create_pedido(self, data):
-    #     if 'usuarioId' in data and 'productos' in data and data['productos']:
-    #         productos_finales = []
-    #         total = 0
-
-    #         for prod in data['productos']:
-    #             producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
-    #             if not producto_db:
-    #                 continue
-
-    #             # Usar valores ya calculados y congelados desde frontend
-    #             precio_original = float(prod.get("precio_original", 0))
-    #             precio_final = float(prod.get("precio_final", precio_original))
-    #             descuento = prod.get("descuento_aplicado")
-
-    #             cantidad = prod.get("cantidad", 1)
-    #             subtotal = precio_final * cantidad
-    #             total += subtotal
-
-    #             productos_finales.append({
-    #                 "productoId": prod["productoId"],
-    #                 "productoNombre": prod.get("nombre", producto_db.get("nombre_producto", "Producto sin nombre")),
-    #                 "cantidad": cantidad,
-    #                 "color": prod.get("color"),
-    #                 "precio_original": precio_original,
-    #                 "precio_final": precio_final,
-    #                 "precio_unitario": precio_final,  # redundante pero práctico
-    #                 "descuento_aplicado": descuento,
-    #                 "subtotal": subtotal,
-    #                 "imagenes": prod.get("imagenes", producto_db.get("imagenes", []))
-    #             })
-
-    #         pedido_data = {
-    #             'usuarioId': data['usuarioId'],
-    #             'productos': productos_finales,
-    #             'total': total,
-    #             'estado': 'Pendiente',
-    #             'fecha': datetime.now()
-    #         }
-
-    #         self.mongo.db.Pedidos.insert_one(pedido_data)
-    #         return {"mensaje": "Pedido creado exitosamente"}
-    #     else:
-    #         return {"error": "Datos insuficientes para crear el pedido"}
-
     def create_pedido(self, data):
         if 'usuarioId' in data and 'productos' in data and data['productos']:
             productos_finales = []
@@ -109,8 +64,6 @@ class PedidosModel:
             }
         else:
             return {"error": "Datos insuficientes para crear el pedido"}
-
-
 
 
     def show_pedidos(self):

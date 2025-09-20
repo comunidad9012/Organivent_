@@ -3,7 +3,7 @@ from models.modelPedidos import PedidosModel
 from models.modelClient import ClientModel
 from controladores.autenticacion import token_required
 from bson import json_util
-from controladores.Notificaciones_email_controlador import enviar_confirmacion_pedido
+from controladores.Notificaciones_email_controlador import enviar_confirmacion_pedido, enviar_actualizacion_estado
 
 
 Pedidos_bp = Blueprint('Pedidos', __name__, url_prefix='/Pedidos')
@@ -22,7 +22,6 @@ def create_pedido():
             response["pedido_id"],
             response["total"]
         )
-    print("📦 response del modelo:", response)
 
     return response
 
@@ -88,7 +87,6 @@ def update_state(token_data, id):
         pedidos_model = PedidosModel(current_app)
         pedido_actual = pedidos_model.get_pedido_by_id_raw(id)
 
-       # Si el resultado es un Response (por ejemplo, jsonify({...})), extraé el JSON
         if isinstance(pedido_actual, Response):
             pedido_actual = pedido_actual.get_json()
 
@@ -99,6 +97,16 @@ def update_state(token_data, id):
             return jsonify({"mensaje": "El estado ya es el mismo. No se realizaron cambios."}), 200
 
         pedidos_model.update_state(id, nuevo_estado) 
+
+        # Enviar correo directamente con los datos del pedido
+        email = pedido_actual.get("cliente_email")
+        nombre = pedido_actual.get("cliente_nombre", "Cliente")
+
+        # 👇 Enviar correo al cliente si tiene email registrado
+        if email:
+            enviar_actualizacion_estado(email, nombre, id, nuevo_estado)
+
+
         return jsonify({"mensaje": "Estado actualizado correctamente"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400

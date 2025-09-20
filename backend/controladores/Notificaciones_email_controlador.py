@@ -164,3 +164,78 @@ Desde hoy recibirás novedades, promociones exclusivas y mucho más.
 
     mail.send(msg)
 
+def enviar_actualizacion_estado(email, nombre, pedido_id, nuevo_estado):
+    msg = Message(
+        subject=f"📦 Actualización de tu pedido #{pedido_id}",
+        recipients=[email],
+    )
+
+    # Texto plano
+    msg.body = f"""
+Hola {nombre},
+
+Tu pedido #{pedido_id} ha cambiado de estado.  
+Nuevo estado: {nuevo_estado} ✅
+
+Te mantendremos informada sobre cualquier novedad.  
+
+¡Gracias por confiar en nuestra librería! 📚
+"""
+
+    # HTML embellecido
+    msg.html = f"""
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {{
+        font-family: Arial, sans-serif;
+        background-color: #f9fafb;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }}
+      .container {{
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }}
+      h2 {{
+        color: #2563eb;
+      }}
+      .estado {{
+        font-size: 18px;
+        font-weight: bold;
+        color: #2563eb;
+      }}
+      .footer {{
+        margin-top: 24px;
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+      }}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>📦 Actualización de tu pedido #{pedido_id}</h2>
+      <p>Hola <strong>{nombre}</strong>,</p>
+      <p>Tu pedido ha cambiado de estado.</p>
+      <p class="estado">➡️ Nuevo estado: {nuevo_estado}</p>
+      
+      <p>Te avisaremos de cualquier otra novedad.  
+      ¡Gracias por confiar en <strong>nuestra librería</strong>! 📚</p>
+
+      <div class="footer">
+        <p>Organivent Librería - Todos los derechos reservados</p>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
+    mail.send(msg)
+
