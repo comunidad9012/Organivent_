@@ -6,6 +6,7 @@ export const UserKey = 'user';
 const EmptyUserState = {
   id: null,
   nombre_usuario: null,
+  email: null,
   rol: null,
   isAuthenticated: false
 };
@@ -20,6 +21,7 @@ const userSlice = createSlice({
       state.nombre_usuario = action.payload.nombre_usuario
       state.rol = action.payload.rol
       state.isAuthenticated = true
+      state.email = action.payload.email
       // persistLocalStorage(UserKey, action.payload); | esto era lo que tenia con el localstorage
       // return action.payload;
     },

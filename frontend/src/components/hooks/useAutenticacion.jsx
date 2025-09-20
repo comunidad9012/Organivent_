@@ -42,7 +42,7 @@ function useAutenticacion() {
         if (response.ok) {
             // Guarda en Redux
             dispatch(createUser(data));
-            console.log("Usuario logueado: ", data);
+            // console.log("Usuario logueado: ", data);
             navigate(`/${PrivateRoutes.PRIVATE}`, {replace: true}); //el replace es para remplazar /login por /private en la ruta
             setMessageAuth('¡Autenticación exitosa!');
         } else {

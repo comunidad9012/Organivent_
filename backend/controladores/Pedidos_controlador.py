@@ -3,6 +3,7 @@ from models.modelPedidos import PedidosModel
 from models.modelClient import ClientModel
 from controladores.autenticacion import token_required
 from bson import json_util
+from controladores.Notificaciones_email_controlador import enviar_confirmacion_pedido
 
 
 Pedidos_bp = Blueprint('Pedidos', __name__, url_prefix='/Pedidos')
@@ -12,6 +13,17 @@ def create_pedido():
     data = request.json
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.create_pedido(data)
+
+    # Si se creó bien el pedido, mandamos mail
+    if "pedido_id" in response and response.get("cliente_email"):
+        enviar_confirmacion_pedido(
+            response["cliente_email"],
+            response.get("cliente_nombre", "Cliente"),
+            response["pedido_id"],
+            response["total"]
+        )
+    print("📦 response del modelo:", response)
+
     return response
 
 @Pedidos_bp.get("/showPedidos")

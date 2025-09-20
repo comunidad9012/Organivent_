@@ -20,12 +20,10 @@ const ListaPedidos = () => {
     fetch("http://localhost:5000/Pedidos/showPedidos", {credentials: "include" })// importante para enviar cookies de sesión/JWT
       // .then(res => res.json())
       .then(res => {
-        console.log("Status:", res.status);
         return res.json();
       })
       // .then(data => setPedidos(data))
       .then(data => {
-        console.log("Data:", data);
         setPedidos(data);
       })
       .catch(err => console.error("Error al obtener pedidos:", err))

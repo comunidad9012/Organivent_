@@ -20,6 +20,8 @@ function useCrearPedido() {
 
     const data = {
       usuarioId: userState.id,
+      cliente_nombre: userState.nombre_usuario,
+      cliente_email: userState.email,
       productos: cart.map(p => ({    
         productoId: p._id,
         nombre: p.nombre_producto,
@@ -55,7 +57,7 @@ function useCrearPedido() {
       if (!response.ok) throw new Error("Error al crear el pedido");
 
       const result = await response.json();
-
+      console.log("📦 Respuesta del servidor al crear pedido:", result);
       if (result.mensaje === "Pedido creado exitosamente") {
         toast.success("¡Pedido creado con éxito!");
         dispatch({ type: "CLEAR_CART" });
