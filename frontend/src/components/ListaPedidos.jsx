@@ -6,6 +6,7 @@ import Loading from "../utilities/Loading"
 import EstadoPedido from "../models/Estado_Pedido/EstadoPedido";
 import FilterState from "./FilterState";
 import FormatoPrecio from "../utilities/FormatoPrecio";
+import Paginacion from './Paginacion.jsx';
 
 const ListaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -15,6 +16,13 @@ const ListaPedidos = () => {
 
   // Obtenemos el usuario de Redux
   const user = useSelector(state => state.user);
+
+      // paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = pedidos.slice(startIndex, endIndex);
 
   useEffect(() => {
     fetch("http://localhost:5000/Pedidos/showPedidos", {credentials: "include" })// importante para enviar cookies de sesión/JWT
@@ -44,7 +52,7 @@ const ListaPedidos = () => {
         <Loading />
       ) : pedidos.length > 0 ? (
         <div className="space-y-4">
-          {pedidos
+          {currentItems
             .filter(p => estadoFiltro === "" || p.estado === estadoFiltro)
             .map((p) => (
               <div
@@ -114,6 +122,13 @@ const ListaPedidos = () => {
             : "Todavía no realizaste ningún pedido."}
         </p>
       )}
+      {/* Paginar */}
+      <Paginacion
+        totalItems={pedidos.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage} 
+      />
     </div>
   );
 };
