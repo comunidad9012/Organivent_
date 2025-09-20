@@ -1,6 +1,7 @@
 from flask import Blueprint, request, current_app
 from models.modelClient import ClientModel
 from models.modelAdmin import AdminModel
+from controladores.Notificaciones_email_controlador import enviar_bienvenida
 
 Client_bp = Blueprint('Client', __name__, url_prefix='/Client')
 
@@ -19,25 +20,13 @@ def create_client():
     data = request.json
     client_model = ClientModel(current_app)
     response, status = client_model.create_client(data)
+
+    # Si se creó correctamente el cliente y tenemos un email → enviamos bienvenida
+    if status == 201 and "email" in data:
+        enviar_bienvenida(data["email"], data.get("nombre_usuario", "Cliente"))
+
     return response, status
 
-#usar para que el admin vea info de sus clientes
-
-@Client_bp.get("/showClients")
-def show_clients():
-    """
-    Retrieve and display all clients.
-
-    This function fetches all clients from the database using the
-    ClientModel and returns the data for display.
-
-    Returns:
-        Response: A response object containing the list of clients.
-        
-    """
-    Admin_model = AdminModel(current_app)
-    response = Admin_model.show_clients()
-    return response
 
 @Client_bp.get("/viewClient/<id>")
 def specific_client(id):

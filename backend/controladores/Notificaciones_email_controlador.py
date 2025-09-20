@@ -83,9 +83,84 @@ En breve nos pondremos en contacto contigo por este mismo correo para coordinar 
 
 def enviar_bienvenida(email, nombre):
     msg = Message(
-        subject="🎉 Bienvenida a nuestra librería",
-        sender="sofi@gmail.com",
+        subject="🎉 ¡Bienvenida a nuestra librería!",
         recipients=[email],
-        body=f"Hola {nombre}, gracias por registrarte en nuestra tienda 📚."
     )
+
+    # Fallback de texto plano
+    msg.body = f"""
+Hola {nombre},
+
+¡Gracias por registrarte en nuestra tienda de libros y agendas 📚!
+
+Ahora formas parte de nuestra comunidad.  
+Desde hoy recibirás novedades, promociones exclusivas y mucho más.  
+
+¡Esperamos que disfrutes la experiencia! 🚀
+"""
+
+    # Versión HTML
+    msg.html = f"""
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {{
+        font-family: Arial, sans-serif;
+        background-color: #f9fafb;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }}
+      .container {{
+        max-width: 600px;
+        margin: 20px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }}
+      h2 {{
+        color: #16a34a;
+      }}
+      .footer {{
+        margin-top: 24px;
+        font-size: 14px;
+        color: #666;
+        text-align: center;
+      }}
+      .btn {{
+        display: inline-block;
+        padding: 12px 20px;
+        margin-top: 16px;
+        background: #16a34a;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+      }}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>🎉 ¡Bienvenida, {nombre}!</h2>
+      <p>Gracias por registrarte en nuestra <strong>librería online</strong>. 📚</p>
+      <p>Ahora formas parte de nuestra comunidad, donde podrás acceder a:</p>
+      <ul>
+        <li>✨ Novedades de libros y agendas</li>
+        <li>💸 Promociones exclusivas</li>
+        <li>🚀 Experiencias personalizadas</li>
+      </ul>
+      
+      <a href="http://localhost:5173/home" class="btn">Explorar la tienda</a>
+
+      <div class="footer">
+        <p>Organivent Librería - Todos los derechos reservados</p>
+      </div>
+    </div>
+  </body>
+</html>
+"""
+
     mail.send(msg)
+
