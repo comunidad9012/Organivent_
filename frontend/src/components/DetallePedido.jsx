@@ -153,7 +153,11 @@ const DetallePedido = () => {
               <div key={idx} className="flex gap-4 border rounded-lg shadow-sm bg-gray-50 p-4 items-center">
                 <div className="w-24 h-24 bg-white rounded border flex items-center justify-center overflow-hidden">
                 {prod.imagenes?.length > 0 ? (
-                  <img src={prod.imagenes[0]} alt={prod.productoNombre} className="w-full h-full object-cover" />
+                  <img
+                    src={prod.imagenes[0].url}  // 👈 usar .url
+                    alt={prod.productoNombre}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <ImageIcon className="text-gray-400 w-8 h-8" />
                 )}

@@ -67,14 +67,25 @@ class ProductosModel:
 
 
     def show_Productos(self):
-        Productos=list(self.mongo.db.Productos.find().sort('_id', -1))
-        for item in Productos:
-            # serializar ids
+        productos = list(self.mongo.db.Productos.find().sort('_id', -1))
+        for item in productos:
             item['_id'] = str(item['_id'])
             item['categoria_id'] = str(item.get('categoria_id')) if item.get('categoria_id') else None
 
-            # resolver imágenes (si hay)
-            image_ids = item.get('imagenes', [])
+            image_refs = item.get('imagenes', [])
+            image_ids = []
+            for ref in image_refs:
+                if isinstance(ref, dict) and '_id' in ref:
+                    try:
+                        image_ids.append(ObjectId(ref['_id']))
+                    except:
+                        pass
+                elif isinstance(ref, str):
+                    try:
+                        image_ids.append(ObjectId(ref))
+                    except:
+                        pass
+
             if image_ids:
                 imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
                 for img in imgs:
@@ -83,7 +94,7 @@ class ProductosModel:
             else:
                 item['imagenes'] = []
 
-        response=json_util.dumps(Productos)
+        response = json_util.dumps(productos)
         return Response(response, mimetype="application/json")
 
     # def specific_product(self,id):

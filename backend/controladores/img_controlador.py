@@ -1,11 +1,8 @@
-import os
-from flask import Blueprint, request, current_app, jsonify, send_from_directory, redirect
+from flask import Blueprint, request, current_app, jsonify, send_file
 from werkzeug.utils import secure_filename
-from models.modelProductos import ProductosModel
 from models.modelImgs import ImagesModel
-from utils.minio_client import upload_to_minio
+from utils.minio_client import upload_to_minio, client, BUCKET_NAME
 from io import BytesIO
-
 
 imgs_bp = Blueprint('imgs', __name__, url_prefix='/imgs')
 
@@ -16,7 +13,6 @@ def upload_file():
 
     files = request.files.getlist('file')
     imagenes_urls = []
-
     img_model = ImagesModel(current_app)
 
     for file in files:
@@ -45,6 +41,7 @@ def upload_file():
 
     return jsonify({'locations': imagenes_urls}), 200
 
+
 @imgs_bp.get('/gallery')
 def gallery():
     img_model = ImagesModel(current_app)
@@ -52,7 +49,24 @@ def gallery():
     return response
 
 
-@imgs_bp.route('/imagenes/<path:filename>')
-def proxy_minio(filename):
-    # Redirige al navegador hacia MinIO (puerto 9000)
-    return redirect(f"http://localhost:9000/product-images/{filename}")
+@imgs_bp.route('/imagenes/<path:filename>', methods=['GET'])
+def get_image(filename):
+    try:
+        response = client.get_object(BUCKET_NAME, filename)
+        data = response.read()
+        response.close()
+        response.release_conn()
+
+        mimetype = "image/jpeg"
+        if filename.lower().endswith(".png"):
+            mimetype = "image/png"
+        elif filename.lower().endswith(".webp"):
+            mimetype = "image/webp"
+        elif filename.lower().endswith(".gif"):
+            mimetype = "image/gif"
+
+        return send_file(BytesIO(data), mimetype=mimetype)
+
+    except Exception as e:
+        current_app.logger.error(f"Error obteniendo imagen {filename}: {e}")
+        return {"error": "Imagen no encontrada"}, 404

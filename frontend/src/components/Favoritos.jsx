@@ -54,7 +54,7 @@ function Favoritos() {
                 >
                   <img
                     src={
-                      product.imagenes?.[0] ||
+                      product.imagenes?.[0]?.url ||
                       "http://localhost:5000/imgs/imagenes/default.jpg"
                     }
                     alt={product.nombre_producto}

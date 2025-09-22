@@ -65,7 +65,7 @@ export default function Cart() {
                  <img
                     src={
                       product.imagenes && product.imagenes.length > 0
-                        ? product.imagenes[0]
+                        ? product.imagenes[0].url 
                         : "https://placehold.co/200x200"
                     }
                     alt={product.nombre_producto}

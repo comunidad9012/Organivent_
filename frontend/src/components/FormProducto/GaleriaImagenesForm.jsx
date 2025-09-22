@@ -19,28 +19,16 @@ export default function GaleriaImagenesForm({ producto, imagenes, setImagenes, s
 
       <div className="grid grid-cols-5 gap-3 items-start">
         {/* Imágenes cargadas */}
-        {producto.imagenes.map((url, index) => (
+        {producto.imagenes.map((img, index) => (
           <div key={`cargada-${index}`} className="relative group">
             <div className="aspect-square relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow">
               <img 
-                src={url} 
+                src={img.url}   // 👈 usar la propiedad url
                 alt={`img-${index}`} 
                 className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
-                onClick={() => setImagenSeleccionada(url)}
+                onClick={() => setImagenSeleccionada(img.url)} // 👈 idem
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
-              <button
-                type="button"
-                onClick={() => {
-                  setProducto(prev => ({
-                    ...prev,
-                    imagenes: prev.imagenes.filter((_, i) => i !== index)
-                  }));
-                }}
-                className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-red-700"
-              >
-                ✕
-              </button>
+              ...
             </div>
           </div>
         ))}

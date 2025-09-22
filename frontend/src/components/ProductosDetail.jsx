@@ -25,7 +25,7 @@ function ProductoDetail() {
       .then(data => {
         setProducto(data);
         if (data.imagenes && data.imagenes.length > 0) {
-          setImagenSeleccionada(data.imagenes[0]);
+          setImagenSeleccionada(data.imagenes[0].url); 
         }
       })
       .catch(error => console.error('Error fetching data:', error));
@@ -59,12 +59,12 @@ function ProductoDetail() {
               {Producto.imagenes.map((img, index) => (
                 <img
                   key={index}
-                  src={img}
+                  src={img.url} 
                   alt={`Miniatura ${index}`}
                   className={`w-20 h-20 object-cover rounded cursor-pointer border-2 transition ${
-                    imagenSeleccionada === img ? "border-black" : "border-transparent"
+                    imagenSeleccionada === img.url ? "border-black" : "border-transparent"
                   }`}
-                  onClick={() => setImagenSeleccionada(img)}
+                  onClick={() => setImagenSeleccionada(img.url)}
                 />
               ))}
             </div>

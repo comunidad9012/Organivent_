@@ -101,11 +101,11 @@ function Productos() {
 
                 {/* Imagen clickeable */}
                 <Link to={`/Productos/viewproduct/${product._id}`} className="block relative z-0">
-                  <img
-                    src={product.imagenes?.[0] || 'http://localhost:5000/imgs/imagenes/default.jpg'}
-                    alt={product.nombre_producto}
-                    className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                  />
+                <img
+                  src={product.imagenes?.[0]?.url || 'http://localhost:5000/imgs/imagenes/default.jpg'}
+                  alt={product.nombre_producto}
+                  className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                />
                 </Link>
               </div>
 

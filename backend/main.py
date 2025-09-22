@@ -13,6 +13,7 @@ from controladores.Pedidos_controlador import Pedidos_bp
 from controladores.descuentos_controlador import Descuentos_bp
 from controladores.Variantes_controlador import Variantes_bp
 from controladores.Stock_controlador import Stock_bp
+from utils.minio_client import client
 
 load_dotenv()
 

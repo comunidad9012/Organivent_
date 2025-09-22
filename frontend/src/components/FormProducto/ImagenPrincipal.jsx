@@ -1,9 +1,11 @@
 // ImagenPrincipal.jsx
 export default function ImagenPrincipal({ imagenSeleccionada, imagenes, producto }) {
-    const imagenSrc =
-      imagenSeleccionada ||
-      (imagenes.length > 0 ? URL.createObjectURL(imagenes[0]) : producto.imagenes[0]) ||
-      "https://placehold.co/600x600/f8fafc/64748b?text=Imagen+Principal";
+  const imagenSrc =
+    imagenSeleccionada ||
+    (imagenes.length > 0
+      ? URL.createObjectURL(imagenes[0])
+      : producto.imagenes[0]?.url) || 
+    "https://placehold.co/600x600/f8fafc/64748b?text=Imagen+Principal";
   
     return (
       <div className="relative group">

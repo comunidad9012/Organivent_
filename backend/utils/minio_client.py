@@ -23,6 +23,7 @@ def upload_to_minio(file_obj, filename, content_type):
         content_type=content_type
     )
 
-    return f"{os.getenv('MINIO_ENDPOINT')}/{BUCKET_NAME}/{filename}"
-    #esta url funciona solo cuando minio esta en modo publico (solo desarrollo)
+    #ahora devolvemos la url de flask en lugar de la de minio
+    flask_url = os.getenv("FLASK_ENDPOINT", "http://localhost:5000")
+    return f"{flask_url}/imgs/imagenes/{filename}"
     
