@@ -81,9 +81,9 @@ function ListDiscount() {
                   : "Ninguna"}
                 </p>
                 <p>
-                  <span className="font-medium">descuentos:</span>{" "}
-                  {d.descuentos_detalle?.length
-                  ? d.descuentos_detalle.map(p => p.nombre).join(", ")
+                  <span className="font-medium">productos:</span>{" "}
+                  {d.productos_detalle?.length
+                  ? d.productos_detalle.map(p => p.nombre).join(", ")
                   : "Ninguno"}
                 </p>
               </div>
@@ -97,7 +97,7 @@ function ListDiscount() {
                 <div className="mt-auto flex justify-end gap-2">
                 {/* Botón editar */}
                 <Link 
-                    to={`/private/admin/descuentos/update/${d._id}`} 
+                    to={`/private/admin/descuentos/update/${d._id}`}
                     onClick={(e) => e.stopPropagation()}
                     className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
                 >

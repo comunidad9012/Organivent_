@@ -60,13 +60,27 @@ def delete_descuento(id):
         return jsonify({"error": "Descuento no encontrado"}), 404
 
 
-# Actualizar un descuento
+@Descuentos_bp.get("/viewDiscount/<id>")
+def specific_discount(id):
+    descuento_model = Descuento(current_app)
+    descuento = descuento_model.get_discount_by_id(id)
+    # print("FUNCIONOOOO esto trae del descuento: ", descuento)
+
+    if not descuento:
+        return jsonify({"error": "Descuento no encontrado"}), 404
+
+    return jsonify(descuento), 200
+
+
+# controlador descuentos
 @Descuentos_bp.put("/update/<id>")
 def update_descuento(id):
     data = request.json
     descuento_model = Descuento(current_app)
 
-    if descuento_model.actualizar(id, data):
+    actualizado = descuento_model.actualizar(id, data)
+    if actualizado:
         return jsonify({"message": "Descuento actualizado con éxito"}), 200
     else:
         return jsonify({"error": "No se encontró el descuento"}), 404
+

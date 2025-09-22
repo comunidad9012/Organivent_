@@ -1,6 +1,7 @@
 from flask_pymongo import PyMongo
 from datetime import datetime
 from bson.objectid import ObjectId
+from flask import jsonify
 
 
 class Descuento:
@@ -103,8 +104,32 @@ class Descuento:
         result = self.mongo.db.descuentos.delete_one({"_id": ObjectId(id)})
         return result.deleted_count == 1
 
+    #esta es la mejor forma de traerlo
+    def get_discount_by_id(self, discount_id):
+        try:
+            descuento = self.mongo.db.descuentos.find_one({"_id": ObjectId(discount_id)})
+            descuento['_id'] = str(descuento['_id'])
+            return descuento  # Diccionario limpio
+        except Exception:
+            return None
+
     def actualizar(self, id, data):
+        if "fecha_inicio" in data and isinstance(data["fecha_inicio"], str):
+
+            #convierto la fecha que viene en string a datetime
+            try:
+                data["fecha_inicio"] = datetime.fromisoformat(data["fecha_inicio"].replace("Z", "+00:00"))
+            except:
+                pass  # si falla, lo dejamos como está
+
+        if "fecha_fin" in data and isinstance(data["fecha_fin"], str):
+            try:
+                data["fecha_fin"] = datetime.fromisoformat(data["fecha_fin"].replace("Z", "+00:00"))
+            except:
+                pass
+
         result = self.mongo.db.descuentos.update_one(
-            {"_id": ObjectId(id)}, {"$set": data}
+            {"_id": ObjectId(id)},
+            {"$set": data}
         )
-        return result.matched_count == 1
+        return result.modified_count > 0 or result.matched_count > 0

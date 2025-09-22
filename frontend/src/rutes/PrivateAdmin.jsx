@@ -24,6 +24,8 @@ function PrivateAdmin() {
           <Route path={PrivateRoutes.ADMIN_PEDIDOS} element={<ListaPedidos />} />
           <Route path={PrivateRoutes.DESCUENTOS} element={<ListDiscount />} />
           <Route path={PrivateRoutes.CREATE_DESCUENTO} element={<FormDescuento />} />
+          {/* arregla para que sea como con productos */}
+          <Route path={`${PrivateRoutes.UPDATE_DESCUENTO}`} element={<FormDescuento isEdit={true} />} />
 
 
           <Route path={PrivateRoutes.ADMIN_VIEW_PEDIDO} element={<DetallePedido />} />
