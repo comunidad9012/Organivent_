@@ -56,13 +56,6 @@ class ProductosModel:
         response=json_util.dumps(Productos)
         return Response(response, mimetype="application/json")
 
-    # def specific_product(self,id):
-    #     producto=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
-    #     if not producto:
-    #         return Response(json_util.dumps({"error": "Producto no encontrado"}), mimetype="application/json", status=404)
-    #     producto['_id'] = str(producto['_id'])
-    #     return Response(json_util.dumps(producto), mimetype="application/json")
-
     def specific_product(self, id):
         producto = self.mongo.db.Productos.find_one({'_id': ObjectId(id)})
         if not producto:
@@ -75,16 +68,16 @@ class ProductosModel:
         regex = re.compile(f".*{re.escape(palabra)}.*", re.IGNORECASE)
         Productos = list(self.mongo.db.Productos.find({
             "$or": [
-                {"nombre_producto": regex}, #aca seguro cambia tambien
-                {"noticia": regex} #serà descripcion aca? ESTOS SON LOS QUE BUSCAN NUNCA LO PROBE (importacion re)
+                {"nombre_producto": regex},
+                {"descripcion": regex}
             ]
         }).sort('_id', -1))
         
         for item in Productos:
             item['_id'] = str(item['_id'])
         
-        response = json_util.dumps(Productos)
-        return Response(response, mimetype="application/json")
+        return Productos
+
 
     def get_productos_by_categoria(self, id_categoria):
         productos = list(self.mongo.db.Productos.find({"categoria": id_categoria}))

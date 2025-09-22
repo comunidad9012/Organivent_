@@ -83,22 +83,17 @@ def specific_product_endpoint(id):
     return jsonify(serialize_doc(producto_con_descuento)), 200
 
 
-@Productos_bp.post("/find_product") #cambie por post para poder usar el formulario, si lo puedo arreglar la vuelvo a get
+@Productos_bp.post("/find_product")
 def find_product():
     data=request.json
     palabra = data['palabra'] 
     Productos_model = ProductosModel(current_app)
-    response = Productos_model.find_Productos(palabra=palabra)
-    return response
+    Descuento_model = Descuento(current_app)
+    productos_filtrados = Productos_model.find_Productos(palabra=palabra)
+    descuentos = Descuento_model.obtener_descuentos_activos()
+    productos_filtrados_con_descuento = aplicar_descuentos_a_productos(productos_filtrados, descuentos)
 
-# @Productos_bp.get("/showProductosPorCategoria/<id_categoria>")
-# def get_productos_por_categoria(id_categoria):
-#     id_categoria = id_categoria.replace("%20", " ")  # Decodifica espacios si es necesario
-#     print("Categoría recibida:", id_categoria)  # Debug en consola
-#     Productos_model = ProductosModel(current_app)#saque current_app.mongo.db  //posible problemita con Productos
-#     response = Productos_model.get_productos_by_categoria(id_categoria) #----------
-#     return response
-
+    return productos_filtrados_con_descuento
 
 @Productos_bp.get("/showProductosPorCategoria/<id_categoria>")
 def get_productos_por_categoria(id_categoria):
