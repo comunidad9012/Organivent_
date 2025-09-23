@@ -12,17 +12,15 @@ class ProductosModel:
     def _normalize_image_ids(self, imagenes):
         if not imagenes:
             return []
-
         normalized = []
         for img in imagenes:
-            if isinstance(img, dict):
-                # si ya viene {_id, url}, lo guardamos así
-                normalized.append(img)
-            elif isinstance(img, str):
-                try:
-                    normalized.append({"_id": ObjectId(img)})
-                except:
-                    normalized.append({"_id": img})
+            try:
+                if isinstance(img, dict) and "_id" in img:
+                    normalized.append(ObjectId(img["_id"]))
+                elif isinstance(img, str):
+                    normalized.append(ObjectId(img))
+            except:
+                continue  # ignora valores inválidos
         return normalized
 
 
@@ -67,35 +65,27 @@ class ProductosModel:
 
 
     def show_Productos(self):
-        productos = list(self.mongo.db.Productos.find().sort('_id', -1))
+        productos = list(self.mongo.db.Productos.aggregate([
+            {
+                "$lookup": {
+                    "from": "Imagenes",
+                    "localField": "imagenes",
+                    "foreignField": "_id",
+                    "as": "imagenes"
+                }
+            },
+            { "$sort": { "_id": -1 } }
+        ]))
+
+        # serializar ObjectIds a string
         for item in productos:
-            item['_id'] = str(item['_id'])
-            item['categoria_id'] = str(item.get('categoria_id')) if item.get('categoria_id') else None
+            item["_id"] = str(item["_id"])
+            item["categoria_id"] = str(item.get("categoria_id")) if item.get("categoria_id") else None
+            for img in item.get("imagenes", []):
+                img["_id"] = str(img["_id"])
 
-            image_refs = item.get('imagenes', [])
-            image_ids = []
-            for ref in image_refs:
-                if isinstance(ref, dict) and '_id' in ref:
-                    try:
-                        image_ids.append(ObjectId(ref['_id']))
-                    except:
-                        pass
-                elif isinstance(ref, str):
-                    try:
-                        image_ids.append(ObjectId(ref))
-                    except:
-                        pass
+        return Response(json_util.dumps(productos), mimetype="application/json")
 
-            if image_ids:
-                imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
-                for img in imgs:
-                    img['_id'] = str(img['_id'])
-                item['imagenes'] = imgs
-            else:
-                item['imagenes'] = []
-
-        response = json_util.dumps(productos)
-        return Response(response, mimetype="application/json")
 
     # def specific_product(self,id):
     #     producto=self.mongo.db.Productos.find_one({'_id': ObjectId(id), })
@@ -105,20 +95,29 @@ class ProductosModel:
     #     return Response(json_util.dumps(producto), mimetype="application/json")
 
     def specific_product(self, id):
-        producto = self.mongo.db.Productos.find_one({'_id': ObjectId(id)})
-        if not producto:
-            return None
-        producto['_id'] = str(producto['_id'])
-        producto['categoria_id'] = str(producto.get('categoria_id')) if producto.get('categoria_id') else None
+        pipeline = [
+            { "$match": { "_id": ObjectId(id) } },
+            {
+                "$lookup": {
+                    "from": "Imagenes",        # colección de imágenes
+                    "localField": "imagenes",  # en Productos: lista de ObjectIds
+                    "foreignField": "_id",     # en Imagenes: campo _id
+                    "as": "imagenes"           # sobrescribe el array con docs completos
+                }
+            }
+        ]
 
-        image_ids = producto.get('imagenes', [])
-        if image_ids:
-            imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
-            for img in imgs:
-                img['_id'] = str(img['_id'])
-            producto['imagenes'] = imgs
-        else:
-            producto['imagenes'] = []
+        result = list(self.mongo.db.Productos.aggregate(pipeline))
+        if not result:
+            return None
+
+        producto = result[0]
+
+        # Serializar ids a string
+        producto["_id"] = str(producto["_id"])
+        producto["categoria_id"] = str(producto.get("categoria_id")) if producto.get("categoria_id") else None
+        for img in producto.get("imagenes", []):
+            img["_id"] = str(img["_id"])
 
         return producto
 
@@ -138,22 +137,30 @@ class ProductosModel:
         response = json_util.dumps(Productos)
         return Response(response, mimetype="application/json")
 
+
     def get_productos_by_categoria(self, id_categoria):
-        productos = list(self.mongo.db.Productos.find({"categoria_id": ObjectId(id_categoria)}))
+        pipeline = [
+            { "$match": { "categoria_id": ObjectId(id_categoria) } },
+            {
+                "$lookup": {
+                    "from": "Imagenes",
+                    "localField": "imagenes",
+                    "foreignField": "_id",
+                    "as": "imagenes"
+                }
+            }
+        ]
+
+        productos = list(self.mongo.db.Productos.aggregate(pipeline))
+
         for producto in productos:
-            producto['_id'] = str(producto['_id'])
-            producto['categoria_id'] = str(producto['categoria_id'])  # serializar
-            # resolver imágenes
-            image_ids = producto.get('imagenes', [])
-            if image_ids:
-                imgs = list(self.mongo.db.Imagenes.find({'_id': {'$in': image_ids}}))
-                for img in imgs:
-                    img['_id'] = str(img['_id'])
-                producto['imagenes'] = imgs
-            else:
-                producto['imagenes'] = []
-        response=json_util.dumps(productos)
-        return Response(response, mimetype="application/json")
+            producto["_id"] = str(producto["_id"])
+            producto["categoria_id"] = str(producto["categoria_id"])
+            for img in producto.get("imagenes", []):
+                img["_id"] = str(img["_id"])
+
+        return Response(json_util.dumps(productos), mimetype="application/json")
+
 
     def update_product(self, product_id, data):
         try:
@@ -188,23 +195,34 @@ class ProductosModel:
             print(f"Error al actualizar el producto: {e}")
             return {"error": "Error interno del servidor"}, 500
 
-    def get_favoritos(self, user_id):
-        favoritos_col = self.mongo.db.Favoritos
-        productos_col = self.mongo.db.Productos
 
-        # Buscar los IDs de productos favoritos del usuario
-        favoritos = list(favoritos_col.find({"user_id": user_id}))
+    def get_favoritos(self, user_id):
+        favoritos = list(self.mongo.db.Favoritos.find({"user_id": user_id}))
+        
+        # Sacamos los IDs de productos
         product_ids = [ObjectId(f["product_id"]) for f in favoritos]
 
-        if not product_ids:
-            return []
+        # Buscamos los productos en la colección Productos + imágenes
+        productos = list(self.mongo.db.Productos.aggregate([
+            {"$match": {"_id": {"$in": product_ids}}},
+            {"$lookup": {
+                "from": "Imagenes",
+                "localField": "imagenes",
+                "foreignField": "_id",
+                "as": "imagenes"
+            }}
+        ]))
 
-        # Buscar los productos en la colección Productos
-        productos = list(productos_col.find({"_id": {"$in": product_ids}}))
-
+        # Serializar ids
         for p in productos:
             p["_id"] = str(p["_id"])
+            if p.get("categoria_id"):
+                p["categoria_id"] = str(p["categoria_id"])
+            for img in p.get("imagenes", []):
+                img["_id"] = str(img["_id"])
+
         return productos
+
 
     def toggle_favorito(self, user_id, product_id):
         favoritos_col = self.mongo.db.Favoritos
@@ -223,7 +241,6 @@ class ProductosModel:
                 "product_id": product_id
             })
             return {"message": "Producto agregado a favoritos", "isFavorito": True}
-
 
 
     def is_favorito(self, user_id, product_id):

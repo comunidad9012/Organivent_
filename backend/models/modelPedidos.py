@@ -10,6 +10,7 @@ class PedidosModel:
     def __init__(self, app):
         self.mongo = PyMongo(app)
 
+
     def create_pedido(self, data):
         if 'usuarioId' in data and 'productos' in data and data['productos']:
             pedido_data = {
@@ -25,21 +26,23 @@ class PedidosModel:
             return {"error": "Datos insuficientes para crear el pedido"}
 
 
-
     def show_pedidos(self):
         # Devuelve todos los pedidos (admin)
         pedidos = list(self.mongo.db.Pedidos.find().sort('_id', -1))
         return self._serialize_pedidos(pedidos)
 
+
     def show_pedidos_by_user(self, user_id):
         # Devuelve los pedidos de un usuario específico.
         pedidos = list(self.mongo.db.Pedidos.find({"usuarioId": user_id}).sort('_id', -1))
         return self._serialize_pedidos(pedidos)
-    
+
+
     def _serialize_pedidos(self, pedidos):
         for pedido in pedidos:
             self._serialize_pedido(pedido)
         return Response(json_util.dumps(pedidos), mimetype="application/json")
+
 
     def _serialize_pedido(self, pedido):
         pedido['_id'] = str(pedido['_id'])
@@ -53,16 +56,23 @@ class PedidosModel:
             producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
             if producto:
                 prod["productoNombre"] = producto.get("nombre_producto", "Producto sin nombre")
-                prod["imagenes"] = producto.get("imagenes", [])   # 👈 importante
-                prod["precio_final"] = producto.get("precio_final", 0)  # opcional, si te interesa mostrarlo
+                prod["precio_final"] = producto.get("precio_final", 0)
+
+                #lookup de imágenes
+                image_ids = producto.get("imagenes", [])
+                imgs = list(self.mongo.db.Imagenes.find({"_id": {"$in": image_ids}}))
+                for img in imgs:
+                    img["_id"] = str(img["_id"])
+                prod["imagenes"] = imgs
+
             else:
                 prod["productoNombre"] = "Producto no encontrado"
                 prod["imagenes"] = []
                 prod["precio_final"] = 0
+
             prod["productoId"] = str(prod["productoId"])
 
         return pedido
-
 
 
     def get_pedido_by_id_raw(self, pedido_id):
@@ -81,6 +91,7 @@ class PedidosModel:
             print(f"Error al eliminar el pedido: {e}")
             return False
 
+
     def update_pedido(self, pedido_id, data):
         try:
             result = self.mongo.db.Pedidos.update_one(
@@ -94,6 +105,7 @@ class PedidosModel:
         except Exception as e:
             print(f"Error al actualizar el pedido: {e}")
             return {"error": "Error interno"}, 500
+
 
     def update_state(self, pedido_id, nuevo_estado):
         if nuevo_estado not in self.ESTADOS_VALIDOS:
