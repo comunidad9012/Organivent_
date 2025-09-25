@@ -14,7 +14,7 @@ import { FiltersContext } from './context/filters.jsx'
 
 function Categorias() {
       const [listaCategorias, setListaCategorias] = useState([]);
-      const {filters , setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
+      const { setFilters } = useContext(FiltersContext) //consumo el contexto de los filtros
       //AGREGAR filters PARA VER QUE SE ELIJIÓ
   
   
@@ -48,7 +48,7 @@ function Categorias() {
               
             <DropdownMenuContent className="bg-white dark:bg-zinc-900  right-0 z-50  mt-2 w-48 origin-top-right rounded-md shadow-lg ring-1 ring-black/5">
               <DropdownMenuItem className="px-4 py-2 hover:bg-blue-50">
-              <div className="block w-full text-sm text-blue-500" onClick={() => setFilters((prevFilters) => ({
+              <div className="block w-full text-sm text-blue-500 text-left" onClick={() => setFilters((prevFilters) => ({
                           ...prevFilters,
                           category: "",
                           id_categoria: ""
@@ -65,7 +65,7 @@ function Categorias() {
                               category: categoria.nombre_categoria,
                               id_categoria: categoria._id
                               }))}>
-                             <DropdownMenuItem className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                             <DropdownMenuItem className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left">
                               {categoria.nombre_categoria}
                             </DropdownMenuItem>
                         </div>

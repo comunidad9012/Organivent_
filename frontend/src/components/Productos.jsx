@@ -60,32 +60,8 @@ function Productos() {
   return (
     <>
       <h1 className="text-2xl font-bold">Productos</h1>
-      <div className="flex flex-row gap-4">
-        {/* Panel lateral filtros */}
-        <div className="basis-1/6 p-4 bg-gray-50 rounded mt-4 text-left">
-          <p className="text-gray-300">
-            aca podriamos poner "categoria / subcategoria" (componente
-            shadcn-ui) y abajo hacer un fetch con las subcategorias{" "}
-          </p>
-          <h5 className="font-semibold mb-2">Categoría</h5>
-
-          {filters.id_categoria ? (
-            <div className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-              {filters.category}
-              <button
-                onClick={() => setFilters({ category: "", id_categoria: "" })}
-                className="mx-2 text-blue-500 hover:text-blue-700 focus:outline-none"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <p className="text-gray-500">Todos los productos</p>
-          )}
-        </div>
-
         {/* Zona principal */}
-        <div className="basis-5/6">
+        
           <div className="max-w-3xl mx-auto px-2 py-6">
             {productos.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -185,8 +161,6 @@ function Productos() {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
           />
-        </div>
-      </div>
     </>
   );
 }
