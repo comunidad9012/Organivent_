@@ -68,7 +68,7 @@ function Productos() {
                 {currentProducts.map((product) => (
                   <div
                     key={product._id}
-                    className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
+                    className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden flex flex-col" // 👈 ahora flex-col
                   >
                     <div className="relative aspect-square bg-white overflow-hidden group">
                       {/* Botón de favorito en la esquina superior derecha */}
@@ -99,42 +99,41 @@ function Productos() {
 
                     <Link
                       to={`/Productos/viewproduct/${product._id}`}
-                      className="block"
+                      className="block flex-1 flex flex-col" // 👈 ocupa el resto del alto
                     >
                       {/* Info */}
-                      <div className="p-3 space-y-2 bg-gray-50">
+                      <div className="p-3 flex flex-col flex-1 bg-gray-50">
                         {/* muestra el precio con descuento si tiene sino el precio normal */}
                         <PriceWhitDiscountOrNot product={product} />
 
-                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors">
+                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 leading-snug group-hover:text-black transition-colors min-h-[2.5rem]">
                           {product.nombre_producto}
                         </h3>
+
+                        {/* Admin Actions */}
+                        {userState.rol === Roles.ADMIN && (
+                          <div className="mt-auto flex justify-end gap-2"> {/* 👈 siempre al fondo */}
+                            {/* Botón editar */}
+                            <Link
+                              to={`/private/admin/Productos/update/${product._id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
+                            >
+                              <SquarePen size={18} />
+                            </Link>
+
+                            {/* Botón borrar */}
+                            <DeleteItem
+                              item={product}
+                              itemName={product.nombre_producto}
+                              resource="Productos"
+                              setItems={setProductos}
+                              getId={(p) => p._id}
+                            />
+                          </div>
+                        )}
                       </div>
                     </Link>
-
-                    {/* Admin Actions */}
-                    {userState.rol === Roles.ADMIN && (
-                      <div className="mt-auto flex justify-end gap-2">
-                        {/* Botón editar */}
-                        <Link
-                          to={`/private/admin/Productos/update/${product._id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-2 rounded-lg bg-yellow-400 hover:bg-yellow-500 text-white shadow"
-                        >
-                          <SquarePen size={18} />
-                        </Link>
-
-                        {/* Botón borrar */}
-                        {/* <DeleteProduct product={product} setProductos={setProductos}/> */}
-                        <DeleteItem
-                          item={product}
-                          itemName={product.nombre_producto}
-                          resource="Productos"
-                          setItems={setProductos}
-                          getId={(p) => p._id}
-                        />
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
