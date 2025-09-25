@@ -8,11 +8,9 @@ import { FiltersContext } from "./context/filters.jsx";
 import Paginacion from "./Paginacion.jsx";
 import PriceWhitDiscountOrNot from "../utilities/PriceWhitDiscountOrNot.jsx";
 import DeleteItem from "../utilities/DeleteItem";
-import SearchBar from "./SearchBar"; // ⬅️ importamos el buscador
 
 function Productos() {
   const [productos, setProductos] = useState([]);
-  const [query, setQuery] = useState(""); // ⬅️ estado búsqueda
 
   // paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,46 +19,38 @@ function Productos() {
   const { filters, setFilters } = useContext(FiltersContext);
   const userState = useSelector((store) => store.user);
 
-  // Fetch inicial (productos o por categoría)
   useEffect(() => {
-    const fetchProductos = async () => {
-      try {
-        const url = filters.id_categoria
-          ? `http://localhost:5000/Productos/showProductosPorCategoria/${filters.id_categoria}`
-          : "http://localhost:5000/Productos/showProductos";
-        const response = await fetch(url);
-        const data = await response.json();
-        setProductos(data);
-        setCurrentPage(1);
-      } catch (error) {
-        console.error("Error al obtener los productos:", error);
-      }
-    };
-
-    fetchProductos();
-  }, [filters.id_categoria]);
-
-  // 🔎 Buscar productos
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const fetchProductos = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:5000/Productos/find_product",
-        {
+      let url;
+      let data;
+
+      if (filters.query.trim() !== "") {
+        const response = await fetch("http://localhost:5000/Productos/find_product", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ palabra: query }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setProductos(data);
-        setCurrentPage(1);
+          body: JSON.stringify({ palabra: filters.query }),
+        });
+        data = await response.json();
+      } else if (filters.id_categoria) {
+        url = `http://localhost:5000/Productos/showProductosPorCategoria/${filters.id_categoria}`;
+        const response = await fetch(url);
+        data = await response.json();
+      } else {
+        url = "http://localhost:5000/Productos/showProductos";
+        const response = await fetch(url);
+        data = await response.json();
       }
-    } catch (err) {
-      console.error("Error en la búsqueda:", err);
+
+      setProductos(data);
+      setCurrentPage(1);
+    } catch (error) {
+      console.error("Error al obtener los productos:", error);
     }
   };
+
+  fetchProductos();
+}, [filters.query, filters.id_categoria]);
 
   // paginación
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -70,14 +60,6 @@ function Productos() {
   return (
     <>
       <h1 className="text-2xl font-bold">Productos</h1>
-
-      {/* Buscador ⬅️ agregado */}
-      <SearchBar
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onSubmit={handleSearch}
-      />
-
       <div className="flex flex-row gap-4">
         {/* Panel lateral filtros */}
         <div className="basis-1/6 p-4 bg-gray-50 rounded mt-4 text-left">
