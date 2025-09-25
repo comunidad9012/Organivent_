@@ -23,7 +23,7 @@ export default function CategoriaForm({
         >
           <option value="">Seleccionar categoría</option>
           {categorias.map((cat) => (
-            <option key={cat._id} value={cat.nombre_categoria}>
+            <option key={cat._id} value={cat._id}>
               {cat.nombre_categoria}
             </option>
           ))}
