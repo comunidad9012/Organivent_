@@ -13,8 +13,9 @@ def create_pedido():
     data = request.json
     pedidos_model = PedidosModel(current_app)
     response = pedidos_model.create_pedido(data)
+    # print("Respuesta de create_pedido en el controlador:", response)
 
-    # Si se creó bien el pedido, mandamos mail
+    # # Si se creó bien el pedido, mandamos mail
     if "pedido_id" in response and response.get("cliente_email"):
         enviar_confirmacion_pedido(
             response["cliente_email"],
@@ -45,6 +46,7 @@ def view_pedido(data, id):
     pedido_raw = pedidos_model.get_pedido_by_id_raw(id)
     if not pedido_raw:
         return jsonify({"error": "Pedido no encontrado"}), 404
+    # print("\n------------\nPedido sin serializar, desde el controlador:", pedido_raw)
 
     # 2️⃣ Validar permisos
     if data.get('rol') != 'admin' and str(pedido_raw.get("usuarioId")) != data["id"]:
@@ -52,6 +54,7 @@ def view_pedido(data, id):
 
     # 3️⃣ Serializar y devolver
     pedido_serializado = pedidos_model._serialize_pedido(pedido_raw)
+    # print("\n------------\nPedido serializado para respuesta, desde el controlador:", pedido_serializado)
     return Response(json_util.dumps(pedido_serializado), mimetype="application/json")
 
 

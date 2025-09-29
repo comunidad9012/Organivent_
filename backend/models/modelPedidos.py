@@ -12,17 +12,21 @@ class PedidosModel:
 
 
     def create_pedido(self, data):
+        print("📦 Creando pedido en el modelo con datos del payload:", data)
         if 'usuarioId' in data and 'productos' in data and data['productos']:
+            print("dentro del if")
             productos_finales = []
             total = 0
 
             for prod in data['productos']:
                 producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+                print("dentor del for, se encontró el producto:", producto_db)
                 if not producto_db:
                     continue
 
                 precio_original = float(prod.get("precio_original", 0))
                 precio_final = float(prod.get("precio_final", precio_original))
+                print("precio original:", precio_original, "precio final:", precio_final)
                 descuento = prod.get("descuento_aplicado")
 
                 cantidad = prod.get("cantidad", 1)
@@ -41,12 +45,13 @@ class PedidosModel:
                     "subtotal": subtotal,
                     "imagenes": prod.get("imagenes", producto_db.get("imagenes", []))
                 })
+                print("Producto añadido al pedido:", productos_finales[-1])
 
             pedido_data = {
                 'usuarioId': data['usuarioId'],
                 'cliente_nombre': data.get('cliente_nombre'),
                 'cliente_email': data.get('cliente_email'),
-                'productos': data['productos'],
+                'productos': productos_finales,
                 'total': total,
                 'estado': 'Pendiente',
                 'fecha': datetime.now()
@@ -54,7 +59,7 @@ class PedidosModel:
 
             result = self.mongo.db.Pedidos.insert_one(pedido_data)
 
-            print("📧 cliente_email recibido:", data.get("cliente_email"))
+            # print("📧 cliente_email recibido:", data.get("cliente_email"))
 
             return {
                 "mensaje": "Pedido creado exitosamente",
@@ -96,9 +101,8 @@ class PedidosModel:
         for prod in pedido.get("productos", []):
             producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
             if producto:
-                # Solo agrego info extra, sin tocar precios ya guardados en el pedido
-                prod["productoNombre"] = producto.get("nombre_producto", "Producto sin nombre")
-                prod["precio_final"] = producto.get("precio_final", 0)
+                # ✅ Solo agrego info extra, no piso precios que ya estaban en el pedido
+                prod["productoNombre"] = producto.get("nombre_producto", prod.get("productoNombre", "Producto sin nombre"))
 
                 #lookup de imágenes
                 image_ids = producto.get("imagenes", [])
@@ -106,13 +110,13 @@ class PedidosModel:
                 for img in imgs:
                     img["_id"] = str(img["_id"])
                 prod["imagenes"] = imgs
-
             else:
                 prod["productoNombre"] = "Producto no encontrado"
                 prod["imagenes"] = []
 
             # Asegurarse de que el id siempre sea string
             prod["productoId"] = str(prod["productoId"])
+
 
         return pedido
 
