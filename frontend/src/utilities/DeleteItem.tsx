@@ -53,16 +53,19 @@ function DeleteItem<T>({
   }
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <button
             type="button"
+            data-no-nav
+            onClick={(e) => e.stopPropagation()}
             className="p-2 rounded bg-red-500 hover:bg-red-600 text-white shadow"
           >
             <Trash size={18} />
           </button>
         </AlertDialogTrigger>
+
 
         <AlertDialogContent className="bg-white dark:bg-zinc-900 shadow-lg">
           <AlertDialogHeader className="m-4">
