@@ -24,6 +24,7 @@ def login():
             'id': str(usuario['_id']),
             'nombre_usuario': usuario['nombre_usuario'],
             'rol': usuario.get('rol', 'user'),
+            'email': usuario['email'],
             'exp': datetime.utcnow() + timedelta(minutes=30)
         }
         token = jwt.encode(payload, current_app.secret_key, algorithm='HS256')
@@ -31,7 +32,8 @@ def login():
         user = {
             'id': str(usuario['_id']),
             'nombre_usuario': usuario['nombre_usuario'],
-            'rol': usuario['rol']
+            'rol': usuario['rol'],
+            'email': usuario['email']
         }
 
         response = make_response(user)
@@ -67,7 +69,8 @@ def verificar_usuario(data):
     return jsonify({
         'id': data['id'],
         'nombre_usuario': data['nombre_usuario'],
-        'rol': data['rol']
+        'rol': data['rol'],
+        'email': data['email']
         }), 200
 
 

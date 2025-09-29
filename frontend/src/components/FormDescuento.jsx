@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useNavigate, useParams } from "react-router-dom";
+import { PrivateRoutes } from "../models/routes";
 
-const FormDescuento = ({ onSubmit }) => {
+const FormDescuento = ({ initialData = null, isEdit = false }) => {
+  const { id } = useParams(); 
   const [tipo, setTipo] = useState("porcentaje");
   const [formData, setFormData] = useState({
     nombre: "",
@@ -11,35 +15,53 @@ const FormDescuento = ({ onSubmit }) => {
 
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const navigate = useNavigate();
 
-  // 🚀 Cargar productos y categorías al montar
+  useEffect(() => {
+    const fetchDescuento = async () => {
+      if (id) {
+        try {
+          const res = await fetch(`http://localhost:5000/Descuentos/viewDiscount/${id}`);
+          const data = await res.json();
+          // console.log("Datos recibidos del descuento:", data);
+
+          setFormData({
+            nombre: data.nombre || "",
+            valor: data.valor || "",
+            productos: data.productos || [],
+            categorias: data.categorias || [],
+          });
+          setTipo(data.tipo || "porcentaje");
+        } catch (error) {
+          console.error("❌ Error al cargar el descuento:", error);
+        }
+      }
+    };
+    fetchDescuento();
+  }, [id]);
+
+
+  // 🚀 Cargar productos y categorías
   useEffect(() => {
     const fetchData = async () => {
       try {
         const resProd = await fetch("http://localhost:5000/Productos/showProductos");
-        const dataProd = await resProd.json();
-        setProductos(dataProd);
+        setProductos(await resProd.json());
 
         const resCat = await fetch("http://localhost:5000/Categoria/showCategorias");
-        const dataCat = await resCat.json();
-        setCategorias(dataCat);
+        setCategorias(await resCat.json());
       } catch (error) {
-        console.error("❌ Error cargando productos o categorías:", error);
+        console.error("❌ Error cargando productos/categorías:", error);
       }
     };
-
     fetchData();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // ✅ Toggle de chips (productos/categorías)
   const toggleProducto = (id) => {
     setFormData((prev) => ({
       ...prev,
@@ -58,54 +80,50 @@ const FormDescuento = ({ onSubmit }) => {
     }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const dataToSend = {
-    nombre: formData.nombre,
-    tipo,
-    valor: parseFloat(formData.valor),
-    productos: formData.productos,  // array de ObjectId en string
-    categorias: formData.categorias, // array de ObjectId en string
-    activo: true,
-    fecha_inicio: new Date().toISOString(), 
-    fecha_fin: new Date("2025-12-31T23:59:59Z").toISOString(),
+    const dataToSend = {
+      nombre: formData.nombre,
+      tipo,
+      valor: parseFloat(formData.valor),
+      productos: formData.productos,
+      categorias: formData.categorias,
+      activo: true,
+      fecha_inicio: new Date().toISOString(),
+      fecha_fin: new Date("2025-12-31T23:59:59Z").toISOString(),
+    };
+
+    try {
+      const url = isEdit
+        ? `http://localhost:5000/Descuentos/update/${id}`
+        : "http://localhost:5000/Descuentos/createDescuento";
+
+      const response = await fetch(url, {
+        method: isEdit ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataToSend),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(isEdit ? "¡Descuento actualizado!" : "¡Descuento creado!");
+        navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}/${PrivateRoutes.DESCUENTOS}`, { replace: true });
+      } else {
+        toast.error(result.error || "Error al guardar el descuento");
+      }
+    } catch (error) {
+      console.error("⚠️ Error en fetch:", error);
+      toast.error("No se pudo conectar con el servidor");
+    }
   };
 
-  try {
-    const response = await fetch("http://localhost:5000/Descuentos/createDescuento", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(dataToSend),
-    });
-
-    const result = await response.json();
-    if (response.ok) {
-      console.log("✅ Descuento creado:", result);
-      alert("Descuento creado con éxito");
-    } else {
-      console.error("❌ Error al crear descuento:", result);
-      alert(result.error || "Error al crear el descuento");
-    }
-  } catch (error) {
-    console.error("⚠️ Error en fetch:", error);
-    alert("No se pudo conectar con el servidor");
-  }
-
-  if (onSubmit) {
-    onSubmit(dataToSend);
-  }
-};
-
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg space-y-6"
-    >
-      <h2 className="text-xl font-bold">Nuevo cupón</h2>
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg space-y-6">
+      <h2 className="text-xl font-bold">
+        {isEdit ? "Editar cupón" : "Nuevo cupón"}
+      </h2>
       <p className="text-gray-600">Elige el tipo de cupón que deseas ofrecer:</p>
 
       {/* Botones de tipo */}
@@ -214,7 +232,7 @@ const FormDescuento = ({ onSubmit }) => {
         type="submit"
         className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
       >
-        Crear cupón
+        {isEdit ? "Actualizar cupón" : "Crear cupón"}
       </button>
     </form>
   );

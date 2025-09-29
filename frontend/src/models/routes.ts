@@ -25,9 +25,10 @@ export const PrivateRoutes: RouteMap ={
     FAVORITES: 'favoritos',
     DESCUENTOS: 'descuentos',
 
-    //ver que onda con estos
     CREATE_DESCUENTO: 'descuentos/create',
+    // este todavia no esta implementado
     UPDATE_DESCUENTO: 'descuentos/update/:id',
+    COMPRA_FINALIZADA: 'compra-finalizada',
 
 
     // Add more private routes as needed

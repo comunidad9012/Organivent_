@@ -5,6 +5,8 @@ import { useSelector } from "react-redux";
 import Loading from "../utilities/Loading"
 import EstadoPedido from "../models/Estado_Pedido/EstadoPedido";
 import FilterState from "./FilterState";
+import FormatoPrecio from "../utilities/FormatoPrecio";
+import Paginacion from './Paginacion.jsx';
 
 const ListaPedidos = () => {
   const [pedidos, setPedidos] = useState([]);
@@ -15,16 +17,21 @@ const ListaPedidos = () => {
   // Obtenemos el usuario de Redux
   const user = useSelector(state => state.user);
 
+      // paginacion
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = pedidos.slice(startIndex, endIndex);
+
   useEffect(() => {
     fetch("http://localhost:5000/Pedidos/showPedidos", {credentials: "include" })// importante para enviar cookies de sesión/JWT
       // .then(res => res.json())
       .then(res => {
-        console.log("Status:", res.status);
         return res.json();
       })
       // .then(data => setPedidos(data))
       .then(data => {
-        console.log("Data:", data);
         setPedidos(data);
       })
       .catch(err => console.error("Error al obtener pedidos:", err))
@@ -45,7 +52,7 @@ const ListaPedidos = () => {
         <Loading />
       ) : pedidos.length > 0 ? (
         <div className="space-y-4">
-          {pedidos
+          {currentItems
             .filter(p => estadoFiltro === "" || p.estado === estadoFiltro)
             .map((p) => (
               <div
@@ -88,7 +95,7 @@ const ListaPedidos = () => {
                     <ShoppingCart className="w-4 h-4" />
                     <span>{p.productos.length} productos</span>
                   </div>
-                  <ul className="mt-2 pl-5 list-disc text-sm text-gray-600">
+                  <ul className="mt-2 pl-5 list-disc text-sm text-gray-600 text-left">
                     {p.productos.map((prod, i) => (
                       <li key={i}>
                         {prod.productoNombre || "Producto"} x{prod.cantidad}
@@ -99,9 +106,10 @@ const ListaPedidos = () => {
 
                 {/* Total + Estado */}
                 <div className="flex flex-col items-end justify-between text-right">
-                  <p className="text-xl font-bold text-blue-600">
-                    ${parseFloat(p.total).toFixed(2)}
-                  </p>
+                    <FormatoPrecio
+                      valor={Number(p.total)}
+                      className="text-xl font-bold text-blue-700"
+                    />
                   <EstadoPedido estado={p.estado} />
                 </div>
               </div>
@@ -114,6 +122,13 @@ const ListaPedidos = () => {
             : "Todavía no realizaste ningún pedido."}
         </p>
       )}
+      {/* Paginar */}
+      <Paginacion
+        totalItems={pedidos.length}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage} 
+      />
     </div>
   );
 };

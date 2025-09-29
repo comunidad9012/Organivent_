@@ -12,6 +12,7 @@ import { PrivateRoutes, PublicRoutes } from "../models/routes";
 import '../styles/navbar.css';
 import { Sparkles } from "lucide-react"; // iconito de brillito
 import FavoritesButton from "./FavoritesButton";
+import SearchBar from "./SearchBar";
 
 // Componente para el logo
 const Logo = () => (
@@ -26,18 +27,6 @@ const Logo = () => (
       Un destello más
     </span>
   </Link>
-);
-
-// Componente para la barra de búsqueda
-const SearchBar = () => (
-  <div className="relative flex-1 max-w-md mx-4">
-    <input
-      type="text"
-      placeholder="Buscar productos..."
-      className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-    />
-    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-  </div>
 );
 
 // Componente para enlaces de navegación
@@ -106,6 +95,13 @@ const UserActions = ({ userRole, location, totalItems, animate, userState }) => 
       <div className="flex items-center gap-2">
         <ProfileDropdown />
       </div>
+
+      {/* Mis pedidos */}
+        {userRole === Roles.USER && location.pathname !== `/private/${PrivateRoutes.USER_PEDIDOS}` && (
+        <NavLink to={`/private/${PrivateRoutes.USER_PEDIDOS}`}>
+          Mis Pedidos
+        </NavLink>
+      )}
       
       {/* Favoritos para usuarios normales */}
       {userRole === Roles.USER && (
@@ -158,7 +154,7 @@ function Navbar() {
       <div className="bg-white px-6 py-2">
         <div className="flex items-center justify-between w-full">
           <Logo />
-          <SearchBar />
+          <SearchBar />  {/* ✅ ahora usa el que ya maneja FiltersContext */}
           
           {!isAuthenticated && (
             <Link 

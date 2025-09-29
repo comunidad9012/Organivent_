@@ -13,15 +13,56 @@ class PedidosModel:
 
     def create_pedido(self, data):
         if 'usuarioId' in data and 'productos' in data and data['productos']:
+            productos_finales = []
+            total = 0
+
+            for prod in data['productos']:
+                producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+                if not producto_db:
+                    continue
+
+                precio_original = float(prod.get("precio_original", 0))
+                precio_final = float(prod.get("precio_final", precio_original))
+                descuento = prod.get("descuento_aplicado")
+
+                cantidad = prod.get("cantidad", 1)
+                subtotal = precio_final * cantidad
+                total += subtotal
+
+                productos_finales.append({
+                    "productoId": prod["productoId"],
+                    "productoNombre": prod.get("nombre", producto_db.get("nombre_producto", "Producto sin nombre")),
+                    "cantidad": cantidad,
+                    "color": prod.get("color"),
+                    "precio_original": precio_original,
+                    "precio_final": precio_final,
+                    "precio_unitario": precio_final,
+                    "descuento_aplicado": descuento,
+                    "subtotal": subtotal,
+                    "imagenes": prod.get("imagenes", producto_db.get("imagenes", []))
+                })
+
             pedido_data = {
                 'usuarioId': data['usuarioId'],
-                'productos': data['productos'],  # lista de productos con cantidad
-                'total': data.get('total', 0),
-                'estado': 'Pendiente',  # por defecto
+                'cliente_nombre': data.get('cliente_nombre'),
+                'cliente_email': data.get('cliente_email'),
+                'productos': data['productos'],
+                'total': total,
+                'estado': 'Pendiente',
                 'fecha': datetime.now()
             }
-            self.mongo.db.Pedidos.insert_one(pedido_data)
-            return {"mensaje": "Pedido creado exitosamente"}
+
+            result = self.mongo.db.Pedidos.insert_one(pedido_data)
+
+            print("📧 cliente_email recibido:", data.get("cliente_email"))
+
+            return {
+                "mensaje": "Pedido creado exitosamente",
+                "pedido_id": str(result.inserted_id),
+                "cliente_email": pedido_data.get("cliente_email"),
+                "cliente_nombre": pedido_data.get("cliente_nombre"),
+                "total": total
+            }
         else:
             return {"error": "Datos insuficientes para crear el pedido"}
 
@@ -55,6 +96,7 @@ class PedidosModel:
         for prod in pedido.get("productos", []):
             producto = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
             if producto:
+                # Solo agrego info extra, sin tocar precios ya guardados en el pedido
                 prod["productoNombre"] = producto.get("nombre_producto", "Producto sin nombre")
                 prod["precio_final"] = producto.get("precio_final", 0)
 
@@ -68,8 +110,8 @@ class PedidosModel:
             else:
                 prod["productoNombre"] = "Producto no encontrado"
                 prod["imagenes"] = []
-                prod["precio_final"] = 0
 
+            # Asegurarse de que el id siempre sea string
             prod["productoId"] = str(prod["productoId"])
 
         return pedido

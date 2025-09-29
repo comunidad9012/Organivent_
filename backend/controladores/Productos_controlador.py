@@ -10,17 +10,21 @@ from bson import ObjectId
 from models.modelVariantes import VariantesModel
 from models.modelStock import StockModel
 from utils.serializers import serialize_doc
+from utils.validators import validar_producto
 
 Productos_bp = Blueprint('Productos', __name__, url_prefix='/Productos')
 
 @Productos_bp.post("/createProductos")
 def create_Productos():
-    data = request.json  #Obtiene los datos enviados en la solicitud como un diccionario JSON.
-    Productos_model = ProductosModel(current_app)  #Instancia el modelo de productos, conectándolo con la aplicación Flask activa.
-    response = Productos_model.create_Productos(data) #Llama al método del modelo para crear el producto con los datos proporcionados.
-    return jsonify(response) #Devuelve la respuesta al cliente (front en react).
+    data = request.json or {}
 
-# arreglar que si o si tiene que tener contenido el producto para crearlo.
+    errores = validar_producto(data, is_update=False)
+    if errores:
+        return jsonify({"errors": errores}), 400
+
+    Productos_model = ProductosModel(current_app)
+    response = Productos_model.create_Productos(data)
+    return response
 
 @Productos_bp.delete("/deleteProductos/<id>")
 def delete_product(id):
@@ -39,96 +43,9 @@ def show_Productos():
 
     productos = Productos_model.show_Productos().get_json()
     descuentos = Descuento_model.obtener_descuentos_activos()
-    # Normalizar todos los descuentos antes de aplicar
-    descuentos_normalizados = [validar_descuento(d) for d in descuentos]
-
-    productos = aplicar_descuentos_a_productos(productos, descuentos_normalizados)
+    productos = aplicar_descuentos_a_productos(productos, descuentos)
 
     return jsonify(productos)
-
-
-
-
-# @Productos_bp.get("/showProductos")
-# def show_Productos():
-#     Productos_model = ProductosModel(current_app)
-#     Descuento_model = Descuento(current_app)
-
-#     # Traemos productos y descuentos activos
-#     response = Productos_model.show_Productos()  # esto es un Response
-#     productos = response.get_json()
-#     descuentos = Descuento_model.obtener_descuentos_activos()
-
-#     # Convertimos lista de descuentos a algo más fácil de buscar
-#     descuentos_por_producto = {}
-#     descuentos_por_categoria = {}
-
-#     for d in descuentos:
-#         for pid in d.get("productos", []):
-#             descuentos_por_producto[str(pid)] = d  # aseguramos string
-#         for cat in d.get("categorias", []):
-#             descuentos_por_categoria[str(cat)] = d  # aseguramos string
-
-#     # Aplicar descuentos al precio de cada producto
-#     for p in productos:
-#         # ✅ precio_venta puede venir como string → lo casteamos
-#         precio_original = float(p.get("precio_venta", 0))
-
-#         # ✅ convertimos _id y categoria a string
-#         p["_id"] = str(p["_id"])
-#         p["categoria"] = str(p.get("categoria", ""))
-
-#         precio_final = precio_original
-#         descuento_aplicado = None
-
-#         # 1️⃣ Descuento por producto
-#         if p["_id"] in descuentos_por_producto:
-#             d = descuentos_por_producto[p["_id"]]
-#             if d["tipo"] == "porcentaje":
-#                 precio_final = precio_original * (1 - d["valor"])
-#             elif d["tipo"] == "fijo":
-#                 precio_final = max(precio_original - d["valor"], 0)
-#             descuento_aplicado = d
-
-#         # 2️⃣ Descuento por categoría
-#         elif p["categoria"] in descuentos_por_categoria:
-#             d = descuentos_por_categoria[p["categoria"]]
-#             if d["tipo"] == "porcentaje":
-#                 precio_final = precio_original * (1 - d["valor"])
-#             elif d["tipo"] == "fijo":
-#                 precio_final = max(precio_original - d["valor"], 0)
-#             descuento_aplicado = d
-
-#         # Guardamos en la respuesta
-#         p["precio_original"] = round(precio_original, 2)
-#         p["precio_final"] = round(precio_final, 2)
-#         if descuento_aplicado:
-#             p["descuento_aplicado"] = {
-#                 "nombre": descuento_aplicado["nombre"],
-#                 "tipo": descuento_aplicado["tipo"],
-#                 "valor": descuento_aplicado["valor"]
-#             }
-
-#     return jsonify(productos)
-
-
-
-
-
-#     Bonus
-
-# Esto mismo lo podés replicar en:
-
-# viewProductos/<id> → mostrar un producto con su descuento aplicado.
-
-# showProductosPorCategoria/<id_categoria> → ya traer con descuentos.
-
-
-# @Productos_bp.get("/viewProductos/<id>")
-# def specific_product(id):
-#     Productos_model=ProductosModel(current_app)
-#     response=(Productos_model.specific_product(id)).json
-#     return response
 
 @Productos_bp.get("/viewProductos/<id>")
 def specific_product_endpoint(id):
@@ -162,25 +79,21 @@ def specific_product_endpoint(id):
     producto_con_descuento = aplicar_descuentos_a_productos([producto], descuentos)[0]
 
     # Serializar todo antes de devolverlo
+    #esto lo tenemos distinto, cualquier cosa usar en su lugar esto:  return jsonify(producto_con_descuento)
     return jsonify(serialize_doc(producto_con_descuento)), 200
 
 
-@Productos_bp.post("/find_product") #cambie por post para poder usar el formulario, si lo puedo arreglar la vuelvo a get
+@Productos_bp.post("/find_product")
 def find_product():
     data=request.json
     palabra = data['palabra'] 
     Productos_model = ProductosModel(current_app)
-    response = Productos_model.find_Productos(palabra=palabra)
-    return response
+    Descuento_model = Descuento(current_app)
+    productos_filtrados = Productos_model.find_Productos(palabra=palabra)
+    descuentos = Descuento_model.obtener_descuentos_activos()
+    productos_filtrados_con_descuento = aplicar_descuentos_a_productos(productos_filtrados, descuentos)
 
-# @Productos_bp.get("/showProductosPorCategoria/<id_categoria>")
-# def get_productos_por_categoria(id_categoria):
-#     id_categoria = id_categoria.replace("%20", " ")  # Decodifica espacios si es necesario
-#     print("Categoría recibida:", id_categoria)  # Debug en consola
-#     Productos_model = ProductosModel(current_app)#saque current_app.mongo.db  //posible problemita con Productos
-#     response = Productos_model.get_productos_by_categoria(id_categoria) #----------
-#     return response
-
+    return productos_filtrados_con_descuento
 
 @Productos_bp.get("/showProductosPorCategoria/<id_categoria>")
 def get_productos_por_categoria(id_categoria):
@@ -198,11 +111,16 @@ def get_productos_por_categoria(id_categoria):
 @Productos_bp.put("/update/<id>")
 def update_product(id):
     data = request.json  # Obtiene los datos enviados en la solicitud como JSON.
+
+    errores = validar_producto(data, is_update=True)
+    if errores:
+        return jsonify({"errors": errores}), 400
+
     Productos_model = ProductosModel(current_app)  # Instancia el modelo de productos.
     response = Productos_model.update_product(id, data)  # Llama al método del modelo.
     return response  # Devuelve la respuesta.
 
-#IMPLEMENTAR DESPUES CUANDO TENGA LA VISTA EN EL FORMULARIO
+#ESTO CREO QUE ES PARA APLICAR DESCUENTOS AL PRODUCTO ACTUALIZADO
 
 # @Productos_bp.put("/update/<id>")
 # def update_product(id):
@@ -246,13 +164,16 @@ def toggle_favorito(product_id):
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+        
 
 @Productos_bp.route('/favoritos/<user_id>', methods=['GET'])
 def get_favoritos(user_id):
     try:
         Productos_model = ProductosModel(current_app)  #ahora instanciado
-        response = Productos_model.get_favoritos(user_id)
+        Descuento_model = Descuento(current_app) #para aplicar descuentos
+        favoritos = Productos_model.get_favoritos(user_id)
+        descuentos = Descuento_model.obtener_descuentos_activos()
+        response = aplicar_descuentos_a_productos(favoritos, descuentos)
         return jsonify(response), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

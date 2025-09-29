@@ -23,10 +23,13 @@ def validar_descuento(descuento):
 
 
 def aplicar_descuentos_a_productos(productos, descuentos):
+    # Normalizamos primero
+    descuentos_normalizados = [validar_descuento(d.copy()) for d in descuentos]
+
     descuentos_por_producto = {}
     descuentos_por_categoria = {}
 
-    for d in descuentos:
+    for d in descuentos_normalizados:
         for pid in d.get("productos", []):
             descuentos_por_producto[str(pid)] = d
         for cat in d.get("categorias", []):

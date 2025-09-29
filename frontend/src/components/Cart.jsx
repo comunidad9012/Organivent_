@@ -2,19 +2,38 @@ import { useEffect, useState } from "react";
 import { useCart } from "./context/CartContext";
 import Loading from "../utilities/Loading";
 import useCrearPedido from "./hooks/useCrearPedido";
-import Precio from "../utilities/Precio";
+import FormatoPrecio from "../utilities/FormatoPrecio";
+import PriceWhitDiscountOrNot from "../utilities/PriceWhitDiscountOrNot";
 
 export default function Cart() {
   const { cart, dispatch } = useCart();
   const [subtotal, setSubtotal] = useState(0);
-  const { handleComprar, loading, messagePedido } = useCrearPedido();
+  const { handleComprar, loading } = useCrearPedido();
+
+  const [ahorro, setAhorro] = useState(0);
+
+
+  // useEffect(() => {
+  //   const total = cart.reduce((acc, item) => acc + item.precio_final * (item.quantity || 1), 0);
+  //   setSubtotal(total);
+  // }, [cart]);
 
   useEffect(() => {
-    const total = cart.reduce((acc, item) => acc + item.precio_venta * (item.quantity || 1), 0);
-    setSubtotal(total);
+    const totalConDescuento = cart.reduce(
+      (acc, item) => acc + item.precio_final * (item.quantity || 1), 
+      0
+    );
+    const totalSinDescuento = cart.reduce(
+      (acc, item) => acc + item.precio_original * (item.quantity || 1), 
+      0
+    );
+    setSubtotal(totalConDescuento);
+    setAhorro(totalSinDescuento - totalConDescuento);
   }, [cart]);
 
+
   const isEmpty = cart.length === 0;
+  const hasDiscounts = ahorro > 0;
 
   return (
     <div className="flex flex-col md:flex-row gap-4 p-6 min-h-[60vh]">
@@ -101,8 +120,10 @@ export default function Cart() {
                       </button>
                       <span className="text-sm text-muted-foreground ml-4">+50 disponibles</span>
                     </div>
-                    <div className="flex justify-between items-center mt-2">
-                      <Precio valor={Number(product.precio_venta)} className="font-semibold text-xl text-blue-700" />
+                    
+                    {/* muestra el precio con descuento si tiene sino el precio normal */}
+                    <PriceWhitDiscountOrNot product={product}/>
+
                       <button
                         onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product })}
                         className="text-red-500 hover:text-red-700"
@@ -110,7 +131,8 @@ export default function Cart() {
                         Eliminar
                       </button>
                     </div>
-                  </div>
+
+                  
                 </li>
               ))}
             </ul>
@@ -130,16 +152,23 @@ export default function Cart() {
           <h3 className="text-lg font-bold mb-4">Resumen de compra</h3>
           <div className="flex justify-between mb-2">
             <span>Productos ({cart.reduce((acc, item) => acc + (item.quantity || 1), 0)})</span>
-            <Precio valor={Number(subtotal)} className="text-blue-700" />
+            <FormatoPrecio valor={Number(subtotal + ahorro)} className={hasDiscounts ? "text-gray-500 line-through" : "text-gray-500" }/>
           </div>
-          <div className="flex justify-between mb-2">
+          {hasDiscounts && (
+            <div className="flex justify-between mb-2 text-green-600">
+              <span>Descuentos</span>
+              <FormatoPrecio valor={-Number(ahorro)} />
+            </div>
+          )}
+          {/* <div className="flex justify-between mb-2">
             <span>Envío</span>
             <span className="text-green-500">Gratis</span>
-          </div>
+          </div> */}
           <div className="flex justify-between font-bold mb-4">
             <span>Total</span>
-            <Precio valor={Number(subtotal)} className="text-xl font-bold text-blue-700" />
+            <FormatoPrecio valor={Number(subtotal)} className="text-xl font-bold text-blue-700" />
           </div>
+
 
           {loading && <Loading />}
 
@@ -148,7 +177,6 @@ export default function Cart() {
           </button>
 
           {/* TODO: Reemplazar por toast */}
-          {messagePedido && <p className="mt-4 text-green-600">{messagePedido}</p>}
         </div>
       )}
     </div>

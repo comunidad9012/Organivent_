@@ -14,6 +14,7 @@ export function FiltersProvider ({ children }) {
     category: "",
     id_categoria: "",
     //minPrice: 0
+    query: ""   // ⬅️ agregamos búsqueda acá
   })
 
   return (

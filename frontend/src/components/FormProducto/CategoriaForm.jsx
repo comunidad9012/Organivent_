@@ -16,6 +16,7 @@ export default function CategoriaForm({
     <div className="infield mb-6 bg-gray-100 p-4 rounded-lg">
       <div className="flex gap-2">
         <select 
+          required
           className="w-full p-2 border rounded"
           value={producto.categoria_id || ''}
           onChange={(e) => setProducto(prev => ({ ...prev, categoria_id: e.target.value }))}

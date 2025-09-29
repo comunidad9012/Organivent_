@@ -26,7 +26,7 @@ export const AuthGuard = () => {
             }
         })
         .then(data => {
-            console.log("Datos recibidos del backend: ", data);
+            // console.log("Datos recibidos del backend: ", data);
             dispatch(createUser(data)) 
             setIsAuthenticated(true)
         })
