@@ -4,6 +4,7 @@ from bson import json_util
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 import re
+from utils.serializers import serialize_doc
     
 class ProductosModel:
     def __init__(self, app):
@@ -117,18 +118,37 @@ class ProductosModel:
     
     def find_Productos(self, palabra):
         regex = re.compile(f".*{re.escape(palabra)}.*", re.IGNORECASE)
-        Productos = list(self.mongo.db.Productos.find({
-            "$or": [
-                {"nombre_producto": regex},
-                {"descripcion": regex}
-            ]
-        }).sort('_id', -1))
-        
-        for item in Productos:
-            item['_id'] = str(item['_id'])
-        
-        return Productos
+        pipeline = [
+            {
+                "$match": {
+                    "$or": [
+                        {"nombre_producto": regex},
+                        {"descripcion": regex}
+                    ]
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "Imagenes",
+                    "localField": "imagenes",
+                    "foreignField": "_id",
+                    "as": "imagenes"
+                }
+            },
+            { "$sort": { "_id": -1 } }
+        ]
 
+        productos = list(self.mongo.db.Productos.aggregate(pipeline))
+
+        # Serializar IDs a string
+        for p in productos:
+            p["_id"] = str(p["_id"])
+            if p.get("categoria_id"):
+                p["categoria_id"] = str(p["categoria_id"])
+            for img in p.get("imagenes", []):
+                img["_id"] = str(img["_id"])
+
+        return productos
 
 
     def get_productos_by_categoria(self, id_categoria):
