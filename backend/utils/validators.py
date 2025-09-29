@@ -18,12 +18,18 @@ def validar_producto(data, is_update=False):
         except (ValueError, TypeError):
             errores["precio_venta"] = "El precio debe ser un número válido"
 
-    # Categoría
-    if not is_update and not data.get("categoria"):
-        errores["categoria"] = "La categoría es obligatoria"
+    # Categoría (usar categoria_id)
+    if not is_update and not data.get("categoria_id"):
+        errores["categoria_id"] = "La categoría es obligatoria"
 
-    # Imágenes (si viene, validar que sea lista de strings)
-    if "imagenes" in data and not all(isinstance(img, str) for img in data["imagenes"]):
-        errores["imagenes"] = "Todas las imágenes deben ser URLs válidas"
+    # Imágenes
+    if "imagenes" in data:
+        if not isinstance(data["imagenes"], list):
+            errores["imagenes"] = "El campo imágenes debe ser una lista"
+        else:
+            for img in data["imagenes"]:
+                if not (isinstance(img, dict) and "_id" in img) and not isinstance(img, str):
+                    errores["imagenes"] = "Formato de imágenes inválido"
+                    break
 
     return errores
