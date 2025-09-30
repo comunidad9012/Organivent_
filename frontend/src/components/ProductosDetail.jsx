@@ -15,9 +15,8 @@ function ProductoDetail() {
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
-
-
   const userState = useSelector(store => store.user) //consumo el estado de redux para saber si el usuario es admin o no
+  const isNotAdmin = userState.rol !== Roles.ADMIN
 
   useEffect(() => {
     fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
@@ -106,10 +105,11 @@ function ProductoDetail() {
                   />
                 ))}
               </div>
-              {selectedColor && (
+              
+              {selectedColor && isNotAdmin && (
                 <p className="mt-2 text-sm text-gray-500">Color seleccionado: {selectedColor.name}</p>
               )}
-              {selectedColor == null && (
+              {selectedColor == null && isNotAdmin && (
                 <p className="mt-2 text-sm text-red-500">Por favor selecciona un color</p>
               )}
             </div>
@@ -117,7 +117,7 @@ function ProductoDetail() {
 
           {/* Agregar al carrito */}
           <div className="flex flex-col justify-end mt-6">
-            {userState.rol !== Roles.ADMIN && (
+            {isNotAdmin && (
               <CartProduct 
                 product={Producto} 
                 selectedColor={selectedColor} 

@@ -69,12 +69,6 @@ function CartProduct({ product , selectedColor}) {
 
   return (
     <div>
-      {hasColorOptions && !selectedColor && (
-        <p className="text-sm text-red-500 text-center mt-2">
-          Selecciona un color para continuar
-        </p>
-      )}
-      
       <button
         className={`cartBtn mx-auto ${added ? 'added' : ''}`}
         onClick={handleClick}
