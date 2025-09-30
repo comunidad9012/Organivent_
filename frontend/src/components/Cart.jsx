@@ -4,6 +4,7 @@ import Loading from "../utilities/Loading";
 import useCrearPedido from "./hooks/useCrearPedido";
 import FormatoPrecio from "../utilities/FormatoPrecio";
 import PriceWhitDiscountOrNot from "../utilities/PriceWhitDiscountOrNot";
+import { PrivateRoutes } from "../models/routes";
 
 export default function Cart() {
   const { cart, dispatch } = useCart();
@@ -63,7 +64,7 @@ export default function Cart() {
                     ¡Añade productos al carrito y descubre tus descuentos!
                   </p>
                 </div>
-                  <a href="/tienda" className="text-blue-600 hover:underline text-sm mt-2 inline-block justify-items-end">
+                  <a href={PrivateRoutes.USER} className="text-blue-600 hover:underline text-sm mt-2 inline-block justify-items-end">
                     Descubrir productos
                   </a>
               </div>

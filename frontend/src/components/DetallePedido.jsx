@@ -41,7 +41,10 @@ const DetallePedido = () => {
 
   useEffect(() => {
     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`, { withCredentials: true })
-      .then(res => setPedido(res.data))
+      .then(res => {setPedido(res.data)
+        console.log(res.data)
+      }
+    )
       .catch(err => {
         if (err.response?.status === 403) {
           setPedido({ error: "No tienes permiso para ver este pedido" })
@@ -99,9 +102,9 @@ const DetallePedido = () => {
               <SelectTrigger className="bg-white border border-gray-300 shadow-sm rounded px-3 py-2">
                 <SelectValue placeholder="Cambiar estado" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 {EstadosPedido.map((estado) => (
-                  <SelectItem key={estado} value={estado}>
+                  <SelectItem key={estado} value={estado} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <EstadoPedido estado={estado} />
                   </SelectItem>
                 ))}
