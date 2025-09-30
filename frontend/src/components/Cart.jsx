@@ -10,28 +10,20 @@ export default function Cart() {
   const { cart, dispatch } = useCart();
   const [subtotal, setSubtotal] = useState(0);
   const { handleComprar, loading } = useCrearPedido();
-
   const [ahorro, setAhorro] = useState(0);
-
-
-  // useEffect(() => {
-  //   const total = cart.reduce((acc, item) => acc + item.precio_final * (item.quantity || 1), 0);
-  //   setSubtotal(total);
-  // }, [cart]);
 
   useEffect(() => {
     const totalConDescuento = cart.reduce(
-      (acc, item) => acc + item.precio_final * (item.quantity || 1), 
+      (acc, item) => acc + item.precio_final * (item.quantity || 1),
       0
     );
     const totalSinDescuento = cart.reduce(
-      (acc, item) => acc + item.precio_original * (item.quantity || 1), 
+      (acc, item) => acc + item.precio_original * (item.quantity || 1),
       0
     );
     setSubtotal(totalConDescuento);
     setAhorro(totalSinDescuento - totalConDescuento);
   }, [cart]);
-
 
   const isEmpty = cart.length === 0;
   const hasDiscounts = ahorro > 0;
@@ -47,7 +39,6 @@ export default function Cart() {
             {/* Columna izquierda: mensaje */}
             <div className="flex-2 flex items-center justify-center bg-white border rounded-lg shadow-md p-6">
               <div className="flex items-center gap-2 w-full">
-                {/* Ícono */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-16 h-16 text-gray-600 ml-8"
@@ -55,18 +46,28 @@ export default function Cart() {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 5.4a1 1 0 001 1.6H19m-12 0a1 1 0 11-2 0m12 0a1 1 0 112 0" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 5.4a1 1 0 001 1.6H19m-12 0a1 1 0 11-2 0m12 0a1 1 0 112 0"
+                  />
                 </svg>
 
                 <div className="md:w-2/3 mt-10">
-                  <h3 className="text-lg font-semibold">Ups! ¡no hay productos aún!</h3>
+                  <h3 className="text-lg font-semibold">
+                    Ups! ¡no hay productos aún!
+                  </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     ¡Añade productos al carrito y descubre tus descuentos!
                   </p>
                 </div>
-                  <a href={PrivateRoutes.USER} className="text-blue-600 hover:underline text-sm mt-2 inline-block justify-items-end">
-                    Descubrir productos
-                  </a>
+                <a
+                  href={PrivateRoutes.USER}
+                  className="text-blue-600 hover:underline text-sm mt-2 inline-block justify-items-end"
+                >
+                  Descubrir productos
+                </a>
               </div>
             </div>
 
@@ -74,18 +75,24 @@ export default function Cart() {
             <div className="md:w-1/3 bg-white rounded-lg shadow-md p-6 border border-gray-100 text-gray-400">
               <h3 className="text-lg font-bold mb-2">Resumen de compra</h3>
               <hr className="mb-2" />
-              <p className="text-sm">Acá verás los importes de tu compra una vez que agregues productos.</p>
+              <p className="text-sm">
+                Acá verás los importes de tu compra una vez que agregues
+                productos.
+              </p>
             </div>
           </div>
         ) : (
           <>
             <ul className="space-y-4">
               {cart.map((product, index) => (
-                <li key={index} className="flex flex-col md:flex-row items-start gap-4 border border-zinc-300 rounded-lg p-4">
-                 <img
+                <li
+                  key={index}
+                  className="flex flex-col md:flex-row items-start gap-4 border border-zinc-300 rounded-lg p-4"
+                >
+                  <img
                     src={
                       product.imagenes && product.imagenes.length > 0
-                        ? product.imagenes[0].url 
+                        ? product.imagenes[0].url
                         : "https://placehold.co/200x200"
                     }
                     alt={product.nombre_producto}
@@ -93,47 +100,82 @@ export default function Cart() {
                   />
 
                   <div className="flex flex-col justify-between">
-                    <h2 className="text-lg font-semibold mt-2">{product.nombre_producto}</h2>
-                    {product.selectedColor && (
-                      <div className="flex items-center my-2">
-                        <span className="text-sm text-muted-foreground mr-2">
-                          Color: {product.selectedColor.name}
-                        </span>
-                        <div
-                          className="w-5 h-5 rounded-full border border-gray-400"
-                          style={{ backgroundColor: product.selectedColor.hex }}
-                        />
+                    <h2 className="text-lg font-semibold mt-2">
+                      {product.nombre_producto}
+                    </h2>
+
+                    {/* Mostrar atributos de la variante seleccionada */}
+                    {product.selectedVariante && (
+                      <div className="flex flex-col gap-1 my-2 text-sm text-muted-foreground">
+                        {Object.entries(product.selectedVariante.atributos || {})
+                          .map(([k, v]) => {
+                            if (k === "color" && v?.hex) {
+                              return (
+                                <div
+                                  key={k}
+                                  className="flex items-center gap-2"
+                                >
+                                  <span>
+                                    {k}: {v.name || v}
+                                  </span>
+                                  <div
+                                    className="w-5 h-5 rounded-full border border-gray-400"
+                                    style={{ backgroundColor: v.hex }}
+                                  />
+                                </div>
+                              );
+                            }
+                            return (
+                              <span key={k}>
+                                {k}: {typeof v === "object" ? v.name : v}
+                              </span>
+                            );
+                          })}
+                        {Object.keys(product.selectedVariante.atributos || {})
+                          .length === 0 && <span>Variante: Única opción</span>}
                       </div>
                     )}
+
                     <div className="flex items-center my-2">
                       <button
-                        onClick={() => dispatch({ type: "DECREMENT_QUANTITY", payload: product._id })}
+                        onClick={() =>
+                          dispatch({
+                            type: "DECREMENT_QUANTITY",
+                            payload: product,
+                          })
+                        }
                         className="bg-zinc-300 px-2 rounded hover:bg-gray-200"
                       >
                         -
                       </button>
                       <span className="mx-3">{product.quantity || 1}</span>
                       <button
-                        onClick={() => dispatch({ type: "INCREMENT_QUANTITY", payload: product._id })}
+                        onClick={() =>
+                          dispatch({
+                            type: "INCREMENT_QUANTITY",
+                            payload: product,
+                          })
+                        }
                         className="bg-zinc-300 px-2 rounded hover:bg-gray-200"
                       >
                         +
                       </button>
-                      <span className="text-sm text-muted-foreground ml-4">+50 disponibles</span>
-                    </div>
-                    
-                    {/* muestra el precio con descuento si tiene sino el precio normal */}
-                    <PriceWhitDiscountOrNot product={product}/>
-
-                      <button
-                        onClick={() => dispatch({ type: "REMOVE_FROM_CART", payload: product })}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Eliminar
-                      </button>
+                      <span className="text-sm text-muted-foreground ml-4">
+                        +50 disponibles
+                      </span>
                     </div>
 
-                  
+                    <PriceWhitDiscountOrNot product={product} />
+
+                    <button
+                      onClick={() =>
+                        dispatch({ type: "REMOVE_FROM_CART", payload: product })
+                      }
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -152,8 +194,16 @@ export default function Cart() {
         <div className="md:w-1/3 bg-card rounded-lg shadow-md p-6">
           <h3 className="text-lg font-bold mb-4">Resumen de compra</h3>
           <div className="flex justify-between mb-2">
-            <span>Productos ({cart.reduce((acc, item) => acc + (item.quantity || 1), 0)})</span>
-            <FormatoPrecio valor={Number(subtotal + ahorro)} className={hasDiscounts ? "text-gray-500 line-through" : "text-gray-500" }/>
+            <span>
+              Productos (
+              {cart.reduce((acc, item) => acc + (item.quantity || 1), 0)})
+            </span>
+            <FormatoPrecio
+              valor={Number(subtotal + ahorro)}
+              className={
+                hasDiscounts ? "text-gray-500 line-through" : "text-gray-500"
+              }
+            />
           </div>
           {hasDiscounts && (
             <div className="flex justify-between mb-2 text-green-600">
@@ -161,23 +211,23 @@ export default function Cart() {
               <FormatoPrecio valor={-Number(ahorro)} />
             </div>
           )}
-          {/* <div className="flex justify-between mb-2">
-            <span>Envío</span>
-            <span className="text-green-500">Gratis</span>
-          </div> */}
           <div className="flex justify-between font-bold mb-4">
             <span>Total</span>
-            <FormatoPrecio valor={Number(subtotal)} className="text-xl font-bold text-blue-700" />
+            <FormatoPrecio
+              valor={Number(subtotal)}
+              className="text-xl font-bold text-blue-700"
+            />
           </div>
-
 
           {loading && <Loading />}
 
-          <button className="button-pretty w-full" onClick={handleComprar} disabled={loading}>
+          <button
+            className="button-pretty w-full"
+            onClick={handleComprar}
+            disabled={loading}
+          >
             {loading ? "Procesando..." : "Continuar compra"}
           </button>
-
-          {/* TODO: Reemplazar por toast */}
         </div>
       )}
     </div>
