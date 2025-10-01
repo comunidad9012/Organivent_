@@ -25,7 +25,7 @@ function ModalVariantes({ producto, setProducto, onClose }) {
       ...prev,
       variantes: [
         ...(prev.variantes || []),
-        { atributos: { color: ""}, cantidad: 0 },
+        { atributos: { color: "" }, cantidad: 0 },
       ],
     }));
   };
@@ -35,31 +35,9 @@ function ModalVariantes({ producto, setProducto, onClose }) {
     setProducto((prev) => ({ ...prev, variantes: nuevas }));
   };
 
-  const handleGuardarYCerrar = async () => {
-    try {
-      for (const variante of producto.variantes || []) {
-        // 1. Crear variante
-        const resVar = await axios.post("/Variantes/create", {
-          producto_id: producto._id,
-          atributos: { color: { name: variante.atributos.color, hex: "#ffffff" } } // acá podés mapear hex también
-        });
-  
-        const varianteCreada = resVar.data;
-  
-        // 2. Crear stock
-        await axios.post("/Stock/create", {
-          variante_id: varianteCreada._id,
-          cantidad: variante.cantidad
-        });
-      }
-  
-      // opcional: actualizar el producto en frontend como "guardado"
-      setProducto((prev) => ({ ...prev, es_stock: true }));
-  
-      onClose();
-    } catch (err) {
-      console.error("Error guardando variantes:", err);
-    }
+  const handleGuardarYCerrar = () => {
+    setProducto((prev) => ({ ...prev, es_stock: true }));
+    onClose();
   };
 
   return (
@@ -96,7 +74,10 @@ function ModalVariantes({ producto, setProducto, onClose }) {
             </thead>
             <tbody>
               {(producto.variantes || []).map((v, i) => (
-                <tr key={i} className="border-b hover:bg-gray-50 hover:bg-opacity-50">
+                <tr
+                  key={i}
+                  className="border-b hover:bg-gray-50 hover:bg-opacity-50"
+                >
                   <td className="p-2">
                     <select
                       value={v.atributos.color || ""}

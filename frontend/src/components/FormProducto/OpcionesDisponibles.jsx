@@ -44,23 +44,23 @@ export default function OpcionesProducto({ producto, setProducto }) {
       ],
     }));
 
-    // Guardar en DB como { atributos: { [opcionNombre]: {...} } }
-    for (const variante of posibilidades) {
-      const normalizedKey = opcionNombre.toLowerCase().trim();
-      await fetch("http://localhost:5000/Variantes/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          producto_id: producto._id,
-          atributos: {
-            [normalizedKey]: {
-              name: variante.name, // siempre string
-              ...(variante.hex ? { hex: variante.hex } : {}),
-            },
-          },
-        }),
-      });
-    }
+    // // Guardar en DB como { atributos: { [opcionNombre]: {...} } }
+    // for (const variante of posibilidades) {
+    //   const normalizedKey = opcionNombre.toLowerCase().trim();
+    //   await fetch("http://localhost:5000/Variantes/create", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       producto_id: producto._id,
+    //       atributos: {
+    //         [normalizedKey]: {
+    //           name: variante.name, // siempre string
+    //           ...(variante.hex ? { hex: variante.hex } : {}),
+    //         },
+    //       },
+    //     }),
+    //   });
+    // }
 
     // Resetear modal
     setOpcionNombre("");
