@@ -42,7 +42,7 @@ const DetallePedido = () => {
   useEffect(() => {
     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`, { withCredentials: true })
       .then(res => {setPedido(res.data)
-        console.log(res.data)
+        // console.log("pedido - lo que llega al front desde el back" ,res.data)
       }
     )
       .catch(err => {
@@ -171,13 +171,28 @@ const DetallePedido = () => {
                 <div className="flex-1 space-y-1 text-left pl-2">
                   <p className="font-semibold text-blue-800">{prod.productoNombre || "Producto sin nombre"}</p>
                   <p className="text-sm text-gray-700">Cantidad: {prod.cantidad}</p>
-                  {prod.color?.name && (
-                    <div className="text-sm text-gray-700 flex items-center gap-2">
-                      <span>Color:</span>
-                      <span className="w-4 h-4 rounded-full border" style={{ backgroundColor: prod.color.hex }}></span>
-                      <span>{prod.color.name}</span>
+                  {/* Mostrar variantes si existen */}
+                  {prod.variante && (
+                    <div className="text-sm text-gray-700 space-y-1">
+                      {Object.entries(prod.variante).map(([atributo, valor]) => (
+                        <div key={atributo} className="flex items-center gap-2">
+                          <span className="capitalize">{atributo}:</span>
+                          {typeof valor === "object" && valor.hex ? (
+                            <>
+                              <span
+                                className="w-4 h-4 rounded-full border"
+                                style={{ backgroundColor: valor.hex }}
+                              ></span>
+                              <span>{valor.name}</span>
+                            </>
+                          ) : (
+                            <span>{valor}</span>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
+
                   <PriceWhitDiscountOrNot product={prod} />
                 </div>
               </div>

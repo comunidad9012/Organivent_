@@ -14,30 +14,29 @@ class PedidosModel:
     def create_pedido(self, data):
         print("📦 Creando pedido en el modelo con datos del payload:", data)
         if 'usuarioId' in data and 'productos' in data and data['productos']:
-            print("dentro del if")
             productos_finales = []
             total = 0
 
             for prod in data['productos']:
                 producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
-                print("dentor del for, se encontró el producto:", producto_db)
                 if not producto_db:
                     continue
 
                 precio_original = float(prod.get("precio_original", 0))
                 precio_final = float(prod.get("precio_final", precio_original))
-                print("precio original:", precio_original, "precio final:", precio_final)
                 descuento = prod.get("descuento_aplicado")
-
                 cantidad = prod.get("cantidad", 1)
                 subtotal = precio_final * cantidad
                 total += subtotal
+
+               # Tomamos la variante directamente como viene del frontend
+                variante = prod.get("variante")  # ya viene plana { color: {...}, tamaño: "A4", ... }
 
                 productos_finales.append({
                     "productoId": prod["productoId"],
                     "productoNombre": prod.get("nombre", producto_db.get("nombre_producto", "Producto sin nombre")),
                     "cantidad": cantidad,
-                    "color": prod.get("color"),
+                    "variante": variante,  # <-- guardamos la variante plana
                     "precio_original": precio_original,
                     "precio_final": precio_final,
                     "precio_unitario": precio_final,
@@ -58,8 +57,6 @@ class PedidosModel:
             }
 
             result = self.mongo.db.Pedidos.insert_one(pedido_data)
-
-            # print("📧 cliente_email recibido:", data.get("cliente_email"))
 
             return {
                 "mensaje": "Pedido creado exitosamente",

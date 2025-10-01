@@ -16,13 +16,13 @@ def create_pedido():
     # print("Respuesta de create_pedido en el controlador:", response)
 
     # # Si se creó bien el pedido, mandamos mail
-    if "pedido_id" in response and response.get("cliente_email"):
-        enviar_confirmacion_pedido(
-            response["cliente_email"],
-            response.get("cliente_nombre", "Cliente"),
-            response["pedido_id"],
-            response["total"]
-        )
+    # if "pedido_id" in response and response.get("cliente_email"):
+    #     enviar_confirmacion_pedido(
+    #         response["cliente_email"],
+    #         response.get("cliente_nombre", "Cliente"),
+    #         response["pedido_id"],
+    #         response["total"]
+    #     )
 
     return response
 
