@@ -42,7 +42,7 @@ const DetallePedido = () => {
   useEffect(() => {
     axios.get(`http://localhost:5000/Pedidos/viewPedido/${id}`, { withCredentials: true })
       .then(res => {setPedido(res.data)
-        // console.log("pedido - lo que llega al front desde el back" ,res.data)
+        console.log("pedido - lo que llega al front desde el back" ,res.data)
       }
     )
       .catch(err => {
@@ -177,7 +177,7 @@ const DetallePedido = () => {
                       {Object.entries(prod.variante).map(([atributo, valor]) => (
                         <div key={atributo} className="flex items-center gap-2">
                           <span className="capitalize">{atributo}:</span>
-                          {typeof valor === "object" && valor.hex ? (
+                          {valor.hex ? (
                             <>
                               <span
                                 className="w-4 h-4 rounded-full border"
@@ -186,10 +186,11 @@ const DetallePedido = () => {
                               <span>{valor.name}</span>
                             </>
                           ) : (
-                            <span>{valor}</span>
+                            <span>{valor.name}</span>
                           )}
                         </div>
                       ))}
+
                     </div>
                   )}
 

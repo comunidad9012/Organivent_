@@ -10,12 +10,13 @@ import { toast } from 'sonner';
 import GaleriaProducto from "./FormProducto/GaleriaProducto";
 import NombreProducto from "./FormProducto/NombreProducto";
 import GaleriaImagenesForm from "./FormProducto/GaleriaImagenesForm";
-import ColoresDisponibles from "./FormProducto/ColoresDisponibles";
 import CategoriaForm from "./FormProducto/CategoriaForm";
 import DescripcionProducto from "./FormProducto/DescripcionProducto";
 import BotonSubmit from "./FormProducto/BotonSubmit";
 import VariantesStockForm from "./FormProducto/VariantesStockForm";
 import PrecioForm from "./FormProducto/PrecioForm";
+
+import OpcionesProducto from './FormProducto/ColoresDisponibles';
 
 function FormProductoModern() {
   const { id } = useParams();
@@ -296,11 +297,10 @@ function FormProductoModern() {
               {/* Precio */}
               <PrecioForm producto={producto} setProducto={setProducto} />
 
-              <ColoresDisponibles
+    
+              <OpcionesProducto
                 producto={producto}
                 setProducto={setProducto}
-                nuevoColor={nuevoColor}
-                setNuevoColor={setNuevoColor}
               />
 
               {/* Variantes */}

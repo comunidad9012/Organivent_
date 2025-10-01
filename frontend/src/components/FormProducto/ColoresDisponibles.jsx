@@ -1,100 +1,228 @@
-// ColoresDisponibles.jsx
-export default function ColoresDisponibles({ producto, setProducto, nuevoColor, setNuevoColor }) {
-  const coloresCount = (producto.colores || []).length;
+import { useState } from "react";
+import { X } from "lucide-react";
+
+export default function OpcionesProducto({ producto, setProducto }) {
+  const [showModal, setShowModal] = useState(false);
+  const [opcionNombre, setOpcionNombre] = useState(""); // ej: Tamaño, Material
+  const [tipo, setTipo] = useState("lista"); // lista | color
+  const [posibilidades, setPosibilidades] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      if (inputValue.trim() !== "") {
+        const nueva = { name: inputValue.trim() };
+        if (tipo === "color") {
+          nueva.hex = "#000000"; // valor por defecto
+        }
+        setPosibilidades([...posibilidades, nueva]);
+        setInputValue("");
+      }
+    }
+  };
+
+  const actualizarColor = (idx, hex) => {
+    const nuevas = [...posibilidades];
+    nuevas[idx].hex = hex;
+    setPosibilidades(nuevas);
+  };
+
+  const eliminarOpcion = (idx) => {
+    setPosibilidades(posibilidades.filter((_, i) => i !== idx));
+  };
+
+  const handleGuardarOpcion = async () => {
+    if (!opcionNombre || posibilidades.length === 0) return;
+
+    // Guardar en estado local del producto
+    setProducto((prev) => ({
+      ...prev,
+      opciones: [
+        ...(prev.opciones || []),
+        { nombre: opcionNombre, tipo, valores: posibilidades },
+      ],
+    }));
+
+    // Guardar en DB como { atributos: { [opcionNombre]: {...} } }
+    for (const variante of posibilidades) {
+      const normalizedKey = opcionNombre.toLowerCase().trim();
+      await fetch("http://localhost:5000/Variantes/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          producto_id: producto._id,
+          atributos: {
+            [normalizedKey]: {
+              name: variante.name, // siempre string
+              ...(variante.hex ? { hex: variante.hex } : {}),
+            },
+          },
+        }),
+      });
+    }
+
+    // Resetear modal
+    setOpcionNombre("");
+    setTipo("lista");
+    setPosibilidades([]);
+    setInputValue("");
+    setShowModal(false);
+  };
 
   return (
-    <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-6 rounded-xl border border-emerald-200">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          Colores Disponibles
-        </h4>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-          coloresCount > 0
-            ? 'bg-emerald-100 text-emerald-800' 
-            : 'bg-gray-100 text-gray-600'
-        }`}>
-          {coloresCount} color{coloresCount !== 1 ? 'es' : ''}
-        </span>
+    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-6 rounded-xl border border-indigo-200">
+      <h4 className="text-lg font-semibold text-gray-800 mb-4">
+        Opciones del producto
+      </h4>
+
+      {/* Botón para abrir modal */}
+      <button
+        type="button"
+        onClick={() => setShowModal(true)}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
+      >
+        + Agregar opciones
+      </button>
+
+      {/* Listado de opciones agregadas */}
+      <div className="mt-4 space-y-2">
+        {producto.opciones?.length > 0 ? (
+          producto.opciones.map((opt, i) => (
+            <div
+              key={i}
+              className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm"
+            >
+              <p className="font-medium">
+                {opt.nombre} ({opt.tipo})
+              </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {opt.valores.map((v, idx) =>
+                  opt.tipo === "color" ? (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span
+                        className="w-5 h-5 rounded-full border"
+                        style={{ backgroundColor: v.hex }}
+                      ></span>
+                      <span>{v.name}</span>
+                    </div>
+                  ) : (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 bg-gray-100 rounded text-sm"
+                    >
+                      {v.name || v}
+                    </span>
+                  )
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm">No hay opciones agregadas</p>
+        )}
       </div>
 
-      {/* Formulario para añadir color */}
-      <div className="mb-4 p-4 bg-white/60 backdrop-blur-sm rounded-lg border border-emerald-200">
-        <div className="flex items-center gap-3">
-          <div className="flex-[2]">
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[90%] md:w-[500px]">
+            <h3 className="text-lg font-semibold mb-4">
+              Agregar opciones de producto
+            </h3>
+
+            {/* Nombre de la opción */}
+            <label className="block mb-2 text-sm">Nombre de la opción</label>
             <input
               type="text"
-              placeholder="Nombre del color"
-              value={nuevoColor.name || ''}
-              onChange={(e) => setNuevoColor(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white bg-opacity-95 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+              value={opcionNombre}
+              onChange={(e) => setOpcionNombre(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg mb-3"
+              placeholder="Ej: Tamaño, Material, etc."
             />
-          </div>
-          
-          <div className="flex-[1]">
-            <input
-              type="color"
-              value={nuevoColor.hex || '#000000'}
-              onChange={(e) => setNuevoColor(prev => ({ ...prev, hex: e.target.value }))}
-              className="w-12 h-10 p-1 border border-gray-300 rounded-lg bg-white cursor-pointer hover:shadow-md transition-all duration-200"
-              title="Seleccionar color"
-            />
-          </div>
-          
-          <button
-            type="button"
-            onClick={() => {
-              if (nuevoColor.name && nuevoColor.hex) {
-                setProducto(prev => ({
-                  ...prev,
-                  colores: [...(prev.colores || []), nuevoColor]
-                }));
-                setNuevoColor({ name: '', hex: '#000000' });
-              }
-            }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!nuevoColor.name || !nuevoColor.hex}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Añadir
-          </button>
-        </div>
-      </div>
 
-      {/* Mostrar colores existentes */}
-      {coloresCount > 0 ? (
-        <div className="flex gap-2 flex-wrap">
-          {(producto.colores || []).map((color, index) => (
-            <div 
-              key={index} 
-              className="inline-flex items-center gap-2 px-3 py-2 bg-white/80 backdrop-blur-sm rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 group"
-            >
-              <div
-                className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
-                style={{ backgroundColor: color.hex }}
-                title={`${color.name} - ${color.hex}`}
-              />
-              <span className="text-sm font-medium text-gray-700">{color.name}</span>
+            {/* Tipo */}
+            <label className="block mb-2 text-sm">
+              Mostrar en página de producto como:
+            </label>
+            <div className="flex gap-4 mb-3">
               <button
                 type="button"
-                onClick={() => {
-                  setProducto(prev => ({
-                    ...prev,
-                    colores: (prev.colores || []).filter((_, i) => i !== index)
-                  }));
-                }}
-                className="ml-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full p-1 transition-all duration-200"
-                title="Eliminar color"
+                onClick={() => setTipo("lista")}
+                className={`px-4 py-2 rounded-lg border ${
+                  tipo === "lista" ? "bg-indigo-600 text-white" : "bg-gray-100"
+                }`}
               >
-                ✕
+                Lista
+              </button>
+              <button
+                type="button"
+                onClick={() => setTipo("color")}
+                className={`px-4 py-2 rounded-lg border ${
+                  tipo === "color" ? "bg-indigo-600 text-white" : "bg-gray-100"
+                }`}
+              >
+                Color
               </button>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-2">
-          <p className="text-gray-400 text-xs">Añade un color para crear variantes</p>
+
+            {/* Input de valores */}
+            <label className="block font-semibold mb-1">
+              Escribe las posibilidades:
+            </label>
+            <input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Presiona Enter o , para agregar"
+              className="border rounded px-2 py-2 w-full mb-3"
+            />
+
+            {/* Pills */}
+            <div className="flex gap-2 flex-wrap mt-2 mb-4">
+              {posibilidades.map((opt, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-2 px-2 py-1 bg-gray-100 rounded-full shadow-sm"
+                >
+                  {tipo === "color" ? (
+                    <>
+                      <input
+                        type="color"
+                        value={opt.hex}
+                        onChange={(e) => actualizarColor(idx, e.target.value)}
+                      />
+                      <span>{opt.name}</span>
+                    </>
+                  ) : (
+                    <span>{opt.name}</span>
+                  )}
+                  <X
+                    className="w-4 h-4 cursor-pointer text-gray-600"
+                    onClick={() => eliminarOpcion(idx)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Botones modal */}
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 bg-gray-200 rounded-lg"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleGuardarOpcion}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
