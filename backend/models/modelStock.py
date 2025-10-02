@@ -20,3 +20,13 @@ class StockModel:
 
     def get_stock_by_variante(self, variante_id):
         return self.mongo.db.Stock.find_one({"variante_id": ObjectId(variante_id)})
+
+
+    def update_stock(self, stock_id, data):
+        result = self.mongo.db.Stock.update_one(
+            {"_id": ObjectId(stock_id)},
+            {"$set": {"cantidad": int(data.get("cantidad", 0))}}
+        )
+        if result.matched_count:
+            return self.mongo.db.Stock.find_one({"_id": ObjectId(stock_id)})
+        return None

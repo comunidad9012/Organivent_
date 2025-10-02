@@ -18,3 +18,13 @@ class VariantesModel:
 
     def get_variantes_by_producto(self, producto_id):
         return list(self.mongo.db.Variantes.find({"producto_id": ObjectId(producto_id)}))
+
+
+    def update_variante(self, variante_id, data):
+        result = self.mongo.db.Variantes.update_one(
+            {"_id": ObjectId(variante_id)},
+            {"$set": {"atributos": data.get("atributos", {})}}
+        )
+        if result.matched_count:
+            return self.mongo.db.Variantes.find_one({"_id": ObjectId(variante_id)})
+        return None

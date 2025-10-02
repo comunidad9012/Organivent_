@@ -120,7 +120,7 @@ class ProductosModel:
         return producto
 
     
-    def find_Productos(self, palabra):
+    def find_Productos(self, palabra): #para buscar productos por nombre o descripcion en el buscador
         regex = re.compile(f".*{re.escape(palabra)}.*", re.IGNORECASE)
         pipeline = [
             {

@@ -26,3 +26,17 @@ def get_variantes_by_producto(producto_id):
     variantes = [serialize_doc(v) for v in variantes]
     return jsonify(variantes), 200
 
+
+@Variantes_bp.put("/update/<variante_id>")
+def update_variante(variante_id):
+    data = request.json
+    model = VariantesModel(current_app)
+    variante_actualizada = model.update_variante(variante_id, data)
+
+    if not variante_actualizada:
+        return jsonify({"error": "Variante no encontrada"}), 404
+
+    if "_id" in variante_actualizada and isinstance(variante_actualizada["_id"], ObjectId):
+        variante_actualizada["_id"] = str(variante_actualizada["_id"])
+
+    return jsonify(variante_actualizada), 200

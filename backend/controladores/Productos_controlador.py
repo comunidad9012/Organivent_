@@ -120,20 +120,6 @@ def update_product(id):
     response = Productos_model.update_product(id, data)  # Llama al método del modelo.
     return response  # Devuelve la respuesta.
 
-#ESTO CREO QUE ES PARA APLICAR DESCUENTOS AL PRODUCTO ACTUALIZADO
-
-# @Productos_bp.put("/update/<id>")
-# def update_product(id):
-#     data = request.json
-#     Productos_model = ProductosModel(current_app)
-#     Descuento_model = Descuento(current_app)
-
-#     response = Productos_model.update_product(id, data)
-#     producto_actualizado = response.get_json()
-#     descuentos = Descuento_model.obtener_descuentos_activos()
-#     producto_actualizado = aplicar_descuentos_a_productos([producto_actualizado], descuentos)[0]
-
-#     return jsonify(producto_actualizado)
 
 @Productos_bp.get("/es_favorito/<product_id>")
 def es_favorito(product_id):

@@ -13,19 +13,34 @@ function ModalVariantes({ producto, setProducto, onClose }) {
 
   const stop = (e) => e.stopPropagation();
 
+  // const handleVarianteChange = (index, field, value) => {
+  //   const nuevas = [...(producto.variantes || [])];
+  //   if (field === "cantidad") nuevas[index].cantidad = Number(value);
+  //   else nuevas[index].atributos[field] = value;
+  //   setProducto((prev) => ({ ...prev, variantes: nuevas }));
+  // };
   const handleVarianteChange = (index, field, value) => {
     const nuevas = [...(producto.variantes || [])];
-    if (field === "cantidad") nuevas[index].cantidad = Number(value);
-    else nuevas[index].atributos[field] = value;
+    nuevas[index].atributos[field] = { name: value }; // 👈 compatibilidad con formato opciones
     setProducto((prev) => ({ ...prev, variantes: nuevas }));
   };
+
+  // const addVariante = () => {
+  //   setProducto((prev) => ({
+  //     ...prev,
+  //     variantes: [
+  //       ...(prev.variantes || []),
+  //       { atributos: { color: "" }, cantidad: 0 },
+  //     ],
+  //   }));
+  // };
 
   const addVariante = () => {
     setProducto((prev) => ({
       ...prev,
       variantes: [
         ...(prev.variantes || []),
-        { atributos: { color: "" }, cantidad: 0 },
+        { atributos: {}, cantidad: 0 }, // 👈 genérico
       ],
     }));
   };

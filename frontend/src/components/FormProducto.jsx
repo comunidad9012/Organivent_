@@ -63,16 +63,13 @@ function FormProductoModern() {
       fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
         .then((response) => response.json())
         .then((data) => {
-          // Transformar variantes para el formulario
-          const variantesTransformadas =
-            data.variantes?.map((v) => ({
-              atributos: {
-                color: v.atributos.color?.name || "", //esto está mal, no sabemos que titulo va a tener el atributo
-                tamaño: v.atributos.tamaño || "",
-              },
-              cantidad: v.stock || 0,
-            })) || [];
-
+          console.log("Producto cargado para editar:", data);
+          const variantesTransformadas = (data.variantes || []).map((v) => ({
+            _id: v._id,
+            stock_id: v.stock?._id,
+            atributos: v.atributos,
+            cantidad: v.stock?.cantidad || 0,
+          }));
           setProducto({
             ...data,
             es_stock: variantesTransformadas.length > 0,
@@ -183,83 +180,76 @@ function FormProductoModern() {
       const productoId = productoCreado._id;
       console.log("productos.variantes:", producto.variantes);
 
-      // 4️⃣ Si hay variantes -> procesarlas
       if (producto.variantes?.length > 0) {
-        console.log("Variantes a crear:", producto.variantes);
-
         for (const variante of producto.variantes) {
-          const varianteBody = {
-            producto_id: productoId,
-            atributos: variante.atributos,
-          };
+          // Si la variante ya tiene _id → update, sino → create
+          if (variante._id) {
+            // Actualizar variante
+            await fetch(
+              `http://localhost:5000/Variantes/update/${variante._id}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ atributos: variante.atributos }),
+              }
+            );
 
-          console.log("🔥 varianteBody que se manda al backend:", varianteBody);
+            // Actualizar stock si existe
+            if (variante.stock_id) {
+              await fetch(
+                `http://localhost:5000/Stock/update/${variante.stock_id}`,
+                {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ cantidad: variante.cantidad }),
+                }
+              );
+            } else {
+              // Crear stock si no existe
+              const stockRes = await fetch(
+                "http://localhost:5000/Stock/create",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    variante_id: variante._id,
+                    cantidad: variante.cantidad,
+                  }),
+                }
+              );
+              const stockData = await stockRes.json();
+              variante.stock_id = stockData._id;
+            }
+          } else {
+            // Crear variante nueva
+            const varianteRes = await fetch(
+              "http://localhost:5000/Variantes/create",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  producto_id: productoId,
+                  atributos: variante.atributos,
+                }),
+              }
+            );
+            const varianteData = await varianteRes.json();
+            variante._id = varianteData._id;
 
-          const varianteRes = await fetch(
-            "http://localhost:5000/Variantes/create",
-            {
+            // Crear stock
+            const stockRes = await fetch("http://localhost:5000/Stock/create", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(varianteBody),
-            }
-          );
-
-          if (!varianteRes.ok) {
-            console.error(
-              "❌ Error creando variante:",
-              await varianteRes.text()
-            );
-            continue;
-          }
-
-          const varianteCreada = await varianteRes.json();
-          console.log("✅ Variante creada:", varianteCreada);
-
-          // Stock
-          const stockRes = await fetch("http://localhost:5000/Stock/create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              variante_id: varianteCreada._id,
-              cantidad: variante.cantidad,
-            }),
-          });
-
-          if (!stockRes.ok) {
-            console.error("❌ Error creando stock:", await stockRes.text());
-          } else {
-            console.log("✅ Stock creado para variante:", varianteCreada._id);
+              body: JSON.stringify({
+                variante_id: variante._id,
+                cantidad: variante.cantidad,
+              }),
+            });
+            const stockData = await stockRes.json();
+            variante.stock_id = stockData._id;
           }
         }
       }
-
-      // if (!producto.variantes || producto.variantes.length === 0) {
-      //   const varianteBody = {
-      //     producto_id: productoId,
-      //     atributos: { default: { name: "unico" } },
-      //   };
-
-      //   const varianteRes = await fetch(
-      //     "http://localhost:5000/Variantes/create",
-      //     {
-      //       method: "POST",
-      //       headers: { "Content-Type": "application/json" },
-      //       body: JSON.stringify(varianteBody),
-      //     }
-      //   );
-
-      //   const varianteCreada = await varianteRes.json();
-
-      //   // Crear stock lo dejamos comentado por ahora
-      //   // await fetch("http://localhost:5000/Stock/create", {
-      //   //   method: "POST",
-      //   //   headers: { "Content-Type": "application/json" },
-      //   //   body: JSON.stringify({
-      //   //     variante_id: varianteCreada._id,
-      //   //     cantidad: producto.stock || 0,
-      //   //   }),
-      //   // });
-      // }
 
       setLoading(false);
       toast.success(id ? "Producto actualizado!" : "Producto creado!");
