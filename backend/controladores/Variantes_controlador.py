@@ -8,8 +8,10 @@ Variantes_bp = Blueprint('Variantes', __name__, url_prefix='/Variantes')
 @Variantes_bp.post("/create")
 def create_variante():
     data = request.json
+    print("📥 Datos recibidos en /Variantes/create:", data, flush=True)
     model = VariantesModel(current_app) 
     variante = model.create_variante(data)
+    print("✅ Variante creada en Mongo:", variante, flush=True)
 
     # Convertir ObjectId a str si existe
     if "_id" in variante and isinstance(variante["_id"], ObjectId):

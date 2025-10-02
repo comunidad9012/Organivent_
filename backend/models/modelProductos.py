@@ -47,13 +47,17 @@ class ProductosModel:
                 'precio_venta': data.get('precio_venta', 0),
                 'categoria_id': categoria_id,
                 'imagenes': imagenes_objids,
-                'colores': data.get('colores', [])
             }
 
             result = self.mongo.db.Productos.insert_one(Productos_data)
-            return {"contenido": "exitoso", "_id": str(result.inserted_id)}
+            print("Producto insertado: ", Productos_data)
+
+            # ⚡ Devolver siempre con ID
+            return {"_id": str(result.inserted_id), "contenido": "exitoso"}, 201
+
         else:
-            return {"contenido": "no funciona"}
+            return {"error": "nombre_producto es requerido"}, 400
+
 
 
     def delete_product_by_id(self, product_id):
@@ -175,7 +179,7 @@ class ProductosModel:
         return Response(json_util.dumps(productos), mimetype="application/json")
 
 
-    def update_product(self, product_id, data):
+    def update_product(self, product_id, data): #si me llega a dar error fijarme en los status que tiene que devolver igual el controlador del update no tiene el status
         try:
             update_fields = {}
 
@@ -185,7 +189,7 @@ class ProductosModel:
                 update_fields['descripcion'] = data['descripcion']
             if 'precio_venta' in data:
                 update_fields['precio_venta'] = data['precio_venta']
-            if 'colores' in data:
+            if 'colores' in data: #ver este campo -----------------------------
                 update_fields['colores'] = data['colores']
             if 'imagenes' in data:
                 # convertir a ObjectId list

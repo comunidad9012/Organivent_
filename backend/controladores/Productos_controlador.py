@@ -23,8 +23,8 @@ def create_Productos():
         return jsonify({"errors": errores}), 400
 
     Productos_model = ProductosModel(current_app)
-    response = Productos_model.create_Productos(data)
-    return response
+    response, status = Productos_model.create_Productos(data)
+    return jsonify(response), status
 
 @Productos_bp.delete("/deleteProductos/<id>")
 def delete_product(id):

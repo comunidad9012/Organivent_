@@ -32,37 +32,70 @@ export default function OpcionesProducto({ producto, setProducto }) {
     setPosibilidades(posibilidades.filter((_, i) => i !== idx));
   };
 
+  // const handleGuardarOpcion = async () => {
+  //   if (!opcionNombre || posibilidades.length === 0) return;
+
+  //   // Guardar en estado local del producto
+  //   setProducto((prev) => ({
+  //     ...prev,
+  //     opciones: [
+  //       ...(prev.opciones || []),
+  //       { nombre: opcionNombre, tipo, valores: posibilidades },
+  //     ],
+  //   }));
+
+  //   // // Guardar en DB como { atributos: { [opcionNombre]: {...} } }
+  //   // for (const variante of posibilidades) {
+  //   //   const normalizedKey = opcionNombre.toLowerCase().trim();
+  //   //   await fetch("http://localhost:5000/Variantes/create", {
+  //   //     method: "POST",
+  //   //     headers: { "Content-Type": "application/json" },
+  //   //     body: JSON.stringify({
+  //   //       producto_id: producto._id,
+  //   //       atributos: {
+  //   //         [normalizedKey]: {
+  //   //           name: variante.name, // siempre string
+  //   //           ...(variante.hex ? { hex: variante.hex } : {}),
+  //   //         },
+  //   //       },
+  //   //     }),
+  //   //   });
+  //   // }
+
+  //   // Resetear modal
+  //   setOpcionNombre("");
+  //   setTipo("lista");
+  //   setPosibilidades([]);
+  //   setInputValue("");
+  //   setShowModal(false);
+  // };
+
   const handleGuardarOpcion = async () => {
     if (!opcionNombre || posibilidades.length === 0) return;
 
-    // Guardar en estado local del producto
-    setProducto((prev) => ({
-      ...prev,
-      opciones: [
-        ...(prev.opciones || []),
-        { nombre: opcionNombre, tipo, valores: posibilidades },
-      ],
+    const normalizedKey = opcionNombre.toLowerCase().trim();
+
+    // Mapear posibilidades a variantes
+    const nuevasVariantes = posibilidades.map((pos) => ({
+      atributos: {
+        [normalizedKey]: {
+          name: pos.name,
+          ...(pos.hex ? { hex: pos.hex } : {}),
+        },
+      },
+      cantidad: 0, // stock por defecto
     }));
 
-    // // Guardar en DB como { atributos: { [opcionNombre]: {...} } }
-    // for (const variante of posibilidades) {
-    //   const normalizedKey = opcionNombre.toLowerCase().trim();
-    //   await fetch("http://localhost:5000/Variantes/create", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({
-    //       producto_id: producto._id,
-    //       atributos: {
-    //         [normalizedKey]: {
-    //           name: variante.name, // siempre string
-    //           ...(variante.hex ? { hex: variante.hex } : {}),
-    //         },
-    //       },
-    //     }),
-    //   });
-    // }
+    setProducto((prev) => ({
+      ...prev,
+      // Solo dejamos 1 título de opciones, el último agregado
+      opciones: [{ nombre: opcionNombre, tipo, valores: posibilidades }],
+      variantes: nuevasVariantes, // reemplazamos variantes
+    }));
 
-    // Resetear modal
+    console.log("Nuevas variantes agregadas:", nuevasVariantes);
+
+    // Reset modal
     setOpcionNombre("");
     setTipo("lista");
     setPosibilidades([]);

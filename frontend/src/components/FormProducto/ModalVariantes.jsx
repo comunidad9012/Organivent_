@@ -64,68 +64,42 @@ function ModalVariantes({ producto, setProducto, onClose }) {
         </div>
 
         <div className="p-4 bg-white bg-opacity-90">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="bg-gray-100 bg-opacity-70">
-                <th className="p-2 border">Color</th>
-                <th className="p-2 border">Cantidad</th>
-                <th className="p-2 border">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(producto.variantes || []).map((v, i) => (
-                <tr
-                  key={i}
-                  className="border-b hover:bg-gray-50 hover:bg-opacity-50"
-                >
-                  <td className="p-2">
-                    <select
-                      value={v.atributos.color || ""}
-                      onChange={(e) =>
-                        handleVarianteChange(i, "color", e.target.value)
-                      }
-                      className="border p-1 rounded w-full bg-white bg-opacity-90"
-                    >
-                      <option value="">-- Seleccionar color --</option>
-                      {(producto.colores || []).map((c, idx) => (
-                        <option key={idx} value={c.name}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-
-                  <td className="p-2">
-                    <input
-                      type="number"
-                      value={v.cantidad ?? ""}
-                      onChange={(e) =>
-                        handleVarianteChange(i, "cantidad", e.target.value)
-                      }
-                      className="border p-1 rounded w-28 bg-white bg-opacity-90"
-                    />
-                  </td>
-                  <td className="p-2 text-center">
-                    <button
-                      type="button"
-                      onClick={() => removeVariante(i)}
-                      className="px-2 py-1 bg-red-500 bg-opacity-90 text-white rounded hover:bg-opacity-100"
-                    >
-                      Eliminar
-                    </button>
-                  </td>
+          {producto.variantes?.length > 0 && (
+            <table className="w-full border mt-4">
+              <thead>
+                <tr className="bg-gray-100">
+                  {/* Mostrar el título de opción dinámicamente */}
+                  <th className="px-4 py-2">{producto.opciones[0]?.nombre}</th>
+                  <th className="px-4 py-2">Stock</th>
                 </tr>
-              ))}
+              </thead>
+              <tbody>
+                {producto.variantes.map((variante, idx) => {
+                  const key = Object.keys(variante.atributos)[0]; // ej: "tamaño"
+                  const value = variante.atributos[key].name; // ej: "S"
 
-              {(!producto.variantes || producto.variantes.length === 0) && (
-                <tr>
-                  <td colSpan={4} className="p-4 text-center text-gray-500">
-                    No hay variantes. Añade una.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                  return (
+                    <tr key={idx} className="border-t">
+                      <td className="px-4 py-2">{value}</td>
+                      <td className="px-4 py-2">
+                        <input
+                          type="number"
+                          value={variante.cantidad || 0}
+                          min={0}
+                          onChange={(e) => {
+                            const nuevas = [...producto.variantes];
+                            nuevas[idx].cantidad = parseInt(e.target.value, 10);
+                            setProducto({ ...producto, variantes: nuevas });
+                          }}
+                          className="border rounded px-2 py-1 w-24"
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
 
           <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-200">
             <button

@@ -17,7 +17,6 @@ import VariantesStockForm from "./FormProducto/VariantesStockForm";
 import PrecioForm from "./FormProducto/PrecioForm";
 import OpcionesProducto from "./FormProducto/OpcionesDisponibles";
 
-
 function FormProductoModern() {
   const { id } = useParams();
   const editorRef = useRef(null);
@@ -29,7 +28,7 @@ function FormProductoModern() {
     descripcion: "",
     precio_venta: "",
     imagenes: [],
-    colores: [],
+    // colores: [],
     categoria_id: "",
   });
   const [categorias, setCategorias] = useState([]);
@@ -40,7 +39,7 @@ function FormProductoModern() {
   });
   const [mostrarFormularioCategoria, setMostrarFormularioCategoria] =
     useState(false);
-  const [nuevoColor, setNuevoColor] = useState({ name: "", hex: "#000000" });
+  // const [nuevoColor, setNuevoColor] = useState({ name: "", hex: "#000000" });
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [currentThumbnailIndex, setCurrentThumbnailIndex] = useState(0);
 
@@ -68,7 +67,7 @@ function FormProductoModern() {
           const variantesTransformadas =
             data.variantes?.map((v) => ({
               atributos: {
-                color: v.atributos.color?.name || "",
+                color: v.atributos.color?.name || "", //esto está mal, no sabemos que titulo va a tener el atributo
                 tamaño: v.atributos.tamaño || "",
               },
               cantidad: v.stock || 0,
@@ -132,7 +131,7 @@ function FormProductoModern() {
       }
 
       const data = await response.json();
-      console.log("Respuesta backend imágenes:", data);
+      // console.log("Respuesta backend imágenes:", data);
       return data.locations; // backend devuelve [{ _id, filename, url }]
     } catch (error) {
       console.error("Error al subir imágenes:", error);
@@ -152,15 +151,17 @@ function FormProductoModern() {
         url: img.url,
       }));
 
-      // 2️⃣ Construir objeto final del producto (sin variantes/es_stock)
-      const { variantes, es_stock, ...productoSinVariantes } = producto;
+      // 2️⃣ Construir objeto final del producto
+      const { variantes, es_stock, ...productoSinVariantes } = producto; // como es que guarda el stock en un producto sin variables si quedamos en que lo iba a guardar en una variante "unica" para linkearle el stock?
+
+      console.log("variantes desestructuradas:", variantes);
 
       const finalProducto = {
         ...productoSinVariantes,
         imagenes: [...(producto.imagenes || []), ...nuevasImgs],
       };
 
-      // 3️⃣ Crear o actualizar producto
+      // 3️⃣ Guardar producto (create o update)
       const url = id
         ? `http://localhost:5000/Productos/update/${id}`
         : "http://localhost:5000/Productos/createProductos";
@@ -174,39 +175,48 @@ function FormProductoModern() {
       });
 
       if (!productoRes.ok) throw new Error("Error al guardar producto");
-
+      //borrar
       const productoCreado = await productoRes.json();
-      console.log("Producto guardado:", productoCreado);
+
+      console.log("\nProducto ID A VERRR SI SALE:", productoCreado._id);
+
+      const productoId = productoCreado._id;
+      console.log("productos.variantes:", producto.variantes);
 
       // 4️⃣ Si hay variantes -> procesarlas
-      if (producto.es_stock && producto.variantes?.length > 0) {
+      if (producto.variantes?.length > 0) {
+        console.log("Variantes a crear:", producto.variantes);
+
         for (const variante of producto.variantes) {
-          // Crear variante
+          const varianteBody = {
+            producto_id: productoId,
+            atributos: variante.atributos,
+          };
+
+          console.log("🔥 varianteBody que se manda al backend:", varianteBody);
+
           const varianteRes = await fetch(
             "http://localhost:5000/Variantes/create",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                producto_id: productoCreado._id, // 👈 siempre usar el que devuelve backend
-                atributos: {
-                  color: {
-                    name: variante.atributos.color,
-                    hex:
-                      producto.colores.find(
-                        (c) => c.name === variante.atributos.color
-                      )?.hex || "#ffffff",
-                  },
-                },
-              }),
+              body: JSON.stringify(varianteBody),
             }
           );
 
-          if (!varianteRes.ok) throw new Error("Error al guardar variante");
-          const varianteCreada = await varianteRes.json();
+          if (!varianteRes.ok) {
+            console.error(
+              "❌ Error creando variante:",
+              await varianteRes.text()
+            );
+            continue;
+          }
 
-          // Crear stock
-          await fetch("http://localhost:5000/Stock/create", {
+          const varianteCreada = await varianteRes.json();
+          console.log("✅ Variante creada:", varianteCreada);
+
+          // Stock
+          const stockRes = await fetch("http://localhost:5000/Stock/create", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -214,22 +224,54 @@ function FormProductoModern() {
               cantidad: variante.cantidad,
             }),
           });
+
+          if (!stockRes.ok) {
+            console.error("❌ Error creando stock:", await stockRes.text());
+          } else {
+            console.log("✅ Stock creado para variante:", varianteCreada._id);
+          }
         }
       }
 
+      // if (!producto.variantes || producto.variantes.length === 0) {
+      //   const varianteBody = {
+      //     producto_id: productoId,
+      //     atributos: { default: { name: "unico" } },
+      //   };
+
+      //   const varianteRes = await fetch(
+      //     "http://localhost:5000/Variantes/create",
+      //     {
+      //       method: "POST",
+      //       headers: { "Content-Type": "application/json" },
+      //       body: JSON.stringify(varianteBody),
+      //     }
+      //   );
+
+      //   const varianteCreada = await varianteRes.json();
+
+      //   // Crear stock lo dejamos comentado por ahora
+      //   // await fetch("http://localhost:5000/Stock/create", {
+      //   //   method: "POST",
+      //   //   headers: { "Content-Type": "application/json" },
+      //   //   body: JSON.stringify({
+      //   //     variante_id: varianteCreada._id,
+      //   //     cantidad: producto.stock || 0,
+      //   //   }),
+      //   // });
+      // }
+
       setLoading(false);
-      toast.success(
-        id ? "Producto actualizado con éxito!" : "Producto creado con éxito!"
-      );
+      toast.success(id ? "Producto actualizado!" : "Producto creado!");
       setTimeout(
         () =>
           navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.ADMIN}`, {
             replace: true,
           }),
-        2000
+        1500
       );
     } catch (error) {
-      console.error("Error en el proceso:", error);
+      console.error("Error en handleSubmit:", error);
       setLoading(false);
       toast.error("Error al guardar el producto.");
     }
