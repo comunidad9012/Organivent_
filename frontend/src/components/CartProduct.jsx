@@ -27,28 +27,56 @@ function CartProduct({ product, selectedVariante }) {
     setAdded(isInCart);
   }, [cart, product._id, selectedVariante]);
 
+  // const addToCart = () => {
+  //   // 1️⃣ Determinar el stock disponible
+  //   let stockDisponible = 0;
+
+  //   if (selectedVariante) {
+  //     // Caso con variante seleccionada
+  //     stockDisponible = selectedVariante?.stock?.cantidad ?? 0;
+  //   } else if (product.variantes?.length > 0) {
+  //     // Caso producto sin opciones → usar la única variante
+  //     stockDisponible = product.variantes[0]?.stock?.cantidad ?? 0;
+  //   }
+
+  //   // 2️⃣ Guardar el producto con su stock real
+  //   const productWithVariante = {
+  //     ...product,
+  //     selectedVariante: selectedVariante || null,
+  //     stockDisponible, // 👈 ahora viaja al cart
+  //   };
+
+  //   console.log("Adding to cart:", productWithVariante);
+
+  //   // 3️⃣ Dispatch al cart
+  //   dispatch({ type: "ADD_TO_CART", payload: productWithVariante });
+  //   setAdded(true);
+  // };
+
   const addToCart = () => {
-    // 1️⃣ Determinar el stock disponible
     let stockDisponible = 0;
+    let varianteId = null;
 
     if (selectedVariante) {
-      // Caso con variante seleccionada
       stockDisponible = selectedVariante?.stock?.cantidad ?? 0;
-    } else if (product.variantes?.length > 0) {
-      // Caso producto sin opciones → usar la única variante
+      varianteId = selectedVariante?._id;
+    } else if (product.variantes && product.variantes.length > 0) {
       stockDisponible = product.variantes[0]?.stock?.cantidad ?? 0;
+      varianteId = product.variantes[0]?._id;
     }
 
-    // 2️⃣ Guardar el producto con su stock real
+    if (stockDisponible <= 0) {
+      alert("Lo sentimos, no hay stock disponible de este producto.");
+      return;
+    }
+
     const productWithVariante = {
       ...product,
       selectedVariante: selectedVariante || null,
-      stockDisponible, // 👈 ahora viaja al cart
+      stockDisponible,
+      variante_id: varianteId,
     };
 
-    console.log("Adding to cart:", productWithVariante);
-
-    // 3️⃣ Dispatch al cart
     dispatch({ type: "ADD_TO_CART", payload: productWithVariante });
     setAdded(true);
   };
@@ -77,7 +105,14 @@ function CartProduct({ product, selectedVariante }) {
       <button
         className={`cartBtn mx-auto ${added ? "added" : ""}`}
         onClick={handleClick}
-        disabled={!isFormValid}
+        disabled={
+          !isFormValid ||
+          selectedVariante?.stock?.cantidad === 0 ||
+          (!selectedVariante &&
+            product.variantes &&
+            product.variantes.length > 0 &&
+            product.variantes[0]?.stock?.cantidad === 0)
+        }
       >
         <svg
           className="cart"
