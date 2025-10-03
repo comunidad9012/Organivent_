@@ -59,6 +59,26 @@ function FormProductoModern() {
   }, []);
 
   useEffect(() => {
+    if (!producto.opciones || producto.opciones.length === 0) {
+      // Si no existen variantes, inicializamos una variante "única"
+      if (!producto.variantes || producto.variantes.length === 0) {
+        setProducto((prev) => ({
+          ...prev,
+          variantes: [
+            {
+              _id: undefined,
+              stock_id: null,
+              atributos: { unica: { name: "Única" } },
+              cantidad: 0,
+            },
+          ],
+          es_stock: true,
+        }));
+      }
+    }
+  }, [producto.opciones]);
+
+  useEffect(() => {
     if (id) {
       const fetchProducto = async () => {
         setLoading(true);
@@ -76,7 +96,7 @@ function FormProductoModern() {
               _id: v._id,
               stock_id: v.stock?._id || null, // 👈 siempre string, nunca undefined
               atributos: v.atributos,
-              cantidad: existente ? existente.cantidad : (v.stock?.cantidad ?? 0),
+              cantidad: existente ? existente.cantidad : v.stock?.cantidad ?? 0,
             };
           });
 
