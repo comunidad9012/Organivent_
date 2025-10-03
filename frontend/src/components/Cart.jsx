@@ -106,33 +106,44 @@ export default function Cart() {
 
                     {/* Mostrar atributos de la variante seleccionada */}
                     {product.selectedVariante && (
-                      <div className="flex flex-col gap-1 my-2 text-sm text-muted-foreground">
-                        {Object.entries(product.selectedVariante.atributos || {})
-                          .map(([k, v]) => {
-                            if (k === "color" && v?.hex) {
-                              return (
-                                <div
-                                  key={k}
-                                  className="flex items-center gap-2"
-                                >
-                                  <span>
-                                    {k}: {v.name || v}
-                                  </span>
-                                  <div
-                                    className="w-5 h-5 rounded-full border border-gray-400"
-                                    style={{ backgroundColor: v.hex }}
-                                  />
-                                </div>
-                              );
-                            }
+                      <div className="flex flex-wrap gap-2 my-2 text-sm text-muted-foreground">
+                        {Object.entries(
+                          product.selectedVariante.atributos || {}
+                        ).map(([key, value]) => {
+                          if (value?.hex) {
+                            // renderiza color si tiene hex
                             return (
-                              <span key={k}>
-                                {k}: {typeof v === "object" ? v.name : v}
+                              <div
+                                key={key}
+                                title={`${key}: ${value.name || value}`}
+                                className="flex items-center gap-1"
+                              >
+                                <div
+                                  className="w-5 h-5 rounded-full border border-gray-400"
+                                  style={{ backgroundColor: value.hex }}
+                                />
+                                <span>{value.name || value}</span>
+                              </div>
+                            );
+                          } else {
+                            // renderiza pill de texto
+                            return (
+                              <span
+                                key={key}
+                                className="px-2 py-1 bg-gray-200 rounded-full text-xs"
+                              >
+                                {key}:{" "}
+                                {typeof value === "object" ? value.name : value}
                               </span>
                             );
-                          })}
+                          }
+                        })}
                         {Object.keys(product.selectedVariante.atributos || {})
-                          .length === 0 && <span>Variante: Única opción</span>}
+                          .length === 0 && (
+                          <span className="px-2 py-1 bg-gray-200 rounded-full text-xs">
+                            Variante: Única opción
+                          </span>
+                        )}
                       </div>
                     )}
 

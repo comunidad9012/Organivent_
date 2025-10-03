@@ -18,57 +18,66 @@ function ProductoDetail() {
   const isNotAdmin = userState.rol !== Roles.ADMIN;
 
   // useEffect(() => {
-  //   fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       setProducto(data);
-  //       if (data.imagenes && data.imagenes.length > 0) {
-  //         setImagenSeleccionada(data.imagenes[0].url);
+  //   async function fetchData() {
+  //     try {
+  //       // 1. Traer producto
+  //       const resProducto = await fetch(
+  //         `http://localhost:5000/Productos/viewProductos/${id}`
+  //       );
+  //       const dataProducto = await resProducto.json();
+
+  //       // 2. Traer variantes del producto
+  //       const resVariantes = await fetch(
+  //         `http://localhost:5000/Variantes/by_producto/${id}`
+  //       );
+  //       const dataVariantes = await resVariantes.json();
+
+  //       // 3. Para cada variante, traer el stock
+  //       const variantesConStock = await Promise.all(
+  //         dataVariantes.map(async (v) => {
+  //           const resStock = await fetch(
+  //             `http://localhost:5000/Stock/by_variante/${v._id}`
+  //           );
+  //           const stockData = await resStock.json();
+  //           return {
+  //             ...v,
+  //             stock: stockData?.cantidad ?? 0,
+  //           };
+  //         })
+  //       );
+
+  //       // 4. Guardamos producto y variantes en el estado
+  //       setProducto({
+  //         ...dataProducto,
+  //         variantes: variantesConStock,
+  //       });
+
+  //       if (dataProducto.imagenes && dataProducto.imagenes.length > 0) {
+  //         setImagenSeleccionada(dataProducto.imagenes[0].url);
   //       }
-  //     })
-  //     .catch(error => console.error('Error fetching data:', error));
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   }
+
+  //   fetchData();
   // }, [id]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // 1. Traer producto
         const resProducto = await fetch(
           `http://localhost:5000/Productos/viewProductos/${id}`
         );
         const dataProducto = await resProducto.json();
 
-        // 2. Traer variantes del producto
-        const resVariantes = await fetch(
-          `http://localhost:5000/Variantes/by_producto/${id}`
-        );
-        const dataVariantes = await resVariantes.json();
-
-        // 3. Para cada variante, traer el stock
-        const variantesConStock = await Promise.all(
-          dataVariantes.map(async (v) => {
-            const resStock = await fetch(
-              `http://localhost:5000/Stock/by_variante/${v._id}`
-            );
-            const stockData = await resStock.json();
-            return {
-              ...v,
-              stock: stockData?.cantidad ?? 0,
-            };
-          })
-        );
-
-        // 4. Guardamos producto y variantes en el estado
-        setProducto({
-          ...dataProducto,
-          variantes: variantesConStock,
-        });
+        setProducto(dataProducto);
 
         if (dataProducto.imagenes && dataProducto.imagenes.length > 0) {
           setImagenSeleccionada(dataProducto.imagenes[0].url);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching producto:", error);
       }
     }
 
@@ -162,15 +171,8 @@ function ProductoDetail() {
               </span>
               <div className="flex gap-3 flex-wrap">
                 {Producto.variantes.map((variante) => {
-                  // ejemplo: atributos = { color: {name:"Rojo", hex:"#ff0000"}, talle: "M" }
-                  const color = variante.atributos?.color;
-                  const otrosAtributos = Object.entries(
-                    variante.atributos || {}
-                  )
-                    .filter(([k]) => k !== "color")
-                    .map(
-                      ([k, v]) => `${k}: ${typeof v === "object" ? v.name : v}`
-                    );
+                  const attr = Object.values(variante.atributos || {})[0] || {}; // asumimos un atributo principal
+                  const esColor = attr.hex;
 
                   return (
                     <div
@@ -178,22 +180,27 @@ function ProductoDetail() {
                       className="flex flex-col items-center"
                     >
                       <div
-                        title={
-                          otrosAtributos.join(", ") || color?.name || "Opción"
-                        }
+                        title={attr.name || "Opción"}
                         onClick={() => setSelectedVariante(variante)}
-                        className={`w-8 h-8 rounded-full border border-black/10 cursor-pointer flex items-center justify-center text-xs ${
-                          selectedVariante?._id === variante._id
-                            ? "ring-2 ring-offset-2 ring-zinc-500"
-                            : ""
-                        }`}
-                        style={{ backgroundColor: color?.hex || "transparent" }}
+                        className={`cursor-pointer flex items-center justify-center 
+                ${
+                  esColor
+                    ? "w-8 h-8 rounded-full border"
+                    : "px-3 py-1 rounded-full border"
+                } 
+                ${
+                  selectedVariante?._id === variante._id
+                    ? "ring-2 ring-offset-2 ring-zinc-500"
+                    : ""
+                }`}
+                        style={esColor ? { backgroundColor: attr.hex } : {}}
                       >
-                        {!color && <span>✓</span>}{" "}
-                        {/* si no hay color, solo un check */}
+                        {!esColor && (
+                          <span className="text-sm">{attr.name}</span>
+                        )}
                       </div>
                       <span className="text-xs text-gray-500 mt-1">
-                        Stock: {variante.stock}
+                        Stock: {variante.stock?.cantidad ?? 0}
                       </span>
                     </div>
                   );
@@ -203,14 +210,11 @@ function ProductoDetail() {
               {selectedVariante && isNotAdmin && (
                 <p className="mt-2 text-sm text-gray-500">
                   Variante seleccionada:{" "}
-                  {Object.entries(selectedVariante.atributos || {}).length > 0
-                    ? Object.entries(selectedVariante.atributos)
-                        .map(
-                          ([k, v]) =>
-                            `${k}: ${typeof v === "object" ? v.name : v}`
-                        )
-                        .join(", ")
-                    : "Única opción"}
+                  {Object.entries(selectedVariante.atributos || {})
+                    .map(
+                      ([k, v]) => `${k}: ${typeof v === "object" ? v.name : v}`
+                    )
+                    .join(", ")}
                 </p>
               )}
               {!selectedVariante && isNotAdmin && (
@@ -224,9 +228,9 @@ function ProductoDetail() {
           {/* Agregar al carrito */}
           <div className="flex flex-col justify-end mt-6">
             {isNotAdmin && (
-              <CartProduct 
-                product={Producto} 
-                selectedVariante={selectedVariante} 
+              <CartProduct
+                product={Producto}
+                selectedVariante={selectedVariante}
               />
             )}
           </div>
