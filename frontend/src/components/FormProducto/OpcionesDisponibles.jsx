@@ -3,8 +3,8 @@ import { X, SquarePen } from "lucide-react";
 
 export default function OpcionesProducto({ producto, setProducto }) {
   const [showModal, setShowModal] = useState(false);
-  const [opcionNombre, setOpcionNombre] = useState(""); 
-  const [tipo, setTipo] = useState("lista"); 
+  const [opcionNombre, setOpcionNombre] = useState("");
+  const [tipo, setTipo] = useState("lista");
   const [posibilidades, setPosibilidades] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
@@ -45,17 +45,26 @@ export default function OpcionesProducto({ producto, setProducto }) {
   const handleGuardarOpcion = () => {
     if (!opcionNombre || posibilidades.length === 0) return;
 
-    const normalizedKey = opcionNombre.toLowerCase().trim();
+    const nuevasVariantes = posibilidades.map((pos) => {
+      const normalizedKey = opcionNombre.toLowerCase().trim();
 
-    const nuevasVariantes = posibilidades.map((pos) => ({
-      atributos: {
-        [normalizedKey]: {
-          name: pos.name,
-          ...(pos.hex ? { hex: pos.hex } : {}),
+      // buscar si ya existe una variante con este atributo
+      const varianteExistente = (producto.variantes || []).find(
+        (v) => v.atributos?.[normalizedKey]?.name === pos.name
+      );
+
+      return {
+        _id: varianteExistente?._id || undefined,
+        stock_id: varianteExistente?.stock_id || null,
+        atributos: {
+          [normalizedKey]: {
+            name: pos.name,
+            ...(pos.hex ? { hex: pos.hex } : {}),
+          },
         },
-      },
-      cantidad: 0,
-    }));
+        cantidad: varianteExistente ? varianteExistente.cantidad : 0,
+      };
+    });
 
     setProducto((prev) => ({
       ...prev,
@@ -78,7 +87,7 @@ export default function OpcionesProducto({ producto, setProducto }) {
       </h4>
 
       {/* Botón agregar o editar */}
-      {(!producto.opciones || producto.opciones.length === 0) ? (
+      {!producto.opciones || producto.opciones.length === 0 ? (
         <button
           type="button"
           onClick={() => setShowModal(true)}

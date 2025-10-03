@@ -60,27 +60,38 @@ function FormProductoModern() {
 
   useEffect(() => {
     if (id) {
-      fetch(`http://localhost:5000/Productos/viewProductos/${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Producto cargado para editar:", data);
-          const variantesTransformadas = (data.variantes || []).map((v) => ({
-            _id: v._id,
-            stock_id: v.stock?._id,
-            atributos: v.atributos,
-            cantidad: v.stock?.cantidad || 0,
-          }));
+      const fetchProducto = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(
+            `http://localhost:5000/Productos/viewProductos/${id}`
+          );
+          if (!res.ok) throw new Error("Error al cargar producto");
+          const data = await res.json();
+
+          // 🔹 Merge variantes: preserva cantidad y stock_id
+          const variantesTransformadas = (data.variantes || []).map((v) => {
+            const existente = producto?.variantes?.find((x) => x._id === v._id);
+            return {
+              _id: v._id,
+              stock_id: v.stock?._id || null, // 👈 siempre string, nunca undefined
+              atributos: v.atributos,
+              cantidad: existente ? existente.cantidad : (v.stock?.cantidad ?? 0),
+            };
+          });
+
           setProducto({
             ...data,
-            es_stock: variantesTransformadas.length > 0,
             variantes: variantesTransformadas,
-            // Guardamos una copia de las variantes originales para compararlas al guardar
-            variantes_existentes_backend: variantesTransformadas.map((v) => ({
-              ...v,
-            })),
+            variantes_existentes_backend: data.variantes || [],
           });
-        })
-        .catch((error) => console.error("Error al cargar el producto:", error));
+        } catch (error) {
+          console.error("Error al cargar producto:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProducto();
     }
   }, [id]);
 
