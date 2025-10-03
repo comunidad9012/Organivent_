@@ -3,7 +3,7 @@ import Productos from "../components/Productos"
 function Admin() {
   return (
     <div>
-      <h1>Usuario ADMIN</h1>
+      <div className="py-2"></div>
       <Productos/>
     </div>
   )

@@ -4,6 +4,8 @@ from bson import json_util
 from bson.objectid import ObjectId
 from datetime import datetime
 
+from models.modelStock import StockModel
+
 class PedidosModel:
     ESTADOS_VALIDOS = ["Pendiente", "Aceptado", "Listo para la entrega", "Cancelado", "Entregado"]
 
@@ -11,11 +13,70 @@ class PedidosModel:
         self.mongo = PyMongo(app)
 
 
+    # def create_pedido(self, data):
+    #     print("📦 Creando pedido en el modelo con datos del payload:", data)
+    #     if 'usuarioId' in data and 'productos' in data and data['productos']:
+    #         productos_finales = []
+    #         total = 0
+
+    #         for prod in data['productos']:
+    #             producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
+    #             if not producto_db:
+    #                 continue
+
+    #             precio_original = float(prod.get("precio_original", 0))
+    #             precio_final = float(prod.get("precio_final", precio_original))
+    #             descuento = prod.get("descuento_aplicado")
+    #             cantidad = prod.get("cantidad", 1)
+    #             subtotal = precio_final * cantidad
+    #             total += subtotal
+
+    #            # Tomamos la variante directamente como viene del frontend
+    #             variante = prod.get("variante")  # ya viene plana { color: {...}, tamaño: "A4", ... }
+
+    #             productos_finales.append({
+    #                 "productoId": prod["productoId"],
+    #                 "productoNombre": prod.get("nombre", producto_db.get("nombre_producto", "Producto sin nombre")),
+    #                 "cantidad": cantidad,
+    #                 "variante": variante,  # <-- guardamos la variante plana
+    #                 "precio_original": precio_original,
+    #                 "precio_final": precio_final,
+    #                 "precio_unitario": precio_final,
+    #                 "descuento_aplicado": descuento,
+    #                 "subtotal": subtotal,
+    #                 "imagenes": prod.get("imagenes", producto_db.get("imagenes", []))
+    #             })
+    #             print("Producto añadido al pedido:", productos_finales[-1])
+
+    #         pedido_data = {
+    #             'usuarioId': data['usuarioId'],
+    #             'cliente_nombre': data.get('cliente_nombre'),
+    #             'cliente_email': data.get('cliente_email'),
+    #             'productos': productos_finales,
+    #             'total': total,
+    #             'estado': 'Pendiente',
+    #             'fecha': datetime.now()
+    #         }
+
+    #         result = self.mongo.db.Pedidos.insert_one(pedido_data)
+
+    #         return {
+    #             "mensaje": "Pedido creado exitosamente",
+    #             "pedido_id": str(result.inserted_id),
+    #             "cliente_email": pedido_data.get("cliente_email"),
+    #             "cliente_nombre": pedido_data.get("cliente_nombre"),
+    #             "total": total
+    #         }
+    #     else:
+    #         return {"error": "Datos insuficientes para crear el pedido"}
+
+
     def create_pedido(self, data):
         print("📦 Creando pedido en el modelo con datos del payload:", data)
         if 'usuarioId' in data and 'productos' in data and data['productos']:
             productos_finales = []
             total = 0
+            stock_model = StockModel(self.mongo)
 
             for prod in data['productos']:
                 producto_db = self.mongo.db.Productos.find_one({"_id": ObjectId(prod["productoId"])})
@@ -29,14 +90,23 @@ class PedidosModel:
                 subtotal = precio_final * cantidad
                 total += subtotal
 
-               # Tomamos la variante directamente como viene del frontend
-                variante = prod.get("variante")  # ya viene plana { color: {...}, tamaño: "A4", ... }
+                # ⚡ Tomamos la variante plana del frontend
+                variante = prod.get("variante")  
+
+                # ⚡ Validar stock
+                variante_id = prod.get("variante_id")
+                if variante_id:
+                    stock_doc = stock_model.get_stock_by_variante(variante_id)
+                    if not stock_doc or stock_doc.get("cantidad", 0) < cantidad:
+                        return {"error": f"Stock insuficiente para {producto_db.get('nombre_producto', 'producto')}"}, 400
+                    # ⚡ Descontar stock
+                    stock_model.decrease_stock(variante_id, cantidad)
 
                 productos_finales.append({
                     "productoId": prod["productoId"],
                     "productoNombre": prod.get("nombre", producto_db.get("nombre_producto", "Producto sin nombre")),
                     "cantidad": cantidad,
-                    "variante": variante,  # <-- guardamos la variante plana
+                    "variante": variante,  # guardamos la variante plana
                     "precio_original": precio_original,
                     "precio_final": precio_final,
                     "precio_unitario": precio_final,

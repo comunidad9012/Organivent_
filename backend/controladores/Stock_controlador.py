@@ -25,17 +25,6 @@ def get_stock_by_variante(variante_id):
     return jsonify({"error": "Stock no encontrado"}), 404
 
 
-# @Stock_bp.put("/update/<stock_id>")
-# def update_stock(stock_id):
-#     data = request.json
-#     model = StockModel(current_app)
-#     stock_actualizado = model.update_stock(stock_id, data)
-
-#     if not stock_actualizado:
-#         return jsonify({"error": "Stock no encontrado"}), 404
-
-#     return jsonify(serialize_doc(stock_actualizado)), 200
-
 @Stock_bp.put("/update/<id>")
 def update_stock(id):
     data = request.get_json()

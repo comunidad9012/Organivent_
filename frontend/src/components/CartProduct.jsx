@@ -13,23 +13,42 @@ function CartProduct({ product, selectedVariante }) {
   const user = useSelector((state) => state.user);
 
   // Si el producto tiene variantes, validamos que haya seleccionado una
-  const hasVariants = Array.isArray(product.variantes) && product.variantes.length > 0;
-  const isFormValid = (!hasVariants || selectedVariante);
+  const hasVariants =
+    Array.isArray(product.variantes) && product.variantes.length > 0;
+  const isFormValid = !hasVariants || selectedVariante;
 
   useEffect(() => {
     const isInCart = cart.some(
       (item) =>
         item._id === product._id &&
-        JSON.stringify(item.selectedVariante) === JSON.stringify(selectedVariante)
+        JSON.stringify(item.selectedVariante) ===
+          JSON.stringify(selectedVariante)
     );
     setAdded(isInCart);
   }, [cart, product._id, selectedVariante]);
 
   const addToCart = () => {
+    // 1️⃣ Determinar el stock disponible
+    let stockDisponible = 0;
+
+    if (selectedVariante) {
+      // Caso con variante seleccionada
+      stockDisponible = selectedVariante?.stock?.cantidad ?? 0;
+    } else if (product.variantes?.length > 0) {
+      // Caso producto sin opciones → usar la única variante
+      stockDisponible = product.variantes[0]?.stock?.cantidad ?? 0;
+    }
+
+    // 2️⃣ Guardar el producto con su stock real
     const productWithVariante = {
       ...product,
-      selectedVariante: selectedVariante || null, // null si no se selecciona nada
+      selectedVariante: selectedVariante || null,
+      stockDisponible, // 👈 ahora viaja al cart
     };
+
+    console.log("Adding to cart:", productWithVariante);
+
+    // 3️⃣ Dispatch al cart
     dispatch({ type: "ADD_TO_CART", payload: productWithVariante });
     setAdded(true);
   };

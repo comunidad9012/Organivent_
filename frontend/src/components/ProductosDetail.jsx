@@ -70,6 +70,7 @@ function ProductoDetail() {
           `http://localhost:5000/Productos/viewProductos/${id}`
         );
         const dataProducto = await resProducto.json();
+        console.log("Producto data:", dataProducto);
 
         setProducto(dataProducto);
 
@@ -142,26 +143,6 @@ function ProductoDetail() {
             dangerouslySetInnerHTML={{ __html: Producto.descripcion }}
             className="mt-4 text-base text-gray-600 leading-relaxed max-w-full overflow-hidden break-words"
           />
-          {/* <p className="mt-2 text-muted-foreground">
-              The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.
-          </p> */}
-
-          {/* Colores disponibles */}
-          {/* {Producto.colores && Producto.colores.length > 0 && (
-            <div className="mt-6">
-              <span className="block mb-2 text-muted-foreground">Colores disponibles:</span>
-              <div className="flex gap-3 flex-wrap">
-                {Producto.colores.map((color, index) => (
-                  <div
-                    key={index}
-                    title={color.name}
-                    onClick={() => setSelectedColor(color)}
-                    className={`w-8 h-8 rounded-full border border-black/10  cursor-pointer ${
-                      selectedColor?.hex === color.hex ?  'ring-2 ring-offset-2 ring-zinc-500' : ''
-                    }`}
-                    style={{ backgroundColor: color.hex }}
-                  />
-                ))} */}
 
           {/* Variantes disponibles */}
           {Producto.variantes && Producto.variantes.length > 0 && (

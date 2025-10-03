@@ -21,9 +21,18 @@ function useCrearPedido() {
 
     // Armamos los productos con la variante plana
     const productosParaPedido = cart.map((p) => {
-      const variantePlana = p.selectedVariante
-        ? { ...p.selectedVariante.atributos } // color, tamaño, etc.
-        : null;
+      let variantePlana;
+      let varianteId;
+
+      if (p.selectedVariante) {
+        variantePlana = { ...p.selectedVariante.atributos };
+        varianteId = p.selectedVariante._id; // <-- id de la variante elegida
+      } else {
+        // Si no tiene variantes, usamos "Única"
+        variantePlana = { unica: { name: "Única" } };
+        // asumimos que p.variantes[0]._id es la variante "Única" en tu producto
+        varianteId = p.variantes && p.variantes[0] ? p.variantes[0]._id : null;
+      }
 
       const precioFinal = p.precio_final || p.precio_venta;
       const cantidad = p.quantity || 1;
@@ -32,7 +41,8 @@ function useCrearPedido() {
         productoId: p._id,
         productoNombre: p.nombre_producto,
         cantidad,
-        variante: variantePlana, // <-- nueva estructura
+        variante: variantePlana,
+        variante_id: varianteId, // <-- esto es clave para descontar stock
         precio_original: p.precio_original || p.precio_venta,
         precio_final: precioFinal,
         precio_unitario: precioFinal,

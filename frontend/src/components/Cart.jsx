@@ -155,10 +155,16 @@ export default function Cart() {
                             payload: product,
                           })
                         }
-                        className="bg-zinc-300 px-2 rounded hover:bg-gray-200"
+                        disabled={product.quantity <= 1} // 👈 deshabilita en 1
+                        className={`bg-zinc-300 px-2 rounded hover:bg-gray-200 ${
+                          product.quantity <= 1
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
                       >
                         -
                       </button>
+
                       <span className="mx-3">{product.quantity || 1}</span>
                       <button
                         onClick={() =>
@@ -167,12 +173,18 @@ export default function Cart() {
                             payload: product,
                           })
                         }
-                        className="bg-zinc-300 px-2 rounded hover:bg-gray-200"
+                        disabled={product.quantity >= product.stockDisponible}
+                        className={`bg-zinc-300 px-2 rounded hover:bg-gray-200 ${
+                          product.quantity >= product.stockDisponible
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
                       >
                         +
                       </button>
+
                       <span className="text-sm text-muted-foreground ml-4">
-                        +50 disponibles
+                        {product.stockDisponible} disponibles
                       </span>
                     </div>
 

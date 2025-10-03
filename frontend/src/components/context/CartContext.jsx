@@ -8,9 +8,11 @@ const CartContext = createContext();
 const cartReducer = (state, action) => {
   switch (action.type) {
     case "ADD_TO_CART": {
-      const existing = state.find(item => isSameProduct(item, action.payload));
+      const existing = state.find((item) =>
+        isSameProduct(item, action.payload)
+      );
       if (existing) {
-        return state.map(item =>
+        return state.map((item) =>
           isSameProduct(item, action.payload)
             ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
@@ -20,21 +22,27 @@ const cartReducer = (state, action) => {
     }
 
     case "INCREMENT_QUANTITY":
-      return state.map(item =>
+      return state.map((item) =>
         isSameProduct(item, action.payload)
-          ? { ...item, quantity: item.quantity + 1 }
+          ? {
+              ...item,
+              quantity:
+                item.quantity < item.stockDisponible
+                  ? item.quantity + 1
+                  : item.quantity,
+            }
           : item
       );
 
     case "DECREMENT_QUANTITY":
-      return state.map(item =>
+      return state.map((item) =>
         isSameProduct(item, action.payload)
           ? { ...item, quantity: item.quantity > 1 ? item.quantity - 1 : 1 }
           : item
       );
 
     case "REMOVE_FROM_CART":
-      return state.filter(item => !isSameProduct(item, action.payload));
+      return state.filter((item) => !isSameProduct(item, action.payload));
 
     case "CLEAR_CART":
       return [];
@@ -61,7 +69,10 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     try {
       const stored = JSON.parse(localStorage.getItem(storageKey));
-      dispatch({ type: "REPLACE_CART", payload: Array.isArray(stored) ? stored : [] });
+      dispatch({
+        type: "REPLACE_CART",
+        payload: Array.isArray(stored) ? stored : [],
+      });
     } catch (e) {
       console.error("No se pudo cargar el carrito del usuario", e);
       dispatch({ type: "REPLACE_CART", payload: [] });
