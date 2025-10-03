@@ -34,8 +34,6 @@ def update_stock(stock_id):
     if not stock_actualizado:
         return jsonify({"error": "Stock no encontrado"}), 404
 
-    if "_id" in stock_actualizado and isinstance(stock_actualizado["_id"], ObjectId):
-        stock_actualizado["_id"] = str(stock_actualizado["_id"])
+    return jsonify(serialize_doc(stock_actualizado)), 200
 
-    return jsonify(stock_actualizado), 200
 

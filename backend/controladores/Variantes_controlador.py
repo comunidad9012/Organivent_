@@ -36,10 +36,21 @@ def update_variante(variante_id):
     if not variante_actualizada:
         return jsonify({"error": "Variante no encontrada"}), 404
 
-    if "_id" in variante_actualizada and isinstance(variante_actualizada["_id"], ObjectId):
-        variante_actualizada["_id"] = str(variante_actualizada["_id"])
+    # Convertir ObjectId a str para el JSON de respuesta, sin tocar la DB
+    variante_actualizada_serializable = variante_actualizada.copy()
+    for field in ["_id", "producto_id"]:
+        if field in variante_actualizada_serializable and isinstance(variante_actualizada_serializable[field], ObjectId):
+            variante_actualizada_serializable[field] = str(variante_actualizada_serializable[field])
 
-    return jsonify(variante_actualizada), 200
+    # Limpiar cualquier _id dentro de atributos
+    atributos = variante_actualizada_serializable.get("atributos", {})
+    for key, val in atributos.items():
+        if isinstance(val, dict) and "_id" in val:
+            del val["_id"]
+    variante_actualizada_serializable["atributos"] = atributos
+
+    return jsonify(variante_actualizada_serializable), 200
+
 
 @Variantes_bp.delete("/delete/<id>")
 def delete_variante(id):

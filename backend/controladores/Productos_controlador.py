@@ -70,7 +70,16 @@ def specific_product_endpoint(id):
     # Para cada variante, agregar stock
     for v in variantes:
         stock_doc = Stock_model.get_stock_by_variante(v["_id"])
-        v["stock"] = stock_doc["cantidad"] if stock_doc else 0
+        if stock_doc:
+            v["stock"] = {
+                "_id": stock_doc["_id"],  # 👈 acá sigue siendo ObjectId
+                "cantidad": stock_doc["cantidad"]
+            }
+        else:
+            v["stock"] = {
+                "_id": None,
+                "cantidad": 0
+            }
 
     producto["variantes"] = variantes
 

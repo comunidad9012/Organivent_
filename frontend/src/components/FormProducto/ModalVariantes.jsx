@@ -12,40 +12,10 @@ function ModalVariantes({ producto, setProducto, onClose }) {
 
   const stop = (e) => e.stopPropagation();
 
-  // const handleVarianteChange = (index, field, value) => {
-  //   const nuevas = [...(producto.variantes || [])];
-  //   nuevas[index].atributos[field] = { name: value }; // 👈 compatibilidad con formato opciones
-  //   setProducto((prev) => ({ ...prev, variantes: nuevas }));
-  // };
-
-  const handleVarianteChange = (index, field, value) => {
+  // Actualizar stock de la variante
+  const handleCantidadChange = (index, value) => {
     const nuevas = [...(producto.variantes || [])];
-
-    // preservamos stock si ya existe
-    const cantidadExistente = nuevas[index].cantidad || 0;
-
-    nuevas[index].atributos = {
-      ...nuevas[index].atributos,
-      [field]: { name: value },
-    };
-
-    nuevas[index].cantidad = cantidadExistente;
-
-    setProducto((prev) => ({ ...prev, variantes: nuevas }));
-  };
-
-  const addVariante = () => {
-    setProducto((prev) => ({
-      ...prev,
-      variantes: [
-        ...(prev.variantes || []),
-        { atributos: {}, cantidad: 0 }, // 👈 genérico
-      ],
-    }));
-  };
-
-  const removeVariante = (index) => {
-    const nuevas = (producto.variantes || []).filter((_, i) => i !== index);
+    nuevas[index].cantidad = parseInt(value, 10) || 0;
     setProducto((prev) => ({ ...prev, variantes: nuevas }));
   };
 
@@ -66,7 +36,7 @@ function ModalVariantes({ producto, setProducto, onClose }) {
         onClick={stop}
       >
         <div className="p-4 border-b bg-white bg-opacity-90 flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Gestionar variantes</h3>
+          <h3 className="text-lg font-semibold">Gestionar stock de variantes</h3>
           <button
             type="button"
             aria-label="Cerrar"
@@ -82,29 +52,37 @@ function ModalVariantes({ producto, setProducto, onClose }) {
             <table className="w-full border mt-4">
               <thead>
                 <tr className="bg-gray-100">
-                  {/* Mostrar el título de opción dinámicamente */}
-                  <th className="px-4 py-2">{producto.opciones[0]?.nombre}</th>
+                  {producto.opciones?.map((opcion, i) => (
+                    <th key={i} className="px-4 py-2">
+                      {opcion.nombre}
+                    </th>
+                  ))}
                   <th className="px-4 py-2">Stock</th>
                 </tr>
               </thead>
               <tbody>
                 {producto.variantes.map((variante, idx) => {
-                  const key = Object.keys(variante.atributos)[0]; // ej: "tamaño"
-                  const value = variante.atributos[key].name; // ej: "S"
-
+                  const atributosKeys = Object.keys(variante.atributos || {});
                   return (
                     <tr key={idx} className="border-t">
-                      <td className="px-4 py-2">{value}</td>
+                      {producto.opciones?.map((opcion, i) => {
+                        const key = atributosKeys[i] || opcion.nombre;
+                        const value = variante.atributos[key]?.name || "";
+                        return (
+                          <td key={i} className="px-4 py-2">
+                            {value}
+                          </td>
+                        );
+                      })}
+
                       <td className="px-4 py-2">
                         <input
                           type="number"
                           value={variante.cantidad || 0}
                           min={0}
-                          onChange={(e) => {
-                            const nuevas = [...producto.variantes];
-                            nuevas[idx].cantidad = parseInt(e.target.value, 10);
-                            setProducto({ ...producto, variantes: nuevas });
-                          }}
+                          onChange={(e) =>
+                            handleCantidadChange(idx, e.target.value)
+                          }
                           className="border rounded px-2 py-1 w-24"
                         />
                       </td>
@@ -115,32 +93,21 @@ function ModalVariantes({ producto, setProducto, onClose }) {
             </table>
           )}
 
-          <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-200">
+          <div className="mt-6 flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
-              onClick={addVariante}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 bg-opacity-90 text-white rounded-lg hover:from-green-600 hover:to-green-700 hover:bg-opacity-100 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+              onClick={handleGuardarYCerrar}
+              className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 bg-opacity-90 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 hover:bg-opacity-100 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
             >
-              <span className="text-lg">+</span>
-              Añadir variante
+              Guardar y cerrar
             </button>
-
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={handleGuardarYCerrar}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 bg-opacity-90 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 hover:bg-opacity-100 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Guardar y cerrar
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-2 bg-gray-300 bg-opacity-90 text-gray-700 rounded-lg hover:bg-gray-400 hover:bg-opacity-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Cancelar
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-2 bg-gray-300 bg-opacity-90 text-gray-700 rounded-lg hover:bg-gray-400 hover:bg-opacity-100 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              Cancelar
+            </button>
           </div>
         </div>
       </div>
