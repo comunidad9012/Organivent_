@@ -54,15 +54,15 @@ def specific_product_endpoint(id):
     Stock_model = StockModel(current_app)
     Descuento_model = Descuento(current_app)
 
-    producto = Productos_model.specific_product(id)
-    if not producto:
-        return jsonify({"error": "Producto no encontrado"}), 404
-
-    # Validar ObjectId
+    # Validar ObjectId al inicio
     try:
         producto_oid = ObjectId(id)
     except:
         return jsonify({"error": "ID inválido"}), 400
+
+    producto = Productos_model.specific_product(id)
+    if not producto:
+        return jsonify({"error": "Producto no encontrado"}), 404
 
     # Buscar variantes del producto
     variantes = list(Variantes_model.mongo.db.Variantes.find({"producto_id": producto_oid}))
@@ -74,13 +74,33 @@ def specific_product_endpoint(id):
 
     producto["variantes"] = variantes
 
+    # 👉 Reconstrucción de opciones
+    if variantes and "atributos" in variantes[0] and variantes[0]["atributos"]:
+        primer_atributo = list(variantes[0]["atributos"].keys())[0]
+
+        valores = []
+        for v in variantes:
+            if primer_atributo in v["atributos"]:
+                attr = v["atributos"][primer_atributo]
+                valores.append(attr)
+
+        if valores:  # solo si realmente hay valores
+            producto["opciones"] = [{
+                "nombre": primer_atributo.capitalize(),
+                "tipo": "color" if "hex" in valores[0] else "lista",
+                "valores": valores
+            }]
+        else:
+            producto["opciones"] = []
+    else:
+        producto["opciones"] = []
+
     # Aplicar descuentos
     descuentos = Descuento_model.obtener_descuentos_activos()
     producto_con_descuento = aplicar_descuentos_a_productos([producto], descuentos)[0]
 
-    # Serializar todo antes de devolverlo
-    #esto lo tenemos distinto, cualquier cosa usar en su lugar esto:  return jsonify(producto_con_descuento)
     return jsonify(serialize_doc(producto_con_descuento)), 200
+
 
 
 @Productos_bp.post("/find_product")

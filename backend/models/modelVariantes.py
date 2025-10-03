@@ -28,3 +28,8 @@ class VariantesModel:
         if result.matched_count:
             return self.mongo.db.Variantes.find_one({"_id": ObjectId(variante_id)})
         return None
+
+    def delete_variante(self, id):
+        res = self.mongo.db.Variantes.delete_one({"_id": ObjectId(id)})
+        return res.deleted_count > 0
+

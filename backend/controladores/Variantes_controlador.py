@@ -40,3 +40,11 @@ def update_variante(variante_id):
         variante_actualizada["_id"] = str(variante_actualizada["_id"])
 
     return jsonify(variante_actualizada), 200
+
+@Variantes_bp.delete("/delete/<id>")
+def delete_variante(id):
+    model = VariantesModel(current_app)
+    success = model.delete_variante(id)
+    if success:
+        return jsonify({"message": "Variante eliminada"}), 200
+    return jsonify({"error": "Variante no encontrada"}), 404

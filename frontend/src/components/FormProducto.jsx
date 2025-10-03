@@ -29,7 +29,7 @@ function FormProductoModern() {
     precio_venta: "",
     imagenes: [],
     // colores: [],
-    categoria_id: "",
+    categoria_id: "", //ver si sacar este
   });
   const [categorias, setCategorias] = useState([]);
   const [nuevaCategoria, setNuevaCategoria] = useState({
@@ -74,6 +74,10 @@ function FormProductoModern() {
             ...data,
             es_stock: variantesTransformadas.length > 0,
             variantes: variantesTransformadas,
+            // Guardamos una copia de las variantes originales para compararlas al guardar
+            variantes_existentes_backend: variantesTransformadas.map((v) => ({
+              ...v,
+            })),
           });
         })
         .catch((error) => console.error("Error al cargar el producto:", error));
@@ -141,28 +145,20 @@ function FormProductoModern() {
     setLoading(true);
 
     try {
-      // 1️⃣ Subir imágenes nuevas
+      // 1️⃣ Subir imágenes
       const nuevas = await subirImagenes();
-      const nuevasImgs = nuevas.map((img) => ({
-        _id: img._id,
-        url: img.url,
-      }));
+      const nuevasImgs = nuevas.map((img) => ({ _id: img._id, url: img.url }));
 
-      // 2️⃣ Construir objeto final del producto
-      const { variantes, es_stock, ...productoSinVariantes } = producto; // como es que guarda el stock en un producto sin variables si quedamos en que lo iba a guardar en una variante "unica" para linkearle el stock?
-
-      console.log("variantes desestructuradas:", variantes);
-
+      // 2️⃣ Guardar producto principal
+      const { variantes, es_stock, ...productoSinVariantes } = producto;
       const finalProducto = {
         ...productoSinVariantes,
         imagenes: [...(producto.imagenes || []), ...nuevasImgs],
       };
 
-      // 3️⃣ Guardar producto (create o update)
       const url = id
         ? `http://localhost:5000/Productos/update/${id}`
         : "http://localhost:5000/Productos/createProductos";
-
       const method = id ? "PUT" : "POST";
 
       const productoRes = await fetch(url, {
@@ -170,84 +166,79 @@ function FormProductoModern() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalProducto),
       });
-
       if (!productoRes.ok) throw new Error("Error al guardar producto");
-      //borrar
       const productoCreado = await productoRes.json();
+      const productoId = id ? id : productoCreado._id;
 
-      console.log("\nProducto ID A VERRR SI SALE:", productoCreado._id);
+      // 3️⃣ Variantes
+      const variantesBackend = producto.variantes_existentes_backend || [];
+      const variantesForm = producto.variantes || [];
 
-      const productoId = productoCreado._id;
-      console.log("productos.variantes:", producto.variantes);
+      // 3a️⃣ Eliminar variantes borradas
+      const idsForm = variantesForm.map((v) => v._id).filter(Boolean);
+      const aEliminar = variantesBackend.filter(
+        (v) => !idsForm.includes(v._id)
+      );
+      for (const v of aEliminar) {
+        await fetch(`http://localhost:5000/Variantes/delete/${v._id}`, {
+          method: "DELETE",
+        });
+      }
 
-      if (producto.variantes?.length > 0) {
-        for (const variante of producto.variantes) {
-          // Si la variante ya tiene _id → update, sino → create
-          if (variante._id) {
-            // Actualizar variante
-            await fetch(
-              `http://localhost:5000/Variantes/update/${variante._id}`,
-              {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ atributos: variante.atributos }),
-              }
-            );
+      // 3b️⃣ Crear o actualizar variantes y stock
+      for (const v of variantesForm) {
+        if (v._id) {
+          // actualizar variante
+          await fetch(`http://localhost:5000/Variantes/update/${v._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ atributos: v.atributos }),
+          });
 
-            // Actualizar stock si existe
-            if (variante.stock_id) {
-              await fetch(
-                `http://localhost:5000/Stock/update/${variante.stock_id}`,
-                {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ cantidad: variante.cantidad }),
-                }
-              );
-            } else {
-              // Crear stock si no existe
-              const stockRes = await fetch(
-                "http://localhost:5000/Stock/create",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    variante_id: variante._id,
-                    cantidad: variante.cantidad,
-                  }),
-                }
-              );
-              const stockData = await stockRes.json();
-              variante.stock_id = stockData._id;
-            }
+          // actualizar stock
+          if (v.stock_id) {
+            await fetch(`http://localhost:5000/Stock/update/${v.stock_id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cantidad: v.cantidad }),
+            });
           } else {
-            // Crear variante nueva
-            const varianteRes = await fetch(
-              "http://localhost:5000/Variantes/create",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  producto_id: productoId,
-                  atributos: variante.atributos,
-                }),
-              }
-            );
-            const varianteData = await varianteRes.json();
-            variante._id = varianteData._id;
-
-            // Crear stock
+            // crear stock nuevo si no existía
             const stockRes = await fetch("http://localhost:5000/Stock/create", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                variante_id: variante._id,
-                cantidad: variante.cantidad,
+                variante_id: v._id,
+                cantidad: v.cantidad,
               }),
             });
             const stockData = await stockRes.json();
-            variante.stock_id = stockData._id;
+            v.stock_id = stockData._id;
           }
+        } else {
+          // crear variante nueva
+          const varianteRes = await fetch(
+            "http://localhost:5000/Variantes/create",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                producto_id: productoId,
+                atributos: v.atributos,
+              }),
+            }
+          );
+          const varianteData = await varianteRes.json();
+          v._id = varianteData._id;
+
+          // crear stock
+          const stockRes = await fetch("http://localhost:5000/Stock/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ variante_id: v._id, cantidad: v.cantidad }),
+          });
+          const stockData = await stockRes.json();
+          v.stock_id = stockData._id;
         }
       }
 
